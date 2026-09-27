@@ -1,0 +1,12 @@
+# ML / Computer Vision dependencies
+# Install separately: pip install -r requirements-ml.txt
+# Requires ~2GB disk space (PyTorch + CUDA support)
+
+-r requirements.txt
+
+# AI / Computer Vision
+ultralytics>=8.3.0
+torch>=2.3.0
+torchvision>=0.18.0
+opencv-python-headless>=4.10.0
+onnxruntime>=1.18.0

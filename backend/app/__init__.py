@@ -1,0 +1,1 @@
+"""Seagrass Backend — FastAPI Application."""
