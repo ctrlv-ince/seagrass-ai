@@ -31,8 +31,8 @@ An integrated system for seagrass meadow monitoring, species detection, and wave
 │                         │                               │
 │              ┌──────────┴──────────┐                    │
 │              ▼                     ▼                    │
-│     PostgreSQL/PostGIS       S3/MinIO                   │
-│     (surveys, spatial)       (images, models)           │
+│     Supabase PostgreSQL      Supabase Storage           │
+│     + PostGIS (spatial)      (images, models)           │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -40,7 +40,7 @@ An integrated system for seagrass meadow monitoring, species detection, and wave
 
 ```
 seagrass/
-├── backend/     Python · FastAPI · YOLOv11 · SQLAlchemy + PostGIS
+├── backend/     Python · FastAPI · YOLOv11 · SQLAlchemy + Supabase PostGIS
 ├── web/         React · Vite · TypeScript · Leaflet · TanStack Query
 └── mobile/      React Native · Expo · TypeScript · Offline-first
 ```
@@ -51,7 +51,7 @@ seagrass/
 
 - Python 3.11+
 - Node.js 20+
-- PostgreSQL 16+ with PostGIS extension
+- [Supabase](https://supabase.com) account (free tier works) — PostgreSQL + PostGIS included
 - (Optional) CUDA-compatible GPU for ML inference
 
 ### Backend
@@ -70,7 +70,8 @@ pip install -r requirements.txt
 pip install -r requirements-ml.txt
 
 cp .env.example .env
-# Edit .env with your database and storage credentials
+# Edit .env with your Supabase database URL and storage credentials
+# Find connection string: Dashboard → Settings → Database → Connection string → URI
 
 uvicorn app.main:app --reload
 ```
@@ -108,10 +109,10 @@ Scan the QR code with Expo Go, or press `a` for Android / `i` for iOS simulator.
 | Layer | Technology | Purpose |
 |-------|-----------|---------|
 | **Backend** | FastAPI, SQLAlchemy, asyncpg | Async REST API |
-| **Database** | PostgreSQL + PostGIS | Spatial data, surveys |
+| **Database** | Supabase (PostgreSQL + PostGIS) | Spatial data, surveys |
 | **AI/CV** | YOLOv11, ONNX Runtime | Seagrass species detection |
 | **Science** | NumPy, SciPy, scikit-learn | Wave attenuation modeling |
-| **Storage** | S3 / MinIO | Survey images, ML models |
+| **Storage** | Supabase Storage (S3-compatible) | Survey images, ML models |
 | **Web** | React, Vite, TypeScript | Dashboard & GIS viewer |
 | **Mobile** | Expo, React Native | Field data collection |
 | **Maps** | Leaflet, MapLibre GL, react-native-maps | Geospatial visualization |

@@ -10,16 +10,29 @@ from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
 
-    # ── Database ──────────────────────────────────────────────
+    # ── Database (Supabase PostgreSQL + PostGIS) ────────────────
     database_url: str = Field(
         default="postgresql+asyncpg://postgres:password@localhost:5432/seagrass",
-        description="Async PostgreSQL connection string",
+        description=(
+            "Async PostgreSQL connection string. "
+            "For Supabase use the transaction-mode pooler on port 6543."
+        ),
     )
 
-    # ── S3 / MinIO Storage ────────────────────────────────────
-    s3_endpoint_url: str = Field(default="http://localhost:9000")
-    s3_access_key: str = Field(default="minioadmin")
-    s3_secret_key: str = Field(default="minioadmin")
+    # ── Supabase Platform ─────────────────────────────────────
+    supabase_url: str = Field(
+        default="",
+        description="Supabase project URL (e.g. https://xxxx.supabase.co)",
+    )
+    supabase_service_key: str = Field(
+        default="",
+        description="Supabase service-role key for server-side access",
+    )
+
+    # ── Object Storage (S3-compatible) ─────────────────────────
+    s3_endpoint_url: str = Field(default="")
+    s3_access_key: str = Field(default="")
+    s3_secret_key: str = Field(default="")
     s3_bucket_name: str = Field(default="seagrass-images")
 
     # ── YOLOv11 Model ─────────────────────────────────────────

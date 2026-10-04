@@ -1,6 +1,15 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { AuthProvider } from "./context/AuthContext";
+import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { Layout } from "./components/layout/Layout";
+
+// Public Pages
+import { Landing } from "./pages/Landing";
+import { Login } from "./pages/Login";
+import { Register } from "./pages/Register";
+
+// Protected Platform Pages
 import { Dashboard } from "./pages/Dashboard";
 import { Surveys } from "./pages/Surveys";
 import { Detection } from "./pages/Detection";
@@ -19,17 +28,71 @@ const queryClient = new QueryClient({
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <Layout>
+      <AuthProvider>
+        <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/surveys" element={<Surveys />} />
-            <Route path="/detection" element={<Detection />} />
-            <Route path="/wave-model" element={<WaveModel />} />
-            <Route path="/map" element={<MapView />} />
+            {/* Public Marketing & Auth Routes */}
+            <Route path="/" element={<Landing />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+
+            {/* Protected Marine Telemetry Routes (With Sidebar Layout) */}
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <Dashboard />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/surveys"
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <Surveys />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/detection"
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <Detection />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/wave-model"
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <WaveModel />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/map"
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <MapView />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Catch-all redirect to landing page */}
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
-        </Layout>
-      </BrowserRouter>
+        </BrowserRouter>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }
