@@ -6,7 +6,7 @@ import uuid
 from datetime import datetime
 
 from geoalchemy2 import Geometry
-from sqlalchemy import DateTime, Float, ForeignKey, String, Text, func
+from sqlalchemy import DateTime, Float, ForeignKey, Index, String, Text, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -34,6 +34,10 @@ class Transect(Base):
     """A survey transect line across a seagrass meadow."""
 
     __tablename__ = "transects"
+    __table_args__ = (
+        Index("ix_transects_survey_created", "survey_id", "created_at"),
+        Index("ix_transects_geometry", "geometry", postgresql_using="gist"),
+    )
 
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
@@ -56,6 +60,11 @@ class Quadrat(Base):
     """A quadrat sampling point along a transect."""
 
     __tablename__ = "quadrats"
+    __table_args__ = (
+        Index("ix_quadrats_transect_position", "transect_id", "position_along_transect"),
+        Index("ix_quadrats_species", "species_id"),
+        Index("ix_quadrats_location", "location", postgresql_using="gist"),
+    )
 
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), primary_key=True, default=uuid.uuid4

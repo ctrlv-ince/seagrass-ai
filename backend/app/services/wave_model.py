@@ -7,6 +7,7 @@ dissipation through seagrass meadow canopies.
 
 from __future__ import annotations
 
+import functools
 import math
 from typing import Any
 
@@ -16,11 +17,13 @@ DEFAULT_DRAG_COEFFICIENT = 0.70  # Bulk drag coefficient for flexible seagrass
 DEFAULT_MEADOW_TRANSECT_LENGTH_M = 50.0  # Standard evaluation distance in meters
 
 
+@functools.lru_cache(maxsize=512)
 def solve_wavenumber(angular_freq: float, water_depth: float, max_iter: int = 15) -> float:
     """Solve the linear wave dispersion relation for wavenumber k:
     omega^2 = g * k * tanh(k * h).
 
     Uses Newton-Raphson iteration with shallow/deep water seed bounds.
+    Results are cached because this is a pure function of its inputs.
     """
     omega = angular_freq
     h = max(water_depth, 0.05)
@@ -56,6 +59,14 @@ class WaveAttenuationModel:
 
     def __init__(self, model_version: str = "v2.1-hydro-physics") -> None:
         self.model_version = model_version
+        # Lazy import to avoid circular dependency at module level
+        self._cache: Any = None
+
+    def _get_cache(self) -> Any:
+        if self._cache is None:
+            from app.services.cache import response_cache
+            self._cache = response_cache
+        return self._cache
 
     async def predict(
         self,
@@ -85,6 +96,17 @@ class WaveAttenuationModel:
                 - confidence_upper: Upper bound of attenuation percentage
                 - raw_output: Diagnostics dictionary with distance decay profile
         """
+        # Build cache key from rounded inputs for slider-stability
+        cache_key = (
+            f"wave:{round(seagrass_density, 1)}:{round(blade_length_cm, 1)}"
+            f":{round(water_depth_m, 2)}:{round(wave_height_m, 2)}"
+            f":{round(wave_period_s, 1)}:{round(meadow_length_m, 1)}"
+        )
+        cache = self._get_cache()
+        cached = cache.get(cache_key)
+        if cached is not None:
+            return cached
+
         # Physical parameter sanitization
         N = max(seagrass_density, 1.0)
         h_v = max(blade_length_cm / 100.0, 0.01)  # Canopy height in meters
@@ -160,7 +182,7 @@ class WaveAttenuationModel:
                 "energy_dissipated_percent": round(energy_loss, 2),
             })
 
-        return {
+        result = {
             "attenuation_percent": round(nom_attenuation, 2),
             "wave_height_reduction_percent": round(nom_height_red, 2),
             "inshore_wave_height_m": round(inshore_H, 3),
@@ -176,3 +198,7 @@ class WaveAttenuationModel:
                 "transect_profile": decay_profile,
             },
         }
+
+        # Cache the result for subsequent identical parameter requests
+        cache.set(cache_key, result, ttl=600)
+        return result

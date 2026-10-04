@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import {
   AreaChart,
   Area,
@@ -19,6 +19,7 @@ import {
   Sliders,
 } from "lucide-react";
 import { usePredictWaveAttenuation } from "../api/predictions";
+import { useDebounce } from "../hooks/useDebounce";
 
 interface Preset {
   name: string;
@@ -77,25 +78,51 @@ export function WaveModel() {
   const [meadowWidth, setMeadowWidth] = useState(50);
   const [activePreset, setActivePreset] = useState<string | null>(null);
 
+  // Debounce slider values (300ms) to prevent flooding API during slider drag
+  const debouncedDensity = useDebounce(density, 300);
+  const debouncedBladeLength = useDebounce(bladeLength, 300);
+  const debouncedWaterDepth = useDebounce(waterDepth, 300);
+  const debouncedWaveHeight = useDebounce(waveHeight, 300);
+  const debouncedWavePeriod = useDebounce(wavePeriod, 300);
+  const debouncedMeadowWidth = useDebounce(meadowWidth, 300);
+
   const predictMutation = usePredictWaveAttenuation();
 
-  const runPrediction = () => {
-    predictMutation.mutate({
-      seagrass_density: density,
-      blade_length_cm: bladeLength,
-      water_depth_m: waterDepth,
-      wave_height_m: waveHeight,
-      wave_period_s: wavePeriod,
-      meadow_length_m: meadowWidth,
-    });
-  };
+  const runPrediction = useCallback(
+    (d: number, bl: number, wd: number, wh: number, wp: number, mw: number) => {
+      predictMutation.mutate({
+        seagrass_density: d,
+        blade_length_cm: bl,
+        water_depth_m: wd,
+        wave_height_m: wh,
+        wave_period_s: wp,
+        meadow_length_m: mw,
+      });
+    },
+    [predictMutation]
+  );
 
-  // Run on initial load or parameter change
+  // Run on initial load and whenever debounced parameters settle
   useEffect(() => {
-    runPrediction();
-  }, [density, bladeLength, waterDepth, waveHeight, wavePeriod, meadowWidth]);
+    runPrediction(
+      debouncedDensity,
+      debouncedBladeLength,
+      debouncedWaterDepth,
+      debouncedWaveHeight,
+      debouncedWavePeriod,
+      debouncedMeadowWidth
+    );
+  }, [
+    debouncedDensity,
+    debouncedBladeLength,
+    debouncedWaterDepth,
+    debouncedWaveHeight,
+    debouncedWavePeriod,
+    debouncedMeadowWidth,
+    runPrediction,
+  ]);
 
-  const applyPreset = (preset: Preset) => {
+  const applyPreset = useCallback((preset: Preset) => {
     setActivePreset(preset.name);
     setDensity(preset.density);
     setBladeLength(preset.bladeLength);
@@ -103,20 +130,36 @@ export function WaveModel() {
     setWaveHeight(preset.waveHeight);
     setWavePeriod(preset.wavePeriod);
     setMeadowWidth(preset.meadowWidth);
-  };
+  }, []);
 
   const result = predictMutation.data;
-  const decayData = result?.raw_output?.distance_decay_profile || [
-    { distance_m: 0, wave_height_m: waveHeight, energy_decay_pct: 0 },
-    { distance_m: meadowWidth * 0.25, wave_height_m: waveHeight * 0.88, energy_decay_pct: 22.5 },
-    { distance_m: meadowWidth * 0.5, wave_height_m: waveHeight * 0.77, energy_decay_pct: 40.7 },
-    { distance_m: meadowWidth * 0.75, wave_height_m: waveHeight * 0.68, energy_decay_pct: 53.5 },
-    { distance_m: meadowWidth, wave_height_m: waveHeight * 0.61, energy_decay_pct: 62.8 },
-  ];
 
-  const inshoreHeight = result?.inshore_wave_height_m ?? Number((waveHeight * 0.62).toFixed(2));
-  const energyDamping = result?.attenuation_percent ?? 62.8;
-  const heightReduction = result?.wave_height_reduction_percent ?? Number(((1 - inshoreHeight / waveHeight) * 100).toFixed(1));
+  const decayData = useMemo(() => {
+    return (
+      result?.raw_output?.distance_decay_profile || [
+        { distance_m: 0, wave_height_m: waveHeight, energy_decay_pct: 0 },
+        { distance_m: meadowWidth * 0.25, wave_height_m: waveHeight * 0.88, energy_decay_pct: 22.5 },
+        { distance_m: meadowWidth * 0.5, wave_height_m: waveHeight * 0.77, energy_decay_pct: 40.7 },
+        { distance_m: meadowWidth * 0.75, wave_height_m: waveHeight * 0.68, energy_decay_pct: 53.5 },
+        { distance_m: meadowWidth, wave_height_m: waveHeight * 0.61, energy_decay_pct: 62.8 },
+      ]
+    );
+  }, [result?.raw_output?.distance_decay_profile, waveHeight, meadowWidth]);
+
+  const inshoreHeight = useMemo(() => {
+    return result?.inshore_wave_height_m ?? Number((waveHeight * 0.62).toFixed(2));
+  }, [result?.inshore_wave_height_m, waveHeight]);
+
+  const energyDamping = useMemo(() => {
+    return result?.attenuation_percent ?? 62.8;
+  }, [result?.attenuation_percent]);
+
+  const heightReduction = useMemo(() => {
+    return (
+      result?.wave_height_reduction_percent ??
+      Number(((1 - inshoreHeight / waveHeight) * 100).toFixed(1))
+    );
+  }, [result?.wave_height_reduction_percent, inshoreHeight, waveHeight]);
 
   return (
     <div className="space-y-6">
@@ -137,7 +180,9 @@ export function WaveModel() {
 
         <div className="flex items-center gap-2">
           <button
-            onClick={() => runPrediction()}
+            onClick={() =>
+              runPrediction(density, bladeLength, waterDepth, waveHeight, wavePeriod, meadowWidth)
+            }
             disabled={predictMutation.isPending}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-medium text-sm transition-colors shadow-sm disabled:opacity-50"
           >

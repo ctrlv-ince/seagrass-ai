@@ -5,7 +5,7 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 
-from sqlalchemy import DateTime, Float, ForeignKey, String, func
+from sqlalchemy import DateTime, Float, ForeignKey, Index, String, func
 from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -16,6 +16,10 @@ class WaveAttenuationPrediction(Base):
     """A wave attenuation prediction result."""
 
     __tablename__ = "wave_attenuation_predictions"
+    __table_args__ = (
+        Index("ix_predictions_survey_created", "survey_id", "created_at"),
+        Index("ix_predictions_created", "created_at"),
+    )
 
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), primary_key=True, default=uuid.uuid4

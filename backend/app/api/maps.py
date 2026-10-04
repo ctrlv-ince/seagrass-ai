@@ -19,6 +19,7 @@ from sqlalchemy.orm import selectinload
 from app.database import get_db
 from app.models.seagrass import Quadrat, Species, Transect
 from app.models.survey import Survey
+from app.services.cache import response_cache
 
 router = APIRouter()
 
@@ -28,6 +29,10 @@ async def surveys_geojson(
     db: AsyncSession = Depends(get_db),
 ) -> dict[str, Any]:
     """Return all surveys with center locations as a GeoJSON FeatureCollection."""
+    cache_key = "map:surveys:geojson"
+    cached = response_cache.get(cache_key)
+    if cached is not None:
+        return cached
     query = (
         select(
             Survey.id,
@@ -66,10 +71,12 @@ async def surveys_geojson(
             },
         })
 
-    return {
+    result_data = {
         "type": "FeatureCollection",
         "features": features,
     }
+    response_cache.set(cache_key, result_data, ttl=300)
+    return result_data
 
 
 @router.get("/transects/geojson")
@@ -78,6 +85,11 @@ async def transects_geojson(
     db: AsyncSession = Depends(get_db),
 ) -> dict[str, Any]:
     """Return transects as a GeoJSON FeatureCollection with LineString geometries."""
+    cache_key = f"map:transects:geojson:{survey_id or 'all'}"
+    cached = response_cache.get(cache_key)
+    if cached is not None:
+        return cached
+
     query = select(
         Transect.id,
         Transect.survey_id,
@@ -109,10 +121,12 @@ async def transects_geojson(
             },
         })
 
-    return {
+    result_data = {
         "type": "FeatureCollection",
         "features": features,
     }
+    response_cache.set(cache_key, result_data, ttl=300)
+    return result_data
 
 
 @router.get("/quadrats/geojson")
@@ -122,6 +136,11 @@ async def quadrats_geojson(
     db: AsyncSession = Depends(get_db),
 ) -> dict[str, Any]:
     """Return quadrats as a GeoJSON FeatureCollection with Point geometries."""
+    cache_key = f"map:quadrats:geojson:{survey_id or 'none'}:{transect_id or 'none'}"
+    cached = response_cache.get(cache_key)
+    if cached is not None:
+        return cached
+
     query = (
         select(
             Quadrat.id,
@@ -162,7 +181,9 @@ async def quadrats_geojson(
             },
         })
 
-    return {
+    result_data = {
         "type": "FeatureCollection",
         "features": features,
     }
+    response_cache.set(cache_key, result_data, ttl=300)
+    return result_data

@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useAnalyzeImage, type DetectionResult } from "../api/detections";
 import { useSurveys } from "../api/surveys";
+import { Skeleton } from "../components/common/Skeleton";
 
 // Demo sample generators for testing when user has not yet uploaded custom photos
 const DEMO_SAMPLES = [
@@ -216,6 +217,7 @@ export function Detection() {
                 <img
                   src={previewUrl}
                   alt="Quadrat scan preview"
+                  loading="lazy"
                   className="w-full h-full object-contain"
                 />
 
@@ -388,6 +390,27 @@ export function Detection() {
                 </div>
               </div>
             </>
+          ) : analyzeMutation.isPending ? (
+            /* Loading Skeleton State */
+            <div className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-xs space-y-5 animate-pulse">
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-40" />
+                <Skeleton className="h-7 w-64" />
+                <Skeleton className="h-3 w-48" />
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                <Skeleton className="h-20 rounded-xl" />
+                <Skeleton className="h-20 rounded-xl" />
+                <Skeleton className="h-20 rounded-xl" />
+              </div>
+              <div className="grid grid-cols-2 gap-3 pt-2">
+                <Skeleton className="h-24 rounded-xl" />
+                <Skeleton className="h-24 rounded-xl" />
+              </div>
+              <div className="text-center text-xs text-teal-700 font-medium py-2">
+                Running YOLO species segmentation &amp; hydrodynamic modeling...
+              </div>
+            </div>
           ) : (
             /* Empty State */
             <div className="bg-white rounded-2xl border border-slate-200/80 p-12 text-center shadow-xs">

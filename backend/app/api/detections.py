@@ -97,14 +97,20 @@ async def analyze_image(
     return analysis_result
 
 
+from app.services.cache import response_cache
+
 @router.get("/species")
 async def list_species(
     db: AsyncSession = Depends(get_db),
 ) -> list[dict[str, Any]]:
     """List known seagrass species reference catalogue."""
+    cached = response_cache.get("species:all")
+    if cached is not None:
+        return cached
+
     result = await db.execute(select(Species).order_by(Species.scientific_name))
     species_list = result.scalars().all()
-    return [
+    data = [
         {
             "id": str(s.id),
             "scientific_name": s.scientific_name,
@@ -113,3 +119,5 @@ async def list_species(
         }
         for s in species_list
     ]
+    response_cache.set("species:all", data, ttl=3600)
+    return data

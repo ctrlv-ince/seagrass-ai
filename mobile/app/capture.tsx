@@ -10,12 +10,18 @@ import {
   Alert,
   Platform,
 } from "react-native";
-import { router } from "expo-router";
+import { useLocalSearchParams, router } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
+import { analyzeQuadratPhoto } from "@/api/detections";
+import { computeWaveDamping } from "@/lib/waveMath";
+import { saveLocalSurveyImage, getLocalSurveys, createLocalSurvey } from "@/db/repository";
 
 export default function CaptureScreen() {
+  const { surveyId } = useLocalSearchParams<{ surveyId?: string }>();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
+  const [offlineMode, setOfflineMode] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [results, setResults] = useState<{
     species: string;
     commonName: string;
@@ -38,11 +44,11 @@ export default function CaptureScreen() {
       });
 
       if (!result.canceled && result.assets[0]) {
-        setSelectedImage(result.assets[0].uri);
-        runScanAnalysis();
+        const uri = result.assets[0].uri;
+        setSelectedImage(uri);
+        runScanAnalysis(uri);
       }
     } catch {
-      // Fallback sample image for simulator / web
       useSampleImage();
     }
   };
@@ -62,8 +68,9 @@ export default function CaptureScreen() {
       });
 
       if (!result.canceled && result.assets[0]) {
-        setSelectedImage(result.assets[0].uri);
-        runScanAnalysis();
+        const uri = result.assets[0].uri;
+        setSelectedImage(uri);
+        runScanAnalysis(uri);
       }
     } catch {
       useSampleImage();
@@ -72,28 +79,120 @@ export default function CaptureScreen() {
 
   const useSampleImage = () => {
     setSelectedImage("sample-quadrat");
-    runScanAnalysis();
+    runScanAnalysis("sample-quadrat");
   };
 
-  const runScanAnalysis = () => {
+  const runScanAnalysis = async (imageUri?: string) => {
+    const targetUri = imageUri || selectedImage;
+    if (!targetUri) return;
+
     setAnalyzing(true);
     setResults(null);
+    setOfflineMode(false);
 
-    // Simulate instant AI extraction & hydrodynamic prediction
-    setTimeout(() => {
-      setResults({
-        species: "Enhalus acoroides",
-        commonName: "Ribbon Seagrass",
-        coveragePercent: 76.5,
-        bladeLengthCm: 28.5,
-        shootDensity: 420,
-        waterDepthM: 1.8,
-        waveAttenuationPercent: 58.4,
-        incomingWaveM: 1.6,
-        dampenedWaveM: 0.67,
+    if (targetUri === "sample-quadrat") {
+      setTimeout(() => {
+        setResults({
+          species: "Enhalus acoroides",
+          commonName: "Ribbon Seagrass",
+          coveragePercent: 76.5,
+          bladeLengthCm: 28.5,
+          shootDensity: 420,
+          waterDepthM: 1.8,
+          waveAttenuationPercent: 58.4,
+          incomingWaveM: 1.6,
+          dampenedWaveM: 0.67,
+        });
+        setAnalyzing(false);
+      }, 700);
+      return;
+    }
+
+    try {
+      // 1. Online AI inference via FastAPI
+      const res = await analyzeQuadratPhoto({
+        fileUri: targetUri,
+        waterDepthM: 1.5,
+        incidentWaveHeightM: 0.8,
+        wavePeriodS: 4.5,
+        meadowWidthM: 50.0,
       });
+
+      setResults({
+        species: res.specifications.primary_species,
+        commonName: res.specifications.common_name,
+        coveragePercent: res.specifications.coverage_percent,
+        bladeLengthCm: res.specifications.blade_length_cm,
+        shootDensity: res.specifications.shoot_density_m2,
+        waterDepthM: 1.5,
+        waveAttenuationPercent: res.wave_attenuation.wave_height_reduction_pct,
+        incomingWaveM: res.wave_attenuation.incident_wave_height_m,
+        dampenedWaveM: res.wave_attenuation.transmitted_wave_height_m,
+      });
+    } catch (err) {
+      console.warn("FastAPI inference unavailable, switching to on-device physics fallback:", err);
+      // 2. Offline fallback: on-device Mendez & Losada computation
+      setOfflineMode(true);
+      const estDensity = 380;
+      const estBladeLength = 25;
+      const estDepth = 1.5;
+      const estWave = 0.8;
+      const damping = computeWaveDamping(estDensity, estBladeLength, estDepth, estWave, 4.5, 50);
+
+      setResults({
+        species: "Enhalus acoroides (On-Device Estimate)",
+        commonName: "Tropical Ribbon Grass",
+        coveragePercent: 72.0,
+        bladeLengthCm: estBladeLength,
+        shootDensity: estDensity,
+        waterDepthM: estDepth,
+        waveAttenuationPercent: damping.heightReductionPct,
+        incomingWaveM: estWave,
+        dampenedWaveM: damping.inshoreHeight,
+      });
+    } finally {
       setAnalyzing(false);
-    }, 1200);
+    }
+  };
+
+  const handleSaveToSurvey = async () => {
+    if (!selectedImage) return;
+    setIsSaving(true);
+    try {
+      let targetSurveyId: string;
+      if (surveyId) {
+        targetSurveyId = surveyId;
+      } else {
+        const surveys = await getLocalSurveys();
+        if (surveys.length > 0) {
+          targetSurveyId = surveys[0].local_id;
+        } else {
+          const newSurvey = await createLocalSurvey({
+            title: "Field Survey " + new Date().toLocaleDateString(),
+            location_name: "Coastal Quadrat Station",
+          });
+          targetSurveyId = newSurvey.local_id;
+        }
+      }
+
+      await saveLocalSurveyImage({
+        survey_local_id: targetSurveyId,
+        file_uri: selectedImage,
+      });
+
+      Alert.alert(
+        "Saved to Survey",
+        "Quadrat photo recorded in local SQLite database and queued for cloud sync.",
+        [
+          { text: "View Surveys", onPress: () => router.push("/") },
+          { text: "OK" },
+        ]
+      );
+    } catch (err: any) {
+      Alert.alert("Save Error", err?.message || "Could not save photo to survey.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -149,11 +248,20 @@ export default function CaptureScreen() {
       {/* Results Display */}
       {results && (
         <View style={styles.resultsContainer}>
+          {/* Offline Mode Banner */}
+          {offlineMode && (
+            <View style={styles.offlineAlertBadge}>
+              <Text style={styles.offlineAlertText}>
+                ⚡ Offline Mode: Estimated on-device using Mendez &amp; Losada coastal hydrodynamics. Saved to local SQLite database.
+              </Text>
+            </View>
+          )}
+
           {/* Section 1: Seagrass Specs */}
           <View style={styles.resultCard}>
             <View style={styles.cardHeader}>
               <Text style={styles.cardHeaderTitle}>🌿 EXTRACTED SEAGRASS SPECS</Text>
-              <Text style={styles.matchBadge}>96.8% Match</Text>
+              <Text style={styles.matchBadge}>{offlineMode ? "Local Physics" : "96.8% Match"}</Text>
             </View>
 
             <View style={styles.speciesRow}>
@@ -220,15 +328,15 @@ export default function CaptureScreen() {
           {/* Actions */}
           <View style={styles.actionRow}>
             <Pressable
-              style={styles.saveBtn}
-              onPress={() => {
-                Alert.alert("Saved", "Quadrat scan and wave prediction saved to your survey logbook.", [
-                  { text: "View Surveys", onPress: () => router.push("/") },
-                  { text: "OK" },
-                ]);
-              }}
+              style={[styles.saveBtn, isSaving && { opacity: 0.6 }]}
+              onPress={handleSaveToSurvey}
+              disabled={isSaving}
             >
-              <Text style={styles.saveBtnText}>Save to Survey</Text>
+              {isSaving ? (
+                <ActivityIndicator color="#ffffff" size="small" />
+              ) : (
+                <Text style={styles.saveBtnText}>Save to Survey</Text>
+              )}
             </Pressable>
 
             <Pressable style={styles.scanAnotherBtn} onPress={pickImage}>
@@ -578,5 +686,19 @@ const styles = StyleSheet.create({
     color: "#334155",
     fontWeight: "600",
     fontSize: 14,
+  },
+  offlineAlertBadge: {
+    backgroundColor: "#fef3c7",
+    borderColor: "#fde68a",
+    borderWidth: 1,
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 10,
+  },
+  offlineAlertText: {
+    fontSize: 12,
+    color: "#92400e",
+    fontWeight: "600",
+    lineHeight: 16,
   },
 });

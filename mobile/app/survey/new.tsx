@@ -1,10 +1,13 @@
 import { useState } from "react";
-import { View, Text, TextInput, StyleSheet, Pressable, Alert, ScrollView } from "react-native";
+import { View, Text, TextInput, StyleSheet, Pressable, Alert, ScrollView, ActivityIndicator } from "react-native";
 import { router } from "expo-router";
 import { useAuth } from "@/hooks/useAuth";
+import { createLocalSurvey } from "@/db/repository";
+import { useOfflineSync } from "@/hooks/useOfflineSync";
 
 export default function NewSurveyScreen() {
   const { user } = useAuth();
+  const { triggerSync } = useOfflineSync();
   const defaultName =
     user?.user_metadata?.full_name ||
     user?.email?.split("@")[0] ||
@@ -13,15 +16,32 @@ export default function NewSurveyScreen() {
   const [title, setTitle] = useState("");
   const [locationName, setLocationName] = useState("");
   const [userName, setUserName] = useState(defaultName);
+  const [isSaving, setIsSaving] = useState(false);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!title.trim()) {
       Alert.alert("Error", "Please enter a survey title.");
       return;
     }
-    Alert.alert("Success", "Survey created locally.", [
-      { text: "OK", onPress: () => router.replace("/") },
-    ]);
+    setIsSaving(true);
+    try {
+      await createLocalSurvey({
+        title: title.trim(),
+        location_name: locationName.trim() || undefined,
+        surveyor_name: userName.trim() || undefined,
+      });
+
+      // Attempt background cloud sync immediately if online
+      triggerSync().catch(() => {});
+
+      Alert.alert("Success", "Survey recorded locally and queued for sync.", [
+        { text: "OK", onPress: () => router.replace("/") },
+      ]);
+    } catch (err: any) {
+      Alert.alert("Save Error", err?.message || "Could not save survey locally.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -53,8 +73,16 @@ export default function NewSurveyScreen() {
         onChangeText={setUserName}
       />
 
-      <Pressable style={styles.submitBtn} onPress={handleSave}>
-        <Text style={styles.submitBtnText}>Create Survey</Text>
+      <Pressable
+        style={[styles.submitBtn, isSaving && styles.submitBtnDisabled]}
+        onPress={handleSave}
+        disabled={isSaving}
+      >
+        {isSaving ? (
+          <ActivityIndicator color="#ffffff" size="small" />
+        ) : (
+          <Text style={styles.submitBtnText}>Create Survey</Text>
+        )}
       </Pressable>
     </ScrollView>
   );
@@ -90,6 +118,9 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: "center",
     marginTop: 28,
+  },
+  submitBtnDisabled: {
+    opacity: 0.6,
   },
   submitBtnText: {
     color: "#ffffff",

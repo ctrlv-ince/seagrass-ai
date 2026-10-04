@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, memo } from "react";
 import {
   Compass,
   Plus,
@@ -6,6 +6,7 @@ import {
   Calendar,
   User,
   Image as ImageIcon,
+  ChevronLeft,
   ChevronRight,
   UploadCloud,
   X,
@@ -17,9 +18,72 @@ import {
   useUploadSurveyImage,
   type Survey,
 } from "../api/surveys";
+import { Skeleton } from "../components/common/Skeleton";
+
+interface SurveyRowProps {
+  survey: Survey;
+  onSelect: (survey: Survey) => void;
+}
+
+const SurveyRow = memo(function SurveyRow({ survey, onSelect }: SurveyRowProps) {
+  return (
+    <div
+      onClick={() => onSelect(survey)}
+      className="p-5 hover:bg-slate-50/80 transition-colors cursor-pointer flex flex-col md:flex-row md:items-center justify-between gap-4"
+    >
+      <div className="space-y-1">
+        <div className="flex items-center gap-2.5">
+          <h3 className="font-semibold text-slate-900 text-base">{survey.title}</h3>
+          <span
+            className={`text-xs px-2.5 py-0.5 rounded-full font-medium ${
+              survey.status === "completed"
+                ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                : survey.status === "in_progress"
+                ? "bg-amber-50 text-amber-700 border border-amber-200"
+                : "bg-slate-100 text-slate-600"
+            }`}
+          >
+            {survey.status}
+          </span>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500 pt-1">
+          {survey.location_name && (
+            <span className="flex items-center gap-1">
+              <MapPin className="w-3.5 h-3.5 text-teal-600" />
+              {survey.location_name}
+            </span>
+          )}
+          {survey.surveyor_name && (
+            <span className="flex items-center gap-1">
+              <User className="w-3.5 h-3.5 text-slate-400" />
+              {survey.surveyor_name}
+            </span>
+          )}
+          <span className="flex items-center gap-1">
+            <Calendar className="w-3.5 h-3.5 text-slate-400" />
+            {new Date(survey.created_at).toLocaleDateString()}
+          </span>
+          <span className="flex items-center gap-1">
+            <ImageIcon className="w-3.5 h-3.5 text-teal-600" />
+            {survey.image_count} photos
+          </span>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-3">
+        <button className="text-teal-700 hover:text-teal-800 text-sm font-semibold flex items-center gap-1">
+          <span>Manage</span>
+          <ChevronRight className="w-4 h-4" />
+        </button>
+      </div>
+    </div>
+  );
+});
 
 export function Surveys() {
-  const [page] = useState(1);
+  const [page, setPage] = useState(1);
+  const pageSize = 20;
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [activeSurvey, setActiveSurvey] = useState<Survey | null>(null);
 
@@ -105,66 +169,78 @@ export function Surveys() {
       {/* Survey List */}
       <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
         {isLoading ? (
-          <div className="p-12 text-center text-slate-400 text-sm">
-            Loading field surveys...
-          </div>
-        ) : surveysData && surveysData.items.length > 0 ? (
-          <div className="divide-y divide-slate-100">
-            {surveysData.items.map((survey) => (
+          <div className="divide-y divide-slate-100 p-2">
+            {Array.from({ length: 5 }).map((_, idx) => (
               <div
-                key={survey.id}
-                onClick={() => setActiveSurvey(survey)}
-                className="p-5 hover:bg-slate-50/80 transition-colors cursor-pointer flex flex-col md:flex-row md:items-center justify-between gap-4"
+                key={idx}
+                className="p-5 flex flex-col md:flex-row md:items-center justify-between gap-4"
               >
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2.5">
-                    <h3 className="font-semibold text-slate-900 text-base">{survey.title}</h3>
-                    <span
-                      className={`text-xs px-2.5 py-0.5 rounded-full font-medium ${
-                        survey.status === "completed"
-                          ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                          : survey.status === "in_progress"
-                          ? "bg-amber-50 text-amber-700 border border-amber-200"
-                          : "bg-slate-100 text-slate-600"
-                      }`}
-                    >
-                      {survey.status}
-                    </span>
+                <div className="space-y-2.5">
+                  <div className="flex items-center gap-3">
+                    <Skeleton className="h-5 w-48" />
+                    <Skeleton className="h-5 w-20 rounded-full" />
                   </div>
-
-                  <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500 pt-1">
-                    {survey.location_name && (
-                      <span className="flex items-center gap-1">
-                        <MapPin className="w-3.5 h-3.5 text-teal-600" />
-                        {survey.location_name}
-                      </span>
-                    )}
-                    {survey.surveyor_name && (
-                      <span className="flex items-center gap-1">
-                        <User className="w-3.5 h-3.5 text-slate-400" />
-                        {survey.surveyor_name}
-                      </span>
-                    )}
-                    <span className="flex items-center gap-1">
-                      <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                      {new Date(survey.created_at).toLocaleDateString()}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <ImageIcon className="w-3.5 h-3.5 text-teal-600" />
-                      {survey.image_count} photos
-                    </span>
+                  <div className="flex items-center gap-4">
+                    <Skeleton className="h-3 w-28" />
+                    <Skeleton className="h-3 w-24" />
+                    <Skeleton className="h-3 w-20" />
                   </div>
                 </div>
-
-                <div className="flex items-center gap-3">
-                  <button className="text-teal-700 hover:text-teal-800 text-sm font-semibold flex items-center gap-1">
-                    <span>Manage</span>
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-                </div>
+                <Skeleton className="h-8 w-20 rounded-lg" />
               </div>
             ))}
           </div>
+        ) : surveysData && surveysData.items.length > 0 ? (
+          <>
+            <div className="divide-y divide-slate-100">
+              {surveysData.items.map((survey) => (
+                <SurveyRow key={survey.id} survey={survey} onSelect={setActiveSurvey} />
+              ))}
+            </div>
+
+            {/* Pagination Controls */}
+            {surveysData.total > pageSize && (
+              <div className="p-4 bg-slate-50/70 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-600">
+                <div>
+                  Showing{" "}
+                  <span className="font-semibold text-slate-900">
+                    {(page - 1) * pageSize + 1}
+                  </span>{" "}
+                  to{" "}
+                  <span className="font-semibold text-slate-900">
+                    {Math.min(page * pageSize, surveysData.total)}
+                  </span>{" "}
+                  of{" "}
+                  <span className="font-semibold text-slate-900">{surveysData.total}</span> surveys
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    disabled={page <= 1}
+                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed font-medium transition-colors"
+                  >
+                    <ChevronLeft className="w-3.5 h-3.5" />
+                    Previous
+                  </button>
+                  <span className="px-2 font-medium text-slate-700">
+                    Page {page} of {Math.ceil(surveysData.total / pageSize)}
+                  </span>
+                  <button
+                    onClick={() =>
+                      setPage((p) =>
+                        Math.min(Math.ceil(surveysData.total / pageSize), p + 1)
+                      )
+                    }
+                    disabled={page >= Math.ceil(surveysData.total / pageSize)}
+                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed font-medium transition-colors"
+                  >
+                    Next
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
         ) : (
           <div className="p-12 text-center">
             <div className="w-12 h-12 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center mx-auto mb-3">
@@ -240,6 +316,7 @@ export function Surveys() {
                           <img
                             src={img.url}
                             alt={img.filename}
+                            loading="lazy"
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                           />
                         ) : (

@@ -44,6 +44,34 @@ class Settings(BaseSettings):
         default=["http://localhost:5173", "http://localhost:8081"],
     )
 
+    # ── Database Connection Pooling ────────────────────────────
+    db_pool_size: int = Field(
+        default=5,
+        description="Number of persistent connections in the pool.",
+    )
+    db_max_overflow: int = Field(
+        default=10,
+        description="Max temporary connections above pool_size.",
+    )
+    db_pool_recycle: int = Field(
+        default=1800,
+        description="Recycle connections after N seconds (default 30 min).",
+    )
+
+    # ── Server-Side Caching ───────────────────────────────────
+    cache_ttl_species: int = Field(
+        default=3600, description="TTL for species catalog cache (seconds)."
+    )
+    cache_ttl_geojson: int = Field(
+        default=300, description="TTL for GeoJSON endpoint cache (seconds)."
+    )
+    cache_ttl_predictions: int = Field(
+        default=600, description="TTL for wave prediction cache (seconds)."
+    )
+    cache_max_entries: int = Field(
+        default=256, description="Max in-memory cache entries before eviction."
+    )
+
     # ── App ───────────────────────────────────────────────────
     debug: bool = Field(default=True)
     log_level: str = Field(default="info")

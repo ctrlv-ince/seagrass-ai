@@ -30,6 +30,7 @@ from app.schemas.survey import (
     SurveyResponse,
     SurveyUpdate,
 )
+from app.services.cache import response_cache
 from app.services.storage import StorageService, get_storage
 
 router = APIRouter()
@@ -129,6 +130,7 @@ async def create_survey(
     db.add(survey)
     await db.flush()
     await db.refresh(survey)
+    response_cache.invalidate("map:")
 
     resp = _format_survey_response(survey)
     resp.center_latitude = body.center_latitude
@@ -159,6 +161,7 @@ async def update_survey(
 
     await db.flush()
     await db.refresh(survey)
+    response_cache.invalidate("map:")
     return _format_survey_response(survey)
 
 
@@ -173,6 +176,7 @@ async def delete_survey(
     if survey is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Survey not found")
     await db.delete(survey)
+    response_cache.invalidate("map:")
 
 
 # ── Survey Images & Uploads ───────────────────────────────────
@@ -289,6 +293,7 @@ async def create_transect(
     db.add(transect)
     await db.flush()
     await db.refresh(transect)
+    response_cache.invalidate("map:")
 
     return TransectResponse(
         id=transect.id,
@@ -346,6 +351,7 @@ async def create_quadrat(
     db.add(quadrat)
     await db.flush()
     await db.refresh(quadrat)
+    response_cache.invalidate("map:")
 
     return QuadratResponse(
         id=quadrat.id,

@@ -6,7 +6,7 @@ import uuid
 from datetime import datetime
 
 from geoalchemy2 import Geometry
-from sqlalchemy import DateTime, Float, ForeignKey, String, Text, func
+from sqlalchemy import DateTime, Float, ForeignKey, Index, String, Text, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -17,6 +17,11 @@ class Survey(Base):
     """A field survey session."""
 
     __tablename__ = "surveys"
+    __table_args__ = (
+        Index("ix_surveys_status_created", "status", "created_at"),
+        Index("ix_surveys_created", "created_at"),
+        Index("ix_surveys_center_point", "center_point", postgresql_using="gist"),
+    )
 
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
@@ -45,6 +50,10 @@ class SurveyImage(Base):
     """An image captured during a survey."""
 
     __tablename__ = "survey_images"
+    __table_args__ = (
+        Index("ix_survey_images_survey_created", "survey_id", "created_at"),
+        Index("ix_survey_images_location", "location", postgresql_using="gist"),
+    )
 
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), primary_key=True, default=uuid.uuid4

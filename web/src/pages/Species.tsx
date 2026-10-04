@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   BookOpen,
   Search,
@@ -7,6 +7,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useDebounce } from "../hooks/useDebounce";
 
 interface SpeciesData {
   scientificName: string;
@@ -120,14 +121,20 @@ export function Species() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedTier, setSelectedTier] = useState<string>("all");
 
-  const filteredSpecies = SPECIES_CATALOG.filter((spec) => {
-    const matchesSearch =
-      spec.scientificName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      spec.commonName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      spec.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesTier = selectedTier === "all" || spec.waveDampingTier === selectedTier;
-    return matchesSearch && matchesTier;
-  });
+  const debouncedSearch = useDebounce(searchTerm, 200);
+
+  const filteredSpecies = useMemo(() => {
+    const term = debouncedSearch.toLowerCase().trim();
+    return SPECIES_CATALOG.filter((spec) => {
+      const matchesSearch =
+        !term ||
+        spec.scientificName.toLowerCase().includes(term) ||
+        spec.commonName.toLowerCase().includes(term) ||
+        spec.description.toLowerCase().includes(term);
+      const matchesTier = selectedTier === "all" || spec.waveDampingTier === selectedTier;
+      return matchesSearch && matchesTier;
+    });
+  }, [debouncedSearch, selectedTier]);
 
   return (
     <div className="space-y-6">

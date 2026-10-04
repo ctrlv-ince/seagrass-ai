@@ -14,6 +14,7 @@ import {
   Info,
 } from "lucide-react";
 import apiClient from "../api/client";
+import { Skeleton } from "../components/common/Skeleton";
 
 // Custom Leaflet icon for coastal survey sites
 const surveyIcon = L.divIcon({
@@ -190,7 +191,17 @@ export function MapView() {
 
           <div className="overflow-y-auto space-y-2 flex-1 pr-1">
             {isLoading ? (
-              <div className="text-xs text-slate-400 p-4 text-center">Loading spatial survey sites...</div>
+              <div className="space-y-3 p-1">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="p-3.5 rounded-2xl border border-slate-100 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Skeleton className="h-4 w-36" />
+                      <Skeleton className="h-3 w-16 rounded-full" />
+                    </div>
+                    <Skeleton className="h-3 w-28" />
+                  </div>
+                ))}
+              </div>
             ) : (
               surveys.map((site) => {
               const isSelected = selectedSite?.id === site.id;

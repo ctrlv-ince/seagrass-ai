@@ -4,20 +4,23 @@ import { AuthProvider } from "./context/AuthContext";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { Layout } from "./components/layout/Layout";
 
-// Public Pages
-import { Landing } from "./pages/Landing";
-import { Login } from "./pages/Login";
-import { Register } from "./pages/Register";
+import { lazy, Suspense } from "react";
+import { PageSkeleton } from "./components/common/Skeleton";
 
-// Protected Platform Pages
-import { Dashboard } from "./pages/Dashboard";
-import { Surveys } from "./pages/Surveys";
-import { SurveyDetail } from "./pages/SurveyDetail";
-import { Detection } from "./pages/Detection";
-import { WaveModel } from "./pages/WaveModel";
-import { MapView } from "./pages/MapView";
-import { Species } from "./pages/Species";
-import { Settings } from "./pages/Settings";
+// Public Pages (Lazy)
+const Landing = lazy(() => import("./pages/Landing").then((m) => ({ default: m.Landing })));
+const Login = lazy(() => import("./pages/Login").then((m) => ({ default: m.Login })));
+const Register = lazy(() => import("./pages/Register").then((m) => ({ default: m.Register })));
+
+// Protected Platform Pages (Lazy)
+const Dashboard = lazy(() => import("./pages/Dashboard").then((m) => ({ default: m.Dashboard })));
+const Surveys = lazy(() => import("./pages/Surveys").then((m) => ({ default: m.Surveys })));
+const SurveyDetail = lazy(() => import("./pages/SurveyDetail").then((m) => ({ default: m.SurveyDetail })));
+const Detection = lazy(() => import("./pages/Detection").then((m) => ({ default: m.Detection })));
+const WaveModel = lazy(() => import("./pages/WaveModel").then((m) => ({ default: m.WaveModel })));
+const MapView = lazy(() => import("./pages/MapView").then((m) => ({ default: m.MapView })));
+const Species = lazy(() => import("./pages/Species").then((m) => ({ default: m.Species })));
+const Settings = lazy(() => import("./pages/Settings").then((m) => ({ default: m.Settings })));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -33,7 +36,8 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <BrowserRouter>
-          <Routes>
+          <Suspense fallback={<PageSkeleton />}>
+            <Routes>
             {/* Public Marketing & Auth Routes */}
             <Route path="/" element={<Landing />} />
             <Route path="/login" element={<Login />} />
@@ -124,7 +128,8 @@ export default function App() {
             {/* Catch-all redirect to landing page */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
-        </BrowserRouter>
+        </Suspense>
+      </BrowserRouter>
       </AuthProvider>
     </QueryClientProvider>
   );
