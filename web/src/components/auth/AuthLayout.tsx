@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Waves, ArrowLeft, ShieldCheck, Scan, Ruler } from "lucide-react";
+import { SeagrassLogo } from "../common/SeagrassLogo";
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -21,23 +22,8 @@ export function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
 
         {/* Top Header / Brand */}
         <div className="relative z-10">
-          <Link to="/" className="inline-flex items-center space-x-3 group">
-            <div className="w-10 h-10 rounded-xl bg-teal-600 text-white flex items-center justify-center shadow-sm shadow-teal-600/30 group-hover:bg-teal-700 transition-colors">
-              <Waves className="w-5 h-5 text-white" />
-            </div>
-            <div className="flex flex-col">
-              <div className="flex items-center space-x-1.5">
-                <span className="text-xl font-bold tracking-tight text-slate-900 group-hover:text-teal-700 transition-colors">
-                  SEAGRASS
-                </span>
-                <span className="px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider bg-teal-100 text-teal-800 rounded">
-                  AI
-                </span>
-              </div>
-              <span className="text-[11px] text-slate-500 font-medium tracking-wide">
-                SPECS & WAVE ATTENUATION
-              </span>
-            </div>
+          <Link to="/" className="inline-flex items-center group">
+            <SeagrassLogo size="md" variant="full" />
           </Link>
         </div>
 

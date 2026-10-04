@@ -11,6 +11,7 @@ import {
   Platform,
 } from "react-native";
 import { router } from "expo-router";
+import { SeagrassLogo } from "@/components/SeagrassLogo";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function RegisterScreen() {
@@ -77,13 +78,7 @@ export default function RegisterScreen() {
       <ScrollView contentContainerStyle={styles.container}>
         {/* Brand header */}
         <View style={styles.brandHeader}>
-          <View style={styles.logoBadge}>
-            <Text style={styles.logoIcon}>🌊</Text>
-          </View>
-          <Text style={styles.brandTitle}>SEAGRASS AI</Text>
-          <Text style={styles.brandSubtitle}>
-            Create your account to start scanning seagrass
-          </Text>
+          <SeagrassLogo size="lg" variant="full" />
         </View>
 
         {!isConfigured && (

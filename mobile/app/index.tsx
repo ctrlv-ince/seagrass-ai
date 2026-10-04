@@ -2,6 +2,7 @@ import { View, Text, StyleSheet, FlatList, Pressable } from "react-native";
 import { router } from "expo-router";
 import { GPSBadge } from "@/components/GPSBadge";
 import { OfflineBanner } from "@/components/OfflineBanner";
+import { SeagrassLogo } from "@/components/SeagrassLogo";
 import { useAuth } from "@/hooks/useAuth";
 
 const MOCK_SURVEYS = [
@@ -45,13 +46,21 @@ export default function HomeScreen() {
     <View style={styles.container}>
       <OfflineBanner isOffline={false} pendingCount={0} />
 
+      {/* Brand Header with SeagrassLogo */}
+      <View style={styles.brandRow}>
+        <SeagrassLogo size="sm" variant="full" />
+        <Pressable onPress={() => router.push("/settings")} style={styles.settingsIconBtn}>
+          <Text style={styles.settingsIconText}>⚙️</Text>
+        </Pressable>
+      </View>
+
       {/* User Status Bar */}
       <View style={styles.userBar}>
         <View style={styles.userBarLeft}>
           <Text style={styles.userGreeting}>
             Hello, <Text style={styles.userNameText}>{userName}</Text>
           </Text>
-          <Text style={styles.userSub}>Palawan Coastal Monitoring</Text>
+          <Text style={styles.userSub}>Coastal Seagrass Field System</Text>
         </View>
 
         <View style={styles.userBarRight}>
@@ -70,25 +79,31 @@ export default function HomeScreen() {
         </View>
       </View>
 
-      {/* Instant Scan Quick Banner */}
-      <View style={styles.quickScanCard}>
-        <View style={styles.quickScanTextCol}>
-          <Text style={styles.quickScanTitle}>Scan Seagrass Quadrat</Text>
-          <Text style={styles.quickScanDesc}>
-            Take a photo to extract species, canopy density, and calculate wave dampening.
-          </Text>
-        </View>
-        <Pressable
-          style={styles.quickScanBtn}
-          onPress={() => router.push("/capture")}
-        >
-          <Text style={styles.quickScanBtnText}>📷 Scan Now</Text>
+      {/* Quick Action Navigation Grid */}
+      <View style={styles.toolsRow}>
+        <Pressable style={styles.toolChip} onPress={() => router.push("/capture")}>
+          <Text style={styles.toolEmoji}>📷</Text>
+          <Text style={styles.toolLabel}>Scan Quadrat</Text>
+        </Pressable>
+        <Pressable style={styles.toolChip} onPress={() => router.push("/wave-calc")}>
+          <Text style={styles.toolEmoji}>🌊</Text>
+          <Text style={styles.toolLabel}>Wave Calc</Text>
+        </Pressable>
+        <Pressable style={styles.toolChip} onPress={() => router.push("/map")}>
+          <Text style={styles.toolEmoji}>📍</Text>
+          <Text style={styles.toolLabel}>Field Map</Text>
+        </Pressable>
+        <Pressable style={styles.toolChip} onPress={() => router.push("/species")}>
+          <Text style={styles.toolEmoji}>📖</Text>
+          <Text style={styles.toolLabel}>Species</Text>
         </Pressable>
       </View>
 
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Active Surveys</Text>
-        <GPSBadge isActive={true} accuracy={3.8} />
+        <Pressable onPress={() => router.push("/survey/new")} style={styles.newSurveyBtn}>
+          <Text style={styles.newSurveyBtnText}>+ New Survey</Text>
+        </Pressable>
       </View>
 
       <FlatList
@@ -170,6 +185,67 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f8fafc",
+  },
+  brandRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    paddingBottom: 8,
+    backgroundColor: "#ffffff",
+  },
+  settingsIconBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: "#f1f5f9",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  settingsIconText: {
+    fontSize: 16,
+  },
+  toolsRow: {
+    flexDirection: "row",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    gap: 8,
+    backgroundColor: "#ffffff",
+    borderBottomWidth: 1,
+    borderBottomColor: "#e2e8f0",
+  },
+  toolChip: {
+    flex: 1,
+    backgroundColor: "#f8fafc",
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: "#e2e8f0",
+    paddingVertical: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 2,
+  },
+  toolEmoji: {
+    fontSize: 18,
+  },
+  toolLabel: {
+    fontSize: 10,
+    fontWeight: "700",
+    color: "#334155",
+  },
+  newSurveyBtn: {
+    backgroundColor: "#f0fdfa",
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#99f6e4",
+  },
+  newSurveyBtnText: {
+    fontSize: 11,
+    fontWeight: "700",
+    color: "#0f766e",
   },
   userBar: {
     flexDirection: "row",

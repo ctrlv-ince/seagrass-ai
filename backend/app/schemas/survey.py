@@ -29,6 +29,8 @@ class SurveyUpdate(BaseModel):
     description: str | None = None
     surveyor_name: str | None = Field(None, max_length=255)
     location_name: str | None = Field(None, max_length=255)
+    center_latitude: float | None = Field(None, ge=-90, le=90)
+    center_longitude: float | None = Field(None, ge=-180, le=180)
     status: str | None = Field(None, pattern=r"^(draft|in_progress|completed)$")
 
 
@@ -41,6 +43,9 @@ class SurveyResponse(BaseModel):
     surveyor_name: str | None
     location_name: str | None
     status: str
+    center_latitude: float | None = None
+    center_longitude: float | None = None
+    image_count: int = 0
     started_at: datetime | None
     completed_at: datetime | None
     created_at: datetime
@@ -67,10 +72,12 @@ class SurveyImageResponse(BaseModel):
     id: uuid.UUID
     survey_id: uuid.UUID
     filename: str
+    s3_key: str
     content_type: str
-    gps_latitude: float | None
-    gps_longitude: float | None
-    captured_at: datetime | None
+    url: str | None = None
+    gps_latitude: float | None = None
+    gps_longitude: float | None = None
+    captured_at: datetime | None = None
     created_at: datetime
 
     model_config = {"from_attributes": True}

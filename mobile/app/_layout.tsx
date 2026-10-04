@@ -68,6 +68,24 @@ export default function RootLayout() {
               title: "Field Map",
             }}
           />
+          <Stack.Screen
+            name="wave-calc"
+            options={{
+              title: "Wave Calculator",
+            }}
+          />
+          <Stack.Screen
+            name="species"
+            options={{
+              title: "Species Guide",
+            }}
+          />
+          <Stack.Screen
+            name="settings"
+            options={{
+              title: "Settings",
+            }}
+          />
         </Stack>
       </AuthProvider>
     </SafeAreaProvider>

@@ -9,7 +9,10 @@ import {
   LogOut,
   User,
   ExternalLink,
+  BookOpen,
+  Settings,
 } from "lucide-react";
+import { SeagrassLogo } from "../common/SeagrassLogo";
 
 const navItems = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -17,6 +20,8 @@ const navItems = [
   { to: "/detection", label: "Seagrass Scanner", icon: Scan },
   { to: "/wave-model", label: "Wave Attenuation", icon: Waves },
   { to: "/map", label: "Spatial Map", icon: MapPin },
+  { to: "/species", label: "Species Guide", icon: BookOpen },
+  { to: "/settings", label: "Settings", icon: Settings },
 ] as const;
 
 export function Sidebar() {
@@ -38,23 +43,8 @@ export function Sidebar() {
       <div>
         {/* Brand Link */}
         <div className="p-5 border-b border-slate-100">
-          <Link to="/" className="flex items-center space-x-3 group">
-            <div className="w-9 h-9 rounded-xl bg-teal-600 text-white flex items-center justify-center shadow-xs group-hover:bg-teal-700 transition-colors">
-              <Waves className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <div className="flex items-center space-x-1.5">
-                <span className="text-base font-bold tracking-tight text-slate-900 group-hover:text-teal-700 transition-colors">
-                  SEAGRASS
-                </span>
-                <span className="px-1 py-0.2 text-[9px] font-semibold bg-teal-100 text-teal-800 rounded">
-                  AI
-                </span>
-              </div>
-              <span className="text-[10px] text-slate-500 block font-medium">
-                SPECS & WAVE ATTENUATION
-              </span>
-            </div>
+          <Link to="/" className="flex items-center group">
+            <SeagrassLogo size="sm" variant="full" />
           </Link>
         </div>
 

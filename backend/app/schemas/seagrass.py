@@ -1,7 +1,4 @@
-"""Seagrass species, transect, and quadrat schemas.
-
-Request and response schemas are kept separate per ECC FastAPI rules.
-"""
+"""Seagrass species, transect, and quadrat schemas."""
 
 from __future__ import annotations
 
@@ -42,9 +39,10 @@ class TransectCreate(BaseModel):
 
     survey_id: uuid.UUID
     name: str = Field(..., min_length=1, max_length=255)
-    geometry_wkt: str = Field(
-        ..., description="WKT LINESTRING geometry in EPSG:4326"
-    )
+    start_latitude: float = Field(..., ge=-90, le=90)
+    start_longitude: float = Field(..., ge=-180, le=180)
+    end_latitude: float = Field(..., ge=-90, le=90)
+    end_longitude: float = Field(..., ge=-180, le=180)
 
 
 class TransectResponse(BaseModel):
@@ -53,6 +51,9 @@ class TransectResponse(BaseModel):
     id: uuid.UUID
     survey_id: uuid.UUID
     name: str
+    start_point: list[float] | None = None  # [lng, lat]
+    end_point: list[float] | None = None    # [lng, lat]
+    quadrat_count: int = 0
     created_at: datetime
 
     model_config = {"from_attributes": True}
@@ -78,8 +79,11 @@ class QuadratResponse(BaseModel):
     id: uuid.UUID
     transect_id: uuid.UUID
     position_along_transect: float
+    latitude: float
+    longitude: float
     coverage_percent: float | None
     species_id: uuid.UUID | None
+    species_name: str | None = None
     created_at: datetime
 
     model_config = {"from_attributes": True}

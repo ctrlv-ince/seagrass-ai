@@ -1,5 +1,5 @@
-import { Waves } from "lucide-react";
 import { Link } from "react-router-dom";
+import { SeagrassLogo } from "../common/SeagrassLogo";
 
 export function Footer() {
   return (
@@ -9,13 +9,8 @@ export function Footer() {
           
           {/* Brand info */}
           <div className="space-y-3">
-            <Link to="/" className="flex items-center space-x-2.5 group">
-              <div className="w-8 h-8 rounded-lg bg-teal-600 text-white flex items-center justify-center shadow-xs">
-                <Waves className="w-4 h-4 text-white" />
-              </div>
-              <span className="text-lg font-bold tracking-tight text-slate-900">
-                SEAGRASS AI
-              </span>
+            <Link to="/" className="inline-flex items-center group">
+              <SeagrassLogo size="sm" variant="full" showSubtitle={false} />
             </Link>
             
             <p className="text-slate-500 text-xs leading-relaxed max-w-xs">
@@ -57,6 +52,11 @@ export function Footer() {
               <li>
                 <Link to="/map" className="hover:text-teal-700 transition-colors">
                   Spatial Map View
+                </Link>
+              </li>
+              <li>
+                <Link to="/species" className="hover:text-teal-700 transition-colors">
+                  Species Field Guide
                 </Link>
               </li>
             </ul>

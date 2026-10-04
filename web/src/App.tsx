@@ -12,9 +12,12 @@ import { Register } from "./pages/Register";
 // Protected Platform Pages
 import { Dashboard } from "./pages/Dashboard";
 import { Surveys } from "./pages/Surveys";
+import { SurveyDetail } from "./pages/SurveyDetail";
 import { Detection } from "./pages/Detection";
 import { WaveModel } from "./pages/WaveModel";
 import { MapView } from "./pages/MapView";
+import { Species } from "./pages/Species";
+import { Settings } from "./pages/Settings";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -58,6 +61,16 @@ export default function App() {
               }
             />
             <Route
+              path="/surveys/:id"
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <SurveyDetail />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/detection"
               element={
                 <ProtectedRoute>
@@ -83,6 +96,26 @@ export default function App() {
                 <ProtectedRoute>
                   <Layout>
                     <MapView />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/species"
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <Species />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/settings"
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <Settings />
                   </Layout>
                 </ProtectedRoute>
               }
