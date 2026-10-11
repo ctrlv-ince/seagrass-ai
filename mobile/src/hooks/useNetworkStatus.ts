@@ -2,33 +2,61 @@ import { useState, useEffect, useCallback } from "react";
 import apiClient from "../api/client";
 
 /**
- * Hook to monitor network connectivity in the field.
- * Periodically pings the FastAPI /health endpoint to verify real end-to-end connectivity.
+ * Hook to monitor network and backend connectivity.
+ * Tests general internet connectivity first, then checks backend availability.
  */
-export function useNetworkStatus(pingIntervalMs = 15_000) {
+export function useNetworkStatus(pingIntervalMs = 20_000) {
   const [isOnline, setIsOnline] = useState<boolean>(true);
+  const [isBackendOnline, setIsBackendOnline] = useState<boolean>(false);
   const [isChecking, setIsChecking] = useState<boolean>(false);
 
   const checkConnection = useCallback(async () => {
     setIsChecking(true);
+    let onlineDetected = false;
+
+    // 1. Check real internet connectivity via public lightweight ping
     try {
-      // Fast lightweight ping with 3s timeout
-      await apiClient.get("/health", { timeout: 3500 });
-      setIsOnline(true);
-      return true;
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3500);
+
+      // Lightweight public ping (Google 204 or Cloudflare trace)
+      const res = await fetch("https://clients3.google.com/generate_204", {
+        method: "HEAD",
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+
+      if (res.status >= 200 && res.status < 400) {
+        onlineDetected = true;
+      }
     } catch {
-      setIsOnline(false);
-      return false;
-    } finally {
-      setIsChecking(false);
+      // Fallback: try secondary reliable endpoint
+      try {
+        const res2 = await fetch("https://www.cloudflare.com/cdn-cgi/trace", {
+          method: "HEAD",
+        });
+        if (res2.ok) onlineDetected = true;
+      } catch {
+        // Continue to backend check
+      }
     }
+
+    // 2. Check local/cloud FastAPI backend health
+    try {
+      await apiClient.get("/health", { timeout: 3000 });
+      setIsBackendOnline(true);
+      onlineDetected = true;
+    } catch {
+      setIsBackendOnline(false);
+    }
+
+    setIsOnline(onlineDetected);
+    setIsChecking(false);
+    return onlineDetected;
   }, []);
 
   useEffect(() => {
-    // Initial check
     checkConnection();
-
-    // Periodic heartbeat check
     const timer = setInterval(() => {
       checkConnection();
     }, pingIntervalMs);
@@ -38,6 +66,7 @@ export function useNetworkStatus(pingIntervalMs = 15_000) {
 
   return {
     isOnline,
+    isBackendOnline,
     isChecking,
     checkConnection,
   };

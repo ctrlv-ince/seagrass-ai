@@ -1,8 +1,11 @@
 /**
- * Interactive offline & sync status banner for field surveyors.
- * Shows connectivity status and queued SQLite records awaiting sync.
+ * Clean offline & sync status banner for field surveyors.
+ * Adheres to theme tokens and uses vector icons.
  */
+import React from "react";
 import { View, Text, StyleSheet, Pressable, ActivityIndicator } from "react-native";
+import { WifiOff, RefreshCw, CloudUpload } from "lucide-react-native";
+import { colors, spacing, radius, fontSize, fontWeight } from "@/theme";
 
 interface OfflineBannerProps {
   isOffline: boolean;
@@ -23,9 +26,15 @@ export function OfflineBanner({
   if (isOffline) {
     return (
       <View style={[styles.banner, styles.bannerOffline]}>
-        <Text style={styles.textOffline}>
-          📶 Offline Mode{pendingCount > 0 ? ` · ${pendingCount} survey items saved to SQLite` : " · Local Storage Ready"}
-        </Text>
+        <View style={styles.contentRow}>
+          <WifiOff size={14} color={colors.warning} />
+          <Text style={styles.textOffline} numberOfLines={1}>
+            Offline Mode
+            {pendingCount > 0
+              ? ` · ${pendingCount} survey items saved locally`
+              : " · SQLite storage active"}
+          </Text>
+        </View>
       </View>
     );
   }
@@ -34,17 +43,30 @@ export function OfflineBanner({
   return (
     <View style={[styles.banner, styles.bannerSync]}>
       <View style={styles.syncRow}>
-        <Text style={styles.textSync}>
-          {isSyncing
-            ? "🔄 Syncing field data with cloud server..."
-            : `☁️ Online · ${pendingCount} survey items ready to sync`}
-        </Text>
+        <View style={styles.contentRow}>
+          {isSyncing ? (
+            <ActivityIndicator size="small" color={colors.primaryDark} />
+          ) : (
+            <CloudUpload size={15} color={colors.primaryDark} />
+          )}
+          <Text style={styles.textSync} numberOfLines={1}>
+            {isSyncing
+              ? "Syncing field records with cloud..."
+              : `${pendingCount} item${pendingCount === 1 ? "" : "s"} ready to sync`}
+          </Text>
+        </View>
         {onSyncPress && !isSyncing && (
-          <Pressable style={styles.syncBtn} onPress={onSyncPress}>
-            <Text style={styles.syncBtnText}>Sync Now</Text>
+          <Pressable
+            style={({ pressed }) => [
+              styles.syncBtn,
+              pressed && styles.syncBtnPressed,
+            ]}
+            onPress={onSyncPress}
+          >
+            <RefreshCw size={11} color={colors.surface} />
+            <Text style={styles.syncBtnText}>Sync</Text>
           </Pressable>
         )}
-        {isSyncing && <ActivityIndicator size="small" color="#0f766e" style={{ marginLeft: 8 }} />}
       </View>
     </View>
   );
@@ -52,48 +74,57 @@ export function OfflineBanner({
 
 const styles = StyleSheet.create({
   banner: {
-    paddingVertical: 9,
-    paddingHorizontal: 16,
-    alignItems: "center",
-    justifyContent: "center",
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.lg,
+    borderBottomWidth: 1,
   },
   bannerOffline: {
-    backgroundColor: "#fef3c7",
-    borderBottomWidth: 1,
-    borderBottomColor: "#fde68a",
-  },
-  textOffline: {
-    fontSize: 12,
-    fontWeight: "700",
-    color: "#92400e",
+    backgroundColor: colors.warningLight,
+    borderBottomColor: "#FDE68A",
   },
   bannerSync: {
-    backgroundColor: "#ccfbf1",
-    borderBottomWidth: 1,
-    borderBottomColor: "#99f6e4",
+    backgroundColor: colors.primaryLight,
+    borderBottomColor: "#99F6E4",
+  },
+  contentRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+    flex: 1,
   },
   syncRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    width: "100%",
+  },
+  textOffline: {
+    fontSize: fontSize.xs,
+    fontWeight: fontWeight.medium,
+    color: colors.warning,
+    flexShrink: 1,
   },
   textSync: {
-    fontSize: 12,
-    fontWeight: "600",
-    color: "#0f766e",
-    flex: 1,
+    fontSize: fontSize.xs,
+    fontWeight: fontWeight.medium,
+    color: colors.primaryDark,
+    flexShrink: 1,
   },
   syncBtn: {
-    backgroundColor: "#0d9488",
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 6,
-    marginLeft: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    backgroundColor: colors.primary,
+    paddingHorizontal: spacing.sm + 2,
+    paddingVertical: 5,
+    borderRadius: radius.full,
+    marginLeft: spacing.sm,
+  },
+  syncBtnPressed: {
+    opacity: 0.8,
   },
   syncBtnText: {
-    color: "#ffffff",
-    fontSize: 11,
-    fontWeight: "700",
+    color: colors.surface,
+    fontSize: fontSize.xs,
+    fontWeight: fontWeight.semibold,
   },
 });

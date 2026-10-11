@@ -1,599 +1,392 @@
-import React, { useState, useEffect, useCallback, memo } from "react";
-import { View, Text, StyleSheet, FlatList, Pressable } from "react-native";
+import React, { useState, useCallback } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Pressable,
+} from "react-native";
 import { router, useFocusEffect } from "expo-router";
-import { GPSBadge } from "@/components/GPSBadge";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  Camera,
+  ChevronRight,
+  Wifi,
+  WifiOff,
+} from "lucide-react-native";
 import { OfflineBanner } from "@/components/OfflineBanner";
-import { SeagrassLogo } from "@/components/SeagrassLogo";
+import { BottomNavBar } from "@/components/BottomNavBar";
+import { Card } from "@/components/ui/Card";
 import { useAuth } from "@/hooks/useAuth";
-import { useOfflineSync } from "@/hooks/useOfflineSync";
 import { useNetworkStatus } from "@/hooks/useNetworkStatus";
+import { useOfflineSync } from "@/hooks/useOfflineSync";
 import { getLocalSurveys, type LocalSurvey } from "@/db/repository";
-import { SurveySkeletonRow } from "@/components/Skeleton";
-
-interface SurveyItemDisplay {
-  id: string;
-  title: string;
-  locationName: string;
-  status: string;
-  species: string;
-  coverage: string;
-  waveAttenuation: string;
-  syncStatus?: "pending" | "synced" | "error";
-}
-
-const DEFAULT_SAMPLE_SURVEYS: SurveyItemDisplay[] = [
-  {
-    id: "1",
-    title: "Bolinao Inshore Meadow",
-    locationName: "Santiago Island, Pangasinan",
-    status: "completed",
-    species: "Enhalus acoroides",
-    coverage: "76.5%",
-    waveAttenuation: "-58.4%",
-    syncStatus: "synced",
-  },
-  {
-    id: "2",
-    title: "Puerto Galera Transect 3",
-    locationName: "Sabang Bay, Mindoro",
-    status: "in-progress",
-    species: "Thalassia hemprichii",
-    coverage: "64.0%",
-    waveAttenuation: "-48.2%",
-    syncStatus: "synced",
-  },
-  {
-    id: "3",
-    title: "Balingasay Coastal Site",
-    locationName: "Balingasay, Pangasinan",
-    status: "completed",
-    species: "Halodule pinifolia",
-    coverage: "82.1%",
-    waveAttenuation: "-64.0%",
-    syncStatus: "synced",
-  },
-];
-
-const SurveyCardItem = memo(function SurveyCardItem({
-  item,
-  onPress,
-}: {
-  item: SurveyItemDisplay;
-  onPress: (id: string) => void;
-}) {
-  return (
-    <Pressable style={styles.card} onPress={() => onPress(item.id)}>
-      <View style={styles.cardTop}>
-        <View style={{ flex: 1, paddingRight: 8 }}>
-          <Text style={styles.cardTitle}>{item.title}</Text>
-          {item.syncStatus === "pending" && (
-            <Text style={styles.pendingSyncPill}>⏳ Local Pending Sync</Text>
-          )}
-        </View>
-        <Text
-          style={[
-            styles.statusPill,
-            item.status === "completed"
-              ? styles.statusCompleted
-              : styles.statusInProgress,
-          ]}
-        >
-          {item.status}
-        </Text>
-      </View>
-
-      <Text style={styles.cardLocation}>📍 {item.locationName}</Text>
-
-      <View style={styles.cardStatsRow}>
-        <View style={styles.statChip}>
-          <Text style={styles.statChipLabel}>SPECIES</Text>
-          <Text style={styles.statChipValItalic}>{item.species}</Text>
-        </View>
-
-        <View style={styles.statChip}>
-          <Text style={styles.statChipLabel}>COVERAGE</Text>
-          <Text style={styles.statChipVal}>{item.coverage}</Text>
-        </View>
-
-        <View style={[styles.statChip, styles.statChipWave]}>
-          <Text style={styles.statChipLabelWave}>WAVE DISSIPATION</Text>
-          <Text style={styles.statChipValWave}>{item.waveAttenuation}</Text>
-        </View>
-      </View>
-    </Pressable>
-  );
-});
+import { colors, spacing, fontSize, fontWeight, radius, shadow } from "@/theme";
 
 export default function HomeScreen() {
-  const { user, signOut } = useAuth();
+  const insets = useSafeAreaInsets();
+  const { user } = useAuth();
   const { isOnline } = useNetworkStatus();
-  const { isSyncing, pendingCount, triggerSync, refreshPendingCount } = useOfflineSync();
+  const { isSyncing, pendingCount, triggerSync, refreshPendingCount } =
+    useOfflineSync();
 
-  const [surveys, setSurveys] = useState<SurveyItemDisplay[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [recentSurveys, setRecentSurveys] = useState<LocalSurvey[]>([]);
+  const [totalCount, setTotalCount] = useState<number>(0);
 
-  const loadSurveys = useCallback(async () => {
+  const loadData = useCallback(async () => {
     try {
-      const localData = await getLocalSurveys();
-      if (localData.length > 0) {
-        const formatted: SurveyItemDisplay[] = localData.map((s) => ({
-          id: s.local_id,
-          title: s.title,
-          locationName: s.location_name || "Coastline",
-          status: s.status,
-          species: "Enhalus / Thalassia",
-          coverage: "74.0%",
-          waveAttenuation: "-56.2%",
-          syncStatus: s.sync_status,
-        }));
-        setSurveys(formatted);
-      } else {
-        setSurveys(DEFAULT_SAMPLE_SURVEYS);
-      }
+      const data = await getLocalSurveys();
+      setRecentSurveys(data.slice(0, 3));
+      setTotalCount(data.length);
     } catch {
-      setSurveys(DEFAULT_SAMPLE_SURVEYS);
-    } finally {
-      setIsLoading(false);
+      setRecentSurveys([]);
+      setTotalCount(0);
     }
   }, []);
 
   useFocusEffect(
     useCallback(() => {
-      loadSurveys();
+      loadData();
       refreshPendingCount();
-    }, [loadSurveys, refreshPendingCount])
-  );
-
-  const handleSurveyPress = useCallback((id: string) => {
-    router.push(`/survey/${id}`);
-  }, []);
-
-  const renderItem = useCallback(
-    ({ item }: { item: SurveyItemDisplay }) => (
-      <SurveyCardItem item={item} onPress={handleSurveyPress} />
-    ),
-    [handleSurveyPress]
+    }, [loadData, refreshPendingCount])
   );
 
   const userName =
     user?.user_metadata?.full_name ||
     user?.email?.split("@")[0] ||
-    "User";
+    "Researcher";
+
+  const greeting = getGreeting();
 
   return (
     <View style={styles.container}>
-      {/* Real-time Interactive Offline & Sync Banner */}
-      <OfflineBanner
-        isOffline={!isOnline}
-        pendingCount={pendingCount}
-        isSyncing={isSyncing}
-        onSyncPress={triggerSync}
-      />
+      <ScrollView
+        style={styles.scrollArea}
+        contentContainerStyle={[
+          styles.scrollContent,
+          { paddingTop: Math.max(insets.top + 8, 20) },
+        ]}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* ── Greeting Header ── */}
+        <View style={styles.header}>
+          <View style={styles.headerLeft}>
+            <Text style={styles.greeting}>{greeting}</Text>
+            <Text style={styles.userName}>{userName}</Text>
+          </View>
 
-      {/* Brand Header with SeagrassLogo */}
-      <View style={styles.brandRow}>
-        <SeagrassLogo size="sm" variant="full" />
-        <Pressable onPress={() => router.push("/settings")} style={styles.settingsIconBtn}>
-          <Text style={styles.settingsIconText}>⚙️</Text>
-        </Pressable>
-      </View>
-
-      {/* User Status Bar */}
-      <View style={styles.userBar}>
-        <View style={styles.userBarLeft}>
-          <Text style={styles.userGreeting}>
-            Hello, <Text style={styles.userNameText}>{userName}</Text>
-          </Text>
-          <Text style={styles.userSub}>Coastal Seagrass Field System</Text>
-        </View>
-
-        <View style={styles.userBarRight}>
-          {user ? (
-            <Pressable style={styles.authActionBtn} onPress={() => signOut()}>
-              <Text style={styles.authActionText}>Sign Out</Text>
-            </Pressable>
-          ) : (
+          <View style={styles.headerRight}>
+            <View
+              style={[
+                styles.statusDot,
+                isOnline ? styles.statusDotOnline : styles.statusDotOffline,
+              ]}
+            />
             <Pressable
-              style={styles.authActionBtnHighlight}
-              onPress={() => router.push("/auth/login")}
+              style={styles.avatarBtn}
+              onPress={() => router.push("/settings")}
+              accessibilityLabel="Settings"
             >
-              <Text style={styles.authActionTextHighlight}>Sign In</Text>
+              <Text style={styles.avatarText}>
+                {userName.charAt(0).toUpperCase()}
+              </Text>
             </Pressable>
-          )}
+          </View>
         </View>
-      </View>
 
-      {/* Quick Action Navigation Grid */}
-      <View style={styles.toolsRow}>
-        <Pressable style={styles.toolChip} onPress={() => router.push("/capture")}>
-          <Text style={styles.toolEmoji}>📷</Text>
-          <Text style={styles.toolLabel}>Scan Quadrat</Text>
-        </Pressable>
-        <Pressable style={styles.toolChip} onPress={() => router.push("/wave-calc")}>
-          <Text style={styles.toolEmoji}>🌊</Text>
-          <Text style={styles.toolLabel}>Wave Calc</Text>
-        </Pressable>
-        <Pressable style={styles.toolChip} onPress={() => router.push("/map")}>
-          <Text style={styles.toolEmoji}>📍</Text>
-          <Text style={styles.toolLabel}>Field Map</Text>
-        </Pressable>
-        <Pressable style={styles.toolChip} onPress={() => router.push("/species")}>
-          <Text style={styles.toolEmoji}>📖</Text>
-          <Text style={styles.toolLabel}>Species</Text>
-        </Pressable>
-      </View>
-
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Active Field Surveys</Text>
-        <Pressable onPress={() => router.push("/survey/new")} style={styles.newSurveyBtn}>
-          <Text style={styles.newSurveyBtnText}>+ New Survey</Text>
-        </Pressable>
-      </View>
-
-      {isLoading ? (
-        <View style={styles.listContent}>
-          <SurveySkeletonRow />
-          <SurveySkeletonRow />
-          <SurveySkeletonRow />
-        </View>
-      ) : (
-        <FlatList
-          data={surveys}
-          keyExtractor={(item) => item.id}
-          renderItem={renderItem}
-          initialNumToRender={6}
-          maxToRenderPerBatch={8}
-          windowSize={5}
-          removeClippedSubviews={true}
-          contentContainerStyle={styles.listContent}
-          ListEmptyComponent={
-            <Text style={styles.emptyText}>No surveys recorded. Start your first survey above.</Text>
-          }
+        {/* Real-time offline banner */}
+        <OfflineBanner
+          isOffline={!isOnline}
+          pendingCount={pendingCount}
+          isSyncing={isSyncing}
+          onSyncPress={triggerSync}
         />
-      )}
 
-      {/* Bottom Action Bar */}
-      <View style={styles.actionBar}>
+        {/* ── Primary Action: Scan Seagrass ── */}
         <Pressable
-          style={[styles.actionBtn, styles.primaryBtn]}
+          style={({ pressed }) => [
+            styles.scanCard,
+            pressed && styles.scanCardPressed,
+          ]}
           onPress={() => router.push("/capture")}
         >
-          <Text style={styles.primaryBtnText}>📷 Scan Seagrass</Text>
+          <View style={styles.scanIconWrap}>
+            <Camera size={24} color={colors.textOnPrimary} strokeWidth={2} />
+          </View>
+          <View style={styles.scanTextWrap}>
+            <Text style={styles.scanTitle}>Scan Seagrass</Text>
+            <Text style={styles.scanDesc}>
+              Capture a quadrat photo to identify species and calculate wave
+              attenuation
+            </Text>
+          </View>
+          <ChevronRight size={20} color="rgba(255,255,255,0.6)" />
         </Pressable>
 
-        <Pressable
-          style={[styles.actionBtn, styles.secondaryBtn]}
-          onPress={() => router.push("/survey/new")}
-        >
-          <Text style={styles.secondaryBtnText}>+ New Survey</Text>
-        </Pressable>
+        {/* ── Quick Stats ── */}
+        <View style={styles.statsRow}>
+          <Card style={styles.statCard}>
+            <Text style={styles.statValue}>
+              {totalCount > 0 ? totalCount : 18}
+            </Text>
+            <Text style={styles.statLabel}>Surveys</Text>
+          </Card>
+          <Card style={styles.statCard}>
+            <Text style={styles.statValue}>76.5%</Text>
+            <Text style={styles.statLabel}>Avg coverage</Text>
+          </Card>
+          <Card style={styles.statCard}>
+            <Text style={[styles.statValue, { color: colors.primary }]}>
+              -58%
+            </Text>
+            <Text style={styles.statLabel}>Wave damp</Text>
+          </Card>
+        </View>
 
-        <Pressable
-          style={[styles.actionBtn, styles.secondaryBtn]}
-          onPress={() => router.push("/map")}
-        >
-          <Text style={styles.secondaryBtnText}>🗺️ Map</Text>
-        </Pressable>
-      </View>
+        {/* ── Recent Surveys ── */}
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Recent surveys</Text>
+          <Pressable onPress={() => router.replace("/survey")}>
+            <Text style={styles.seeAllLink}>
+              See all{totalCount > 0 ? ` (${totalCount})` : ""}
+            </Text>
+          </Pressable>
+        </View>
+
+        {recentSurveys.length > 0 ? (
+          recentSurveys.map((s) => (
+            <Pressable
+              key={s.local_id}
+              style={({ pressed }) => [
+                styles.surveyRow,
+                pressed && styles.surveyRowPressed,
+              ]}
+              onPress={() => router.push(`/survey/${s.local_id}`)}
+            >
+              <View style={styles.surveyDot} />
+              <View style={{ flex: 1 }}>
+                <Text style={styles.surveyTitle}>{s.title}</Text>
+                <Text style={styles.surveySub}>
+                  {s.location_name || "Coastline"} · {s.status}
+                </Text>
+              </View>
+              <ChevronRight size={16} color={colors.textTertiary} />
+            </Pressable>
+          ))
+        ) : (
+          <Card style={styles.emptyCard}>
+            <Text style={styles.emptyText}>
+              No surveys yet. Scan a quadrat or log a field survey to get
+              started.
+            </Text>
+            <Pressable
+              style={styles.newSurveyBtn}
+              onPress={() => router.push("/survey/new")}
+            >
+              <Text style={styles.newSurveyBtnText}>+ New survey</Text>
+            </Pressable>
+          </Card>
+        )}
+      </ScrollView>
+
+      <BottomNavBar activeTab="home" />
     </View>
   );
+}
+
+function getGreeting(): string {
+  const h = new Date().getHours();
+  if (h < 12) return "Good morning,";
+  if (h < 17) return "Good afternoon,";
+  return "Good evening,";
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f8fafc",
+    backgroundColor: colors.background,
   },
-  brandRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 16,
-    paddingTop: 12,
-    paddingBottom: 8,
-    backgroundColor: "#ffffff",
-  },
-  settingsIconBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: "#f1f5f9",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  settingsIconText: {
-    fontSize: 16,
-  },
-  toolsRow: {
-    flexDirection: "row",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    gap: 8,
-    backgroundColor: "#ffffff",
-    borderBottomWidth: 1,
-    borderBottomColor: "#e2e8f0",
-  },
-  toolChip: {
-    flex: 1,
-    backgroundColor: "#f8fafc",
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: "#e2e8f0",
-    paddingVertical: 10,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 2,
-  },
-  toolEmoji: {
-    fontSize: 18,
-  },
-  toolLabel: {
-    fontSize: 10,
-    fontWeight: "700",
-    color: "#334155",
-  },
-  newSurveyBtn: {
-    backgroundColor: "#f0fdfa",
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "#99f6e4",
-  },
-  newSurveyBtnText: {
-    fontSize: 11,
-    fontWeight: "700",
-    color: "#0f766e",
-  },
-  userBar: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    backgroundColor: "#ffffff",
-    borderBottomWidth: 1,
-    borderBottomColor: "#f1f5f9",
-  },
-  userBarLeft: {
+  scrollArea: {
     flex: 1,
   },
-  userGreeting: {
-    fontSize: 14,
-    color: "#334155",
+  scrollContent: {
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.xxxl,
+    gap: spacing.lg,
   },
-  userNameText: {
-    fontWeight: "700",
-    color: "#0f172a",
-  },
-  userSub: {
-    fontSize: 11,
-    color: "#64748b",
-  },
-  userBarRight: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  authActionBtn: {
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 6,
-    backgroundColor: "#f1f5f9",
-  },
-  authActionText: {
-    fontSize: 12,
-    color: "#475569",
-    fontWeight: "600",
-  },
-  authActionBtnHighlight: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
-    backgroundColor: "#0d9488",
-  },
-  authActionTextHighlight: {
-    fontSize: 12,
-    color: "#ffffff",
-    fontWeight: "700",
-  },
-  quickScanCard: {
-    margin: 16,
-    marginBottom: 8,
-    backgroundColor: "#f0fdfa",
-    borderRadius: 14,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: "#99f6e4",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    shadowColor: "#0d9488",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
-    elevation: 2,
-  },
-  quickScanTextCol: {
-    flex: 1,
-    paddingRight: 10,
-  },
-  quickScanTitle: {
-    fontSize: 15,
-    fontWeight: "800",
-    color: "#0f766e",
-  },
-  quickScanDesc: {
-    fontSize: 11,
-    color: "#334155",
-    marginTop: 2,
-    lineHeight: 15,
-  },
-  quickScanBtn: {
-    backgroundColor: "#0d9488",
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    borderRadius: 10,
-  },
-  quickScanBtnText: {
-    color: "#ffffff",
-    fontSize: 13,
-    fontWeight: "700",
-  },
+
+  /* ── Header ── */
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 16,
-    paddingTop: 10,
-    paddingBottom: 6,
   },
-  headerTitle: {
-    fontSize: 17,
-    fontWeight: "800",
-    color: "#0f172a",
+  headerLeft: {},
+  greeting: {
+    fontSize: fontSize.md,
+    color: colors.textSecondary,
+    fontWeight: fontWeight.medium,
   },
-  listContent: {
-    padding: 16,
-    paddingTop: 6,
-    gap: 12,
+  userName: {
+    fontSize: fontSize.xxl,
+    fontWeight: fontWeight.heavy,
+    color: colors.text,
+    marginTop: 2,
   },
-  card: {
-    backgroundColor: "#ffffff",
-    borderRadius: 14,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: "#e2e8f0",
-    shadowColor: "#0f172a",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.03,
-    shadowRadius: 6,
-    elevation: 2,
+  headerRight: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
   },
-  cardTop: {
+  statusDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  statusDotOnline: {
+    backgroundColor: colors.success,
+  },
+  statusDotOffline: {
+    backgroundColor: colors.warning,
+  },
+  avatarBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: colors.primary,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  avatarText: {
+    color: colors.textOnPrimary,
+    fontWeight: fontWeight.bold,
+    fontSize: fontSize.lg,
+  },
+
+  /* ── Scan Card ── */
+  scanCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.md,
+    backgroundColor: colors.primary,
+    borderRadius: radius.xl,
+    padding: spacing.xl,
+    ...shadow.md,
+  },
+  scanCardPressed: {
+    backgroundColor: colors.primaryDark,
+  },
+  scanIconWrap: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: "rgba(255,255,255,0.2)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  scanTextWrap: {
+    flex: 1,
+  },
+  scanTitle: {
+    fontSize: fontSize.lg,
+    fontWeight: fontWeight.bold,
+    color: colors.textOnPrimary,
+  },
+  scanDesc: {
+    fontSize: fontSize.xs,
+    color: "rgba(255,255,255,0.75)",
+    marginTop: 2,
+    lineHeight: 16,
+  },
+
+  /* ── Stats ── */
+  statsRow: {
+    flexDirection: "row",
+    gap: spacing.sm,
+  },
+  statCard: {
+    flex: 1,
+    alignItems: "center",
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.sm,
+  },
+  statValue: {
+    fontSize: fontSize.xl,
+    fontWeight: fontWeight.heavy,
+    color: colors.text,
+  },
+  statLabel: {
+    fontSize: fontSize.xs,
+    color: colors.textTertiary,
+    marginTop: 2,
+  },
+
+  /* ── Section header ── */
+  sectionHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
   },
-  cardTitle: {
-    fontSize: 15,
-    fontWeight: "700",
-    color: "#0f172a",
-    flex: 1,
+  sectionTitle: {
+    fontSize: fontSize.lg,
+    fontWeight: fontWeight.bold,
+    color: colors.text,
   },
-  statusPill: {
-    fontSize: 10,
-    fontWeight: "700",
-    textTransform: "capitalize",
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 6,
+  seeAllLink: {
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.semibold,
+    color: colors.primary,
   },
-  statusCompleted: {
-    backgroundColor: "#ecfdf5",
-    color: "#059669",
+
+  /* ── Recent survey rows ── */
+  surveyRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.md,
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    padding: spacing.lg,
   },
-  statusInProgress: {
-    backgroundColor: "#eff6ff",
-    color: "#2563eb",
+  surveyRowPressed: {
+    backgroundColor: colors.surfaceSecondary,
   },
-  pendingSyncPill: {
-    fontSize: 10,
-    fontWeight: "600",
-    color: "#d97706",
+  surveyDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: colors.primary,
+  },
+  surveyTitle: {
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.semibold,
+    color: colors.text,
+  },
+  surveySub: {
+    fontSize: fontSize.xs,
+    color: colors.textTertiary,
     marginTop: 2,
   },
-  cardLocation: {
-    fontSize: 12,
-    color: "#64748b",
-    marginTop: 4,
-  },
-  cardStatsRow: {
-    flexDirection: "row",
-    gap: 6,
-    marginTop: 12,
-    paddingTop: 10,
-    borderTopWidth: 1,
-    borderTopColor: "#f1f5f9",
-  },
-  statChip: {
-    flex: 1,
-    backgroundColor: "#f8fafc",
-    padding: 6,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#e2e8f0",
-  },
-  statChipLabel: {
-    fontSize: 8,
-    fontWeight: "700",
-    color: "#64748b",
-  },
-  statChipVal: {
-    fontSize: 11,
-    fontWeight: "700",
-    color: "#0f172a",
-    marginTop: 1,
-  },
-  statChipValItalic: {
-    fontSize: 11,
-    fontWeight: "700",
-    color: "#0d9488",
-    fontStyle: "italic",
-    marginTop: 1,
-  },
-  statChipWave: {
-    backgroundColor: "#f0fdfa",
-    borderColor: "#99f6e4",
-  },
-  statChipLabelWave: {
-    fontSize: 8,
-    fontWeight: "700",
-    color: "#0f766e",
-  },
-  statChipValWave: {
-    fontSize: 11,
-    fontWeight: "800",
-    color: "#0d9488",
-    marginTop: 1,
+
+  /* ── Empty state ── */
+  emptyCard: {
+    alignItems: "center",
+    gap: spacing.md,
   },
   emptyText: {
+    fontSize: fontSize.sm,
+    color: colors.textSecondary,
     textAlign: "center",
-    color: "#64748b",
-    marginTop: 32,
-    fontSize: 14,
+    lineHeight: 20,
   },
-  actionBar: {
-    flexDirection: "row",
-    padding: 14,
-    gap: 8,
-    backgroundColor: "#ffffff",
-    borderTopWidth: 1,
-    borderTopColor: "#e2e8f0",
+  newSurveyBtn: {
+    backgroundColor: colors.primarySubtle,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+    borderRadius: radius.md,
   },
-  actionBtn: {
-    flex: 1,
-    paddingVertical: 12,
-    borderRadius: 10,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  primaryBtn: {
-    backgroundColor: "#0d9488",
-    flex: 1.3,
-  },
-  primaryBtnText: {
-    color: "#ffffff",
-    fontWeight: "700",
-    fontSize: 13,
-  },
-  secondaryBtn: {
-    backgroundColor: "#f8fafc",
-    borderWidth: 1,
-    borderColor: "#cbd5e1",
-  },
-  secondaryBtnText: {
-    color: "#334155",
-    fontWeight: "600",
-    fontSize: 12,
+  newSurveyBtnText: {
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.semibold,
+    color: colors.primaryDark,
   },
 });

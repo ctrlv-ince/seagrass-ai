@@ -1,89 +1,126 @@
+import { useEffect } from "react";
+import { Platform, StatusBar } from "react-native";
 import { Stack } from "expo-router";
-import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { AuthProvider } from "@/context/AuthContext";
+import { colors } from "@/theme";
 
 export default function RootLayout() {
+  useEffect(() => {
+    if (Platform.OS === "android") {
+      StatusBar.setTranslucent(true);
+      StatusBar.setBackgroundColor("transparent");
+      StatusBar.setBarStyle("dark-content");
+    }
+  }, []);
+
   return (
     <SafeAreaProvider>
       <AuthProvider>
-        <StatusBar style="dark" />
+        <StatusBar
+          barStyle="dark-content"
+          backgroundColor="transparent"
+          translucent={true}
+        />
         <Stack
           screenOptions={{
-            headerStyle: {
-              backgroundColor: "#ffffff",
-            },
-            headerTintColor: "#0f172a",
-            headerTitleStyle: {
-              fontWeight: "700",
-              fontSize: 17,
-            },
-            headerShadowVisible: false,
+            headerShown: false,
+            animation: "slide_from_right",
+            animationDuration: 220,
             contentStyle: {
-              backgroundColor: "#f8fafc",
+              backgroundColor: colors.background,
             },
           }}
         >
+          {/* Main Tab Screens — NO transition animation so bottom tab switching is instant and seamless */}
           <Stack.Screen
             name="index"
             options={{
-              title: "Seagrass Surveys",
+              headerShown: false,
+              animation: "none",
             }}
           />
           <Stack.Screen
-            name="auth/login"
+            name="survey/index"
             options={{
-              title: "Sign In",
-              presentation: "modal",
-            }}
-          />
-          <Stack.Screen
-            name="auth/register"
-            options={{
-              title: "Create Account",
-              presentation: "modal",
-            }}
-          />
-          <Stack.Screen
-            name="capture"
-            options={{
-              title: "Scan Quadrat",
-            }}
-          />
-          <Stack.Screen
-            name="survey/[id]"
-            options={{
-              title: "Survey Details",
-            }}
-          />
-          <Stack.Screen
-            name="survey/new"
-            options={{
-              title: "New Survey",
+              headerShown: false,
+              animation: "none",
             }}
           />
           <Stack.Screen
             name="map"
             options={{
-              title: "Field Map",
+              headerShown: false,
+              animation: "none",
             }}
           />
           <Stack.Screen
-            name="wave-calc"
+            name="more"
             options={{
-              title: "Wave Calculator",
+              headerShown: false,
+              animation: "none",
+            }}
+          />
+
+          {/* Sub-screens — Smooth native slide-from-right animation */}
+          <Stack.Screen
+            name="capture"
+            options={{
+              headerShown: false,
+              animation: "slide_from_right",
             }}
           />
           <Stack.Screen
             name="species"
             options={{
-              title: "Species Guide",
+              headerShown: false,
+              animation: "slide_from_right",
+            }}
+          />
+          <Stack.Screen
+            name="wave-calc"
+            options={{
+              headerShown: false,
+              animation: "slide_from_right",
             }}
           />
           <Stack.Screen
             name="settings"
             options={{
-              title: "Settings",
+              headerShown: false,
+              animation: "slide_from_right",
+            }}
+          />
+          <Stack.Screen
+            name="survey/[id]"
+            options={{
+              headerShown: false,
+              animation: "slide_from_right",
+            }}
+          />
+          <Stack.Screen
+            name="survey/new"
+            options={{
+              headerShown: false,
+              animation: "slide_from_right",
+            }}
+          />
+
+          {/* Modal Screens */}
+          <Stack.Screen
+            name="auth/login"
+            options={{
+              headerShown: false,
+              presentation: "modal",
+              animation: "slide_from_bottom",
+            }}
+          />
+          <Stack.Screen
+            name="auth/register"
+            options={{
+              headerShown: false,
+              presentation: "modal",
+              animation: "slide_from_bottom",
             }}
           />
         </Stack>

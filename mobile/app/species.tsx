@@ -8,6 +8,19 @@ import {
   Pressable,
 } from "react-native";
 import { router } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  ArrowLeft,
+  Search,
+  ChevronDown,
+  ChevronUp,
+  Camera,
+  Info,
+} from "lucide-react-native";
+import { BottomNavBar } from "@/components/BottomNavBar";
+import { Card } from "@/components/ui/Card";
+import { Badge, type BadgeVariant } from "@/components/ui/Badge";
+import { colors, spacing, radius, fontSize, fontWeight } from "@/theme";
 
 interface SpeciesCardData {
   scientificName: string;
@@ -15,6 +28,7 @@ interface SpeciesCardData {
   bladeLength: string;
   shootDensity: string;
   dampingTier: string;
+  tierVariant: BadgeVariant;
   features: string;
   fieldTip: string;
 }
@@ -26,35 +40,47 @@ const SPECIES_LIST: SpeciesCardData[] = [
     bladeLength: "30 – 150 cm",
     shootDensity: "100 – 350 /m²",
     dampingTier: "Very High (>60%)",
-    features: "Long strap blades with air chambers; black bristle fibers on rhizome.",
-    fieldTip: "Largest seagrass in Southeast Asia. Coarse ribbon blades stay buoyant in water.",
+    tierVariant: "success",
+    features:
+      "Long strap blades with air chambers; black bristle fibers on rhizome.",
+    fieldTip:
+      "Largest seagrass in Southeast Asia. Coarse ribbon blades stay buoyant in water.",
   },
   {
     scientificName: "Thalassia hemprichii",
     commonName: "Pacific Turtle Grass",
     bladeLength: "10 – 35 cm",
     shootDensity: "200 – 600 /m²",
-    dampingTier: "High (45-60%)",
-    features: "Sickle-shaped curved blades; black/red tannin speckles along blade.",
-    fieldTip: "Reef-flat carpet builder. Look for curved leaves with longitudinal flecks against sunlight.",
+    dampingTier: "High (45–60%)",
+    tierVariant: "primary",
+    features:
+      "Sickle-shaped curved blades; black/red tannin speckles along blade.",
+    fieldTip:
+      "Reef-flat carpet builder. Look for curved leaves with longitudinal flecks against sunlight.",
   },
   {
     scientificName: "Cymodocea rotundata",
     commonName: "Ribbon Seagrass",
     bladeLength: "8 – 25 cm",
     shootDensity: "250 – 700 /m²",
-    dampingTier: "Moderate (35-45%)",
-    features: "Smooth rounded leaf tip; circular closed ring scars on short shoot stems.",
-    fieldTip: "Blunt rounded leaf tips without serrations. Stems have clear circular rings.",
+    dampingTier: "Moderate (35–45%)",
+    tierVariant: "info",
+    features:
+      "Smooth rounded leaf tip; circular closed ring scars on short shoot stems.",
+    fieldTip:
+      "Blunt rounded leaf tips without serrations. Stems have clear circular rings.",
   },
   {
     scientificName: "Halodule pinifolia",
     commonName: "Fiber-strand Seagrass",
     bladeLength: "5 – 20 cm",
     shootDensity: "400 – 1200 /m²",
-    dampingTier: "Moderate (30-40%)",
-    features: "Narrow needle-like green blades; trident leaf tip with minute central tooth.",
-    fieldTip: "Fine hair-like strands resembling pine needles in shallow intertidal sand.",
+    dampingTier: "Moderate (30–40%)",
+    tierVariant: "info",
+    features:
+      "Narrow needle-like green blades; trident leaf tip with minute central tooth.",
+    fieldTip:
+      "Fine hair-like strands resembling pine needles in shallow intertidal sand.",
   },
   {
     scientificName: "Halophila ovalis",
@@ -62,13 +88,24 @@ const SPECIES_LIST: SpeciesCardData[] = [
     bladeLength: "1 – 4 cm",
     shootDensity: "500 – 1500 /m²",
     dampingTier: "Low-Moderate (<30%)",
-    features: "Paired oval paddle-shaped leaves on thin stalk; 10-25 paired cross-veins.",
-    fieldTip: "Distinctive clover/paddle leaves. Completely distinct from ribbon seagrasses.",
+    tierVariant: "warning",
+    features:
+      "Paired oval paddle-shaped leaves on thin stalk; 10–25 paired cross-veins.",
+    fieldTip:
+      "Distinctive clover/paddle leaves. Completely distinct from ribbon seagrasses.",
   },
 ];
 
 export default function SpeciesScreen() {
+  const insets = useSafeAreaInsets();
   const [search, setSearch] = useState("");
+  const [expandedSpecies, setExpandedSpecies] = useState<string | null>(null);
+
+  const toggleExpand = (scientificName: string) => {
+    setExpandedSpecies((current) =>
+      current === scientificName ? null : scientificName
+    );
+  };
 
   const filtered = SPECIES_LIST.filter(
     (s) =>
@@ -78,216 +115,310 @@ export default function SpeciesScreen() {
   );
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.title}>Species Field Guide</Text>
-        <Text style={styles.subtitle}>
-          Visual identification keys and hydrodynamic wave damping ratings.
-        </Text>
+    <View style={styles.container}>
+      {/* Top Header Bar */}
+      <View style={[styles.topBar, { paddingTop: Math.max(insets.top, 14) }]}>
+        <Pressable
+          onPress={() => (router.canGoBack() ? router.back() : router.push("/more"))}
+          style={styles.backBtn}
+          hitSlop={8}
+        >
+          <ArrowLeft size={20} color={colors.text} />
+        </Pressable>
+        <Text style={styles.topBarTitle}>Species Guide</Text>
+        <View style={styles.topBarRightPlaceholder} />
       </View>
 
-      {/* Search Input */}
-      <View style={styles.searchContainer}>
-        <TextInput
-          placeholder="Search species name, blade traits..."
-          value={search}
-          onChangeText={setSearch}
-          placeholderTextColor="#94a3b8"
-          style={styles.searchInput}
-        />
-      </View>
+      <ScrollView
+        style={styles.scrollArea}
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Subtitle description */}
+        <View style={styles.headerTextWrap}>
+          <Text style={styles.subtitle}>
+            Field identification keys and hydrodynamic wave damping ratings.
+          </Text>
+        </View>
 
-      {/* Species Cards */}
-      <View style={styles.list}>
-        {filtered.map((item) => (
-          <View key={item.scientificName} style={styles.card}>
-            <View style={styles.cardHeader}>
-              <View style={styles.names}>
-                <Text style={styles.scientificName}>{item.scientificName}</Text>
-                <Text style={styles.commonName}>{item.commonName}</Text>
-              </View>
-              <View style={styles.badge}>
-                <Text style={styles.badgeText}>{item.dampingTier.split(" ")[0]}</Text>
-              </View>
-            </View>
+        {/* Search Input */}
+        <View style={styles.searchContainer}>
+          <Search size={18} color={colors.textTertiary} />
+          <TextInput
+            placeholder="Search species name or traits..."
+            value={search}
+            onChangeText={setSearch}
+            placeholderTextColor={colors.textTertiary}
+            style={styles.searchInput}
+          />
+        </View>
 
-            <View style={styles.statsRow}>
-              <View style={styles.statBox}>
-                <Text style={styles.statLabel}>BLADE LENGTH</Text>
-                <Text style={styles.statVal}>{item.bladeLength}</Text>
-              </View>
-              <View style={styles.statBox}>
-                <Text style={styles.statLabel}>SHOOT DENSITY</Text>
-                <Text style={styles.statVal}>{item.shootDensity}</Text>
-              </View>
-            </View>
+        {/* Species List */}
+        <View style={styles.list}>
+          {filtered.map((item) => {
+            const isExpanded = expandedSpecies === item.scientificName;
+            return (
+              <Card key={item.scientificName} style={styles.card}>
+                <Pressable
+                  onPress={() => toggleExpand(item.scientificName)}
+                  style={styles.cardHeader}
+                >
+                  <View style={styles.names}>
+                    <Text style={styles.scientificName}>
+                      {item.scientificName}
+                    </Text>
+                    <Text style={styles.commonName}>{item.commonName}</Text>
+                  </View>
 
-            <View style={styles.featureBox}>
-              <Text style={styles.featureLabel}>Key Features:</Text>
-              <Text style={styles.featureText}>{item.features}</Text>
-            </View>
+                  <View style={styles.headerRight}>
+                    <Badge
+                      label={item.dampingTier.split(" ")[0]}
+                      variant={item.tierVariant}
+                      size="sm"
+                    />
+                    <View style={styles.chevronWrap}>
+                      {isExpanded ? (
+                        <ChevronUp size={18} color={colors.textTertiary} />
+                      ) : (
+                        <ChevronDown size={18} color={colors.textTertiary} />
+                      )}
+                    </View>
+                  </View>
+                </Pressable>
 
-            <View style={styles.tipBox}>
-              <Text style={styles.tipText}>
-                <Text style={styles.tipBold}>Field ID: </Text>
-                {item.fieldTip}
-              </Text>
-            </View>
-          </View>
-        ))}
-      </View>
+                {/* Collapsible Details */}
+                {isExpanded && (
+                  <View style={styles.expandedContent}>
+                    <View style={styles.statsRow}>
+                      <View style={styles.statBox}>
+                        <Text style={styles.statLabel}>Blade Length</Text>
+                        <Text style={styles.statVal}>{item.bladeLength}</Text>
+                      </View>
+                      <View style={styles.statBox}>
+                        <Text style={styles.statLabel}>Shoot Density</Text>
+                        <Text style={styles.statVal}>{item.shootDensity}</Text>
+                      </View>
+                    </View>
 
-      {/* Button to scan quadrat */}
-      <Pressable onPress={() => router.push("/capture")} style={styles.actionBtn}>
-        <Text style={styles.actionBtnText}>Open Camera Scanner</Text>
-      </Pressable>
-    </ScrollView>
+                    <View style={styles.infoSection}>
+                      <Text style={styles.sectionLabel}>Key Characteristics</Text>
+                      <Text style={styles.bodyText}>{item.features}</Text>
+                    </View>
+
+                    <View style={styles.tipBox}>
+                      <Info size={15} color={colors.primary} style={styles.tipIcon} />
+                      <View style={styles.tipContent}>
+                        <Text style={styles.tipTitle}>Field ID Tip</Text>
+                        <Text style={styles.tipText}>{item.fieldTip}</Text>
+                      </View>
+                    </View>
+                  </View>
+                )}
+              </Card>
+            );
+          })}
+        </View>
+
+        {/* Action Button */}
+        <Pressable
+          onPress={() => router.push("/capture")}
+          style={({ pressed }) => [
+            styles.actionBtn,
+            pressed && styles.actionBtnPressed,
+          ]}
+        >
+          <Camera size={18} color={colors.surface} />
+          <Text style={styles.actionBtnText}>Scan with Camera</Text>
+        </Pressable>
+      </ScrollView>
+
+      <BottomNavBar activeTab="more" />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f8fafc",
+    backgroundColor: colors.background,
+  },
+  topBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.md,
+    backgroundColor: colors.surface,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.borderLight,
+  },
+  backBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: radius.md,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: colors.surfaceSecondary,
+  },
+  topBarTitle: {
+    fontSize: fontSize.md,
+    fontWeight: fontWeight.bold,
+    color: colors.text,
+  },
+  topBarRightPlaceholder: {
+    width: 36,
+  },
+  scrollArea: {
+    flex: 1,
   },
   content: {
-    padding: 16,
+    padding: spacing.lg,
     paddingBottom: 40,
-    gap: 14,
+    gap: spacing.md,
   },
-  header: {
-    marginBottom: 4,
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: "800",
-    color: "#0f172a",
+  headerTextWrap: {
+    marginBottom: spacing.xs,
   },
   subtitle: {
-    fontSize: 12,
-    color: "#64748b",
-    marginTop: 2,
+    fontSize: fontSize.sm,
+    color: colors.textSecondary,
+    lineHeight: 18,
   },
   searchContainer: {
-    backgroundColor: "#ffffff",
-    borderRadius: 14,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
     borderWidth: 1,
-    borderColor: "#e2e8f0",
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    borderColor: colors.border,
+    paddingHorizontal: spacing.md,
+    paddingVertical: 10,
+    gap: spacing.sm,
   },
   searchInput: {
-    fontSize: 13,
-    color: "#0f172a",
+    flex: 1,
+    fontSize: fontSize.sm,
+    color: colors.text,
+    padding: 0,
   },
   list: {
-    gap: 12,
+    gap: spacing.md,
   },
   card: {
-    backgroundColor: "#ffffff",
-    borderRadius: 20,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: "#e2e8f0",
-    gap: 10,
+    padding: spacing.md,
+    borderRadius: radius.lg,
   },
   cardHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "flex-start",
+    alignItems: "center",
   },
   names: {
     flex: 1,
+    marginRight: spacing.sm,
   },
   scientificName: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#0f172a",
+    fontSize: fontSize.md,
+    fontWeight: fontWeight.bold,
+    color: colors.text,
     fontStyle: "italic",
   },
   commonName: {
-    fontSize: 11,
-    color: "#64748b",
-    marginTop: 1,
+    fontSize: fontSize.xs,
+    color: colors.textSecondary,
+    marginTop: 2,
   },
-  badge: {
-    backgroundColor: "#f0fdfa",
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#99f6e4",
+  headerRight: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
   },
-  badgeText: {
-    fontSize: 10,
-    fontWeight: "700",
-    color: "#0f766e",
+  chevronWrap: {
+    marginLeft: 2,
+  },
+  expandedContent: {
+    marginTop: spacing.md,
+    paddingTop: spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: colors.borderLight,
+    gap: spacing.md,
   },
   statsRow: {
     flexDirection: "row",
-    gap: 8,
+    gap: spacing.sm,
   },
   statBox: {
     flex: 1,
-    backgroundColor: "#f8fafc",
-    padding: 8,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "#f1f5f9",
+    backgroundColor: colors.surfaceSecondary,
+    padding: spacing.sm + 2,
+    borderRadius: radius.md,
   },
   statLabel: {
-    fontSize: 9,
-    fontWeight: "700",
-    color: "#94a3b8",
+    fontSize: fontSize.xs,
+    fontWeight: fontWeight.medium,
+    color: colors.textSecondary,
   },
   statVal: {
-    fontSize: 12,
-    fontWeight: "700",
-    color: "#1e293b",
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.bold,
+    color: colors.text,
     marginTop: 2,
   },
-  featureBox: {
-    backgroundColor: "#f8fafc",
-    padding: 10,
-    borderRadius: 10,
+  infoSection: {
+    gap: 4,
   },
-  featureLabel: {
-    fontSize: 10,
-    fontWeight: "700",
-    color: "#475569",
-    marginBottom: 2,
+  sectionLabel: {
+    fontSize: fontSize.xs,
+    fontWeight: fontWeight.semibold,
+    color: colors.text,
   },
-  featureText: {
-    fontSize: 11,
-    color: "#64748b",
-    lineHeight: 15,
+  bodyText: {
+    fontSize: fontSize.xs,
+    color: colors.textSecondary,
+    lineHeight: 18,
   },
   tipBox: {
-    backgroundColor: "#f0fdfa",
-    padding: 10,
-    borderRadius: 10,
+    flexDirection: "row",
+    backgroundColor: colors.primarySubtle,
+    padding: spacing.md,
+    borderRadius: radius.md,
     borderWidth: 1,
-    borderColor: "#ccfbf1",
+    borderColor: colors.primaryLight,
+    gap: spacing.sm,
+  },
+  tipIcon: {
+    marginTop: 2,
+  },
+  tipContent: {
+    flex: 1,
+  },
+  tipTitle: {
+    fontSize: fontSize.xs,
+    fontWeight: fontWeight.semibold,
+    color: colors.primaryDark,
+    marginBottom: 2,
   },
   tipText: {
-    fontSize: 11,
-    color: "#0f766e",
-    lineHeight: 15,
-  },
-  tipBold: {
-    fontWeight: "700",
+    fontSize: fontSize.xs,
+    color: colors.textSecondary,
+    lineHeight: 17,
   },
   actionBtn: {
-    backgroundColor: "#0d9488",
-    borderRadius: 16,
+    flexDirection: "row",
+    backgroundColor: colors.primary,
+    borderRadius: radius.lg,
     paddingVertical: 14,
     alignItems: "center",
-    marginTop: 6,
+    justifyContent: "center",
+    marginTop: spacing.sm,
+    gap: spacing.sm,
+  },
+  actionBtnPressed: {
+    opacity: 0.9,
   },
   actionBtnText: {
-    color: "#ffffff",
-    fontWeight: "700",
-    fontSize: 14,
+    color: colors.surface,
+    fontWeight: fontWeight.semibold,
+    fontSize: fontSize.sm,
   },
 });

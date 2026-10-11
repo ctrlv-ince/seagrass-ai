@@ -1,15 +1,42 @@
-import React, { useEffect, useState, useCallback } from "react";
-import { View, Text, StyleSheet, Pressable, ScrollView, Image } from "react-native";
+import React, { useState, useCallback } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  ScrollView,
+  Image,
+} from "react-native";
 import { useLocalSearchParams, router, useFocusEffect } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  ArrowLeft,
+  Camera,
+  MapPin,
+  User,
+  Calendar,
+  Waves,
+  Leaf,
+  Plus,
+} from "lucide-react-native";
 import { z } from "zod";
-import { getLocalSurveyById, getLocalSurveyImages, LocalSurvey, LocalSurveyImage } from "@/db/repository";
-import { CardSkeleton, Skeleton } from "@/components/Skeleton";
+import {
+  getLocalSurveyById,
+  getLocalSurveyImages,
+  LocalSurvey,
+  LocalSurveyImage,
+} from "@/db/repository";
+import { CardSkeleton } from "@/components/Skeleton";
+import { Card } from "@/components/ui/Card";
+import { Badge } from "@/components/ui/Badge";
+import { colors, spacing, radius, fontSize, fontWeight } from "@/theme";
 
 const ParamsSchema = z.object({
   id: z.string().min(1),
 });
 
 export default function SurveyDetailScreen() {
+  const insets = useSafeAreaInsets();
   const rawParams = useLocalSearchParams();
   const parsed = ParamsSchema.safeParse(rawParams);
 
@@ -45,10 +72,13 @@ export default function SurveyDetailScreen() {
 
   if (!parsed.success) {
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, styles.centerContent]}>
         <Text style={styles.errorText}>Invalid survey identifier.</Text>
-        <Pressable style={styles.backBtn} onPress={() => router.back()}>
-          <Text style={styles.backBtnText}>Go Back</Text>
+        <Pressable
+          style={styles.backBtnFallback}
+          onPress={() => router.back()}
+        >
+          <Text style={styles.backBtnFallbackText}>Go Back</Text>
         </Pressable>
       </View>
     );
@@ -58,416 +88,490 @@ export default function SurveyDetailScreen() {
 
   if (loading) {
     return (
-      <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-        <CardSkeleton />
-        <CardSkeleton />
-        <CardSkeleton />
-      </ScrollView>
+      <View style={styles.container}>
+        <View style={[styles.topBar, { paddingTop: Math.max(insets.top, 14) }]}>
+          <Pressable
+            style={styles.topBarBtn}
+            onPress={() => router.back()}
+            hitSlop={8}
+          >
+            <ArrowLeft size={20} color={colors.text} />
+          </Pressable>
+          <Text style={styles.topBarTitle}>Survey Details</Text>
+          <View style={styles.topBarRightPlaceholder} />
+        </View>
+        <ScrollView style={styles.scrollArea} contentContainerStyle={styles.content}>
+          <CardSkeleton />
+          <CardSkeleton />
+          <CardSkeleton />
+        </ScrollView>
+      </View>
     );
   }
 
   const isLocal = !!survey;
   const isPending = survey?.sync_status === "pending";
-  const displayTitle = survey?.title || "Bolinao Inshore Meadow";
+  const displayTitle = survey?.title || "Survey Session";
   const displayLocation =
     survey?.location_name ||
     (survey?.latitude && survey?.longitude
       ? `${survey.latitude.toFixed(3)}°N, ${survey.longitude.toFixed(3)}°E`
-      : "Santiago Island, Pangasinan • 16.384°N, 119.892°E");
-  const surveyor = survey?.surveyor_name || "Marine Ecology Team";
+      : "Santiago Island, Pangasinan");
+  const surveyor = survey?.surveyor_name || "Field Team";
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      {/* Overview Card */}
-      <View style={styles.card}>
-        <View style={styles.cardHeader}>
-          <Text style={styles.surveyTag}>
-            {isLocal ? `LOCAL SURVEY #${id.slice(-6).toUpperCase()}` : `SURVEY SESSION #${id}`}
-          </Text>
-          <Text
-            style={[
-              styles.statusBadge,
-              isLocal
-                ? isPending
-                  ? styles.badgePending
-                  : styles.badgeSynced
-                : styles.badgeCompleted,
-            ]}
-          >
-            {isLocal ? (isPending ? "⏳ Pending Sync" : "✓ Cloud Synced") : "Completed"}
-          </Text>
-        </View>
-
-        <Text style={styles.heading}>{displayTitle}</Text>
-        <Text style={styles.locationText}>📍 {displayLocation}</Text>
-        <Text style={styles.surveyorText}>👤 Surveyor: {surveyor}</Text>
-        {survey?.created_at && (
-          <Text style={styles.dateText}>
-            🗓 Recorded: {new Date(survey.created_at).toLocaleDateString()} at{" "}
-            {new Date(survey.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-          </Text>
-        )}
+    <View style={styles.container}>
+      {/* Top Header Bar */}
+      <View style={[styles.topBar, { paddingTop: Math.max(insets.top, 14) }]}>
+        <Pressable
+          style={styles.topBarBtn}
+          onPress={() => router.back()}
+          hitSlop={8}
+        >
+          <ArrowLeft size={20} color={colors.text} />
+        </Pressable>
+        <Text style={styles.topBarTitle} numberOfLines={1}>
+          {displayTitle}
+        </Text>
+        <View style={styles.topBarRightPlaceholder} />
       </View>
 
-      {/* Captured Quadrat Photos (Offline SQLite items) */}
-      <View style={styles.card}>
-        <View style={styles.cardHeader}>
-          <Text style={styles.sectionTitle}>📷 QUADRAT SCANS ({images.length})</Text>
-          <Pressable
-            style={styles.addMiniBtn}
-            onPress={() => router.push({ pathname: "/capture", params: { surveyId: id } })}
-          >
-            <Text style={styles.addMiniBtnText}>+ Scan</Text>
-          </Pressable>
-        </View>
+      <ScrollView
+        style={styles.scrollArea}
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Overview Card */}
+        <Card style={styles.card}>
+          <View style={styles.cardHeaderRow}>
+            <Text style={styles.surveyIdText}>
+              {isLocal
+                ? `ID: #${id.slice(-6).toUpperCase()}`
+                : `ID: #${id}`}
+            </Text>
+            <Badge
+              label={
+                isLocal
+                  ? isPending
+                    ? "Pending Sync"
+                    : "Cloud Synced"
+                  : "Completed"
+              }
+              variant={
+                isLocal
+                  ? isPending
+                    ? "warning"
+                    : "info"
+                  : "success"
+              }
+              dot
+            />
+          </View>
 
-        {images.length === 0 ? (
-          <View style={styles.emptyQuadratBox}>
-            <Text style={styles.emptyQuadratText}>
-              No quadrat photos captured yet for this survey session.
+          <Text style={styles.heading}>{displayTitle}</Text>
+
+          <View style={styles.metaRow}>
+            <MapPin size={14} color={colors.textSecondary} />
+            <Text style={styles.metaText}>{displayLocation}</Text>
+          </View>
+
+          <View style={styles.metaRow}>
+            <User size={14} color={colors.textSecondary} />
+            <Text style={styles.metaText}>Surveyor: {surveyor}</Text>
+          </View>
+
+          {survey?.created_at && (
+            <View style={styles.metaRow}>
+              <Calendar size={14} color={colors.textSecondary} />
+              <Text style={styles.metaText}>
+                {new Date(survey.created_at).toLocaleDateString()} at{" "}
+                {new Date(survey.created_at).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </Text>
+            </View>
+          )}
+        </Card>
+
+        {/* Captured Quadrat Photos */}
+        <Card style={styles.card}>
+          <View style={styles.sectionHeaderRow}>
+            <View style={styles.sectionTitleGroup}>
+              <Camera size={16} color={colors.primary} />
+              <Text style={styles.sectionTitle}>
+                Quadrat Scans ({images.length})
+              </Text>
+            </View>
+            <Pressable
+              style={styles.addMiniBtn}
+              onPress={() =>
+                router.push({
+                  pathname: "/capture",
+                  params: { surveyId: id },
+                })
+              }
+            >
+              <Plus size={13} color={colors.primary} />
+              <Text style={styles.addMiniBtnText}>Scan</Text>
+            </Pressable>
+          </View>
+
+          {images.length === 0 ? (
+            <View style={styles.emptyQuadratBox}>
+              <Text style={styles.emptyQuadratText}>
+                No quadrat photos captured yet for this session.
+              </Text>
+            </View>
+          ) : (
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={styles.imageScroll}
+              contentContainerStyle={styles.imageScrollContent}
+            >
+              {images.map((img) => (
+                <View key={img.local_id} style={styles.imageCard}>
+                  <Image
+                    source={{ uri: img.file_uri }}
+                    style={styles.thumbnail}
+                  />
+                  <View style={styles.imageMeta}>
+                    <Badge
+                      label={img.sync_status === "synced" ? "Synced" : "Queued"}
+                      variant={img.sync_status === "synced" ? "success" : "warning"}
+                      size="sm"
+                    />
+                  </View>
+                </View>
+              ))}
+            </ScrollView>
+          )}
+        </Card>
+
+        {/* Meadow Specs Card */}
+        <Card style={styles.card}>
+          <View style={styles.sectionTitleGroup}>
+            <Leaf size={16} color={colors.primary} />
+            <Text style={styles.sectionTitle}>Meadow Characteristics</Text>
+          </View>
+
+          <View style={styles.specItem}>
+            <Text style={styles.specLabel}>Identified Species</Text>
+            <Text style={styles.specValueItalic}>Enhalus acoroides</Text>
+          </View>
+
+          <View style={styles.specItem}>
+            <Text style={styles.specLabel}>Canopy Coverage</Text>
+            <Text style={styles.specValueBold}>76.5% Mean</Text>
+          </View>
+
+          <View style={styles.specItem}>
+            <Text style={styles.specLabel}>Average Blade Length</Text>
+            <Text style={styles.specValueBold}>28.5 cm</Text>
+          </View>
+
+          <View style={styles.specItem}>
+            <Text style={styles.specLabel}>Shoot Density</Text>
+            <Text style={styles.specValueBold}>420 shoots / m²</Text>
+          </View>
+
+          <View style={styles.specItem}>
+            <Text style={styles.specLabel}>Water Depth</Text>
+            <Text style={styles.specValueBold}>1.80 meters</Text>
+          </View>
+
+          <View style={[styles.specItem, styles.specItemLast]}>
+            <Text style={styles.specLabel}>Quadrats Sampled</Text>
+            <Text style={styles.specValueBold}>
+              {images.length > 0
+                ? `${images.length} quadrats recorded`
+                : "Transect baseline"}
             </Text>
           </View>
-        ) : (
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.imageScroll}>
-            {images.map((img) => (
-              <View key={img.local_id} style={styles.imageCard}>
-                <Image source={{ uri: img.file_uri }} style={styles.thumbnail} />
-                <View style={styles.imageMeta}>
-                  <Text
-                    style={[
-                      styles.imageSyncStatus,
-                      img.sync_status === "synced" ? styles.syncSuccess : styles.syncPending,
-                    ]}
-                  >
-                    {img.sync_status === "synced" ? "✓ Synced" : "⏳ Queued"}
-                  </Text>
-                </View>
-              </View>
-            ))}
-          </ScrollView>
-        )}
-      </View>
+        </Card>
 
-      {/* Meadow Specs Card */}
-      <View style={styles.card}>
-        <Text style={styles.sectionTitle}>🌿 MEADOW SPECS</Text>
+        {/* Wave Attenuation Impact Card */}
+        <Card style={styles.card}>
+          <View style={styles.sectionHeaderRow}>
+            <View style={styles.sectionTitleGroup}>
+              <Waves size={16} color={colors.primary} />
+              <Text style={styles.sectionTitle}>Wave Attenuation</Text>
+            </View>
+            <Badge label="-58.4%" variant="primary" size="md" />
+          </View>
 
-        <View style={styles.speciesRow}>
-          <Text style={styles.specLabel}>Identified Species:</Text>
-          <Text style={styles.specValueItalic}>Enhalus acoroides</Text>
-        </View>
-
-        <View style={styles.specRow}>
-          <Text style={styles.specLabel}>Canopy Coverage:</Text>
-          <Text style={styles.specValueBold}>76.5% Mean</Text>
-        </View>
-
-        <View style={styles.specRow}>
-          <Text style={styles.specLabel}>Average Blade Length:</Text>
-          <Text style={styles.specValueBold}>28.5 cm</Text>
-        </View>
-
-        <View style={styles.specRow}>
-          <Text style={styles.specLabel}>Shoot Density:</Text>
-          <Text style={styles.specValueBold}>420 shoots / m²</Text>
-        </View>
-
-        <View style={styles.specRow}>
-          <Text style={styles.specLabel}>Water Depth:</Text>
-          <Text style={styles.specValueBold}>1.80 meters</Text>
-        </View>
-
-        <View style={styles.specRow}>
-          <Text style={styles.specLabel}>Quadrats Sampled:</Text>
-          <Text style={styles.specValueBold}>
-            {images.length > 0 ? `${images.length} quadrats recorded` : "10 points along 50m transect"}
+          <Text style={styles.waveDescription}>
+            The dense canopy attenuates incoming wave energy before reaching shoreline.
           </Text>
-        </View>
-      </View>
 
-      {/* Wave Attenuation Impact Card */}
-      <View style={[styles.card, styles.waveCard]}>
-        <View style={styles.cardHeader}>
-          <Text style={styles.waveSectionTitle}>🌊 WAVE ATTENUATION IMPACT</Text>
-          <Text style={styles.waveAttenuationBadge}>-58.4%</Text>
-        </View>
-
-        <Text style={styles.waveDescription}>
-          The 76.5% dense seagrass canopy attenuates incoming wave energy before reaching the shoreline.
-        </Text>
-
-        <View style={styles.waveMetricsRow}>
-          <View style={styles.waveMetricBox}>
-            <Text style={styles.waveMetricLabel}>Incoming Wave</Text>
-            <Text style={styles.waveMetricVal}>1.60 m</Text>
+          <View style={styles.waveMetricsRow}>
+            <View style={styles.waveMetricBox}>
+              <Text style={styles.waveMetricLabel}>Incoming Wave</Text>
+              <Text style={styles.waveMetricVal}>1.60 m</Text>
+            </View>
+            <View style={[styles.waveMetricBox, styles.waveMetricBoxHighlight]}>
+              <Text style={styles.waveMetricLabelHighlight}>Dampened Wave</Text>
+              <Text style={styles.waveMetricValHighlight}>0.67 m</Text>
+            </View>
           </View>
-          <View style={[styles.waveMetricBox, styles.waveMetricBoxHighlight]}>
-            <Text style={styles.waveMetricLabelHighlight}>Dampened Wave</Text>
-            <Text style={styles.waveMetricValHighlight}>0.67 m</Text>
-          </View>
-        </View>
-      </View>
+        </Card>
 
-      {/* Action Button */}
-      <Pressable
-        style={styles.actionBtn}
-        onPress={() => router.push({ pathname: "/capture", params: { surveyId: id } })}
-      >
-        <Text style={styles.actionBtnText}>📷 Add Quadrat Scan</Text>
-      </Pressable>
-    </ScrollView>
+        {/* Action Button: Add Quadrat Scan */}
+        <Pressable
+          style={({ pressed }) => [
+            styles.actionBtn,
+            pressed && styles.actionBtnPressed,
+          ]}
+          onPress={() =>
+            router.push({
+              pathname: "/capture",
+              params: { surveyId: id },
+            })
+          }
+        >
+          <Camera size={18} color={colors.surface} />
+          <Text style={styles.actionBtnText}>Add Quadrat Scan</Text>
+        </Pressable>
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f8fafc",
+    backgroundColor: colors.background,
+  },
+  centerContent: {
+    alignItems: "center",
+    justifyContent: "center",
+    padding: spacing.xl,
+  },
+  topBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.md,
+    backgroundColor: colors.surface,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.borderLight,
+  },
+  topBarBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: radius.md,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: colors.surfaceSecondary,
+  },
+  topBarTitle: {
+    fontSize: fontSize.md,
+    fontWeight: fontWeight.bold,
+    color: colors.text,
+    flex: 1,
+    textAlign: "center",
+    marginHorizontal: spacing.sm,
+  },
+  topBarRightPlaceholder: {
+    width: 36,
+  },
+  scrollArea: {
+    flex: 1,
   },
   content: {
-    padding: 16,
+    padding: spacing.lg,
     paddingBottom: 40,
-    gap: 12,
+    gap: spacing.md,
   },
   card: {
-    backgroundColor: "#ffffff",
-    borderRadius: 14,
-    padding: 18,
-    borderWidth: 1,
-    borderColor: "#e2e8f0",
-    shadowColor: "#0f172a",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.03,
-    shadowRadius: 6,
-    elevation: 2,
+    padding: spacing.md,
+    borderRadius: radius.lg,
+    gap: spacing.sm,
   },
-  cardHeader: {
+  cardHeaderRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 8,
   },
-  surveyTag: {
-    fontSize: 10,
-    fontWeight: "800",
-    color: "#0d9488",
-    letterSpacing: 0.5,
-  },
-  statusBadge: {
-    fontSize: 11,
-    fontWeight: "700",
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 6,
-  },
-  badgeCompleted: {
-    color: "#059669",
-    backgroundColor: "#ecfdf5",
-  },
-  badgePending: {
-    color: "#d97706",
-    backgroundColor: "#fef3c7",
-  },
-  badgeSynced: {
-    color: "#0284c7",
-    backgroundColor: "#e0f2fe",
+  surveyIdText: {
+    fontSize: fontSize.xs,
+    fontWeight: fontWeight.semibold,
+    color: colors.textTertiary,
   },
   heading: {
-    fontSize: 19,
-    fontWeight: "800",
-    color: "#0f172a",
+    fontSize: fontSize.lg,
+    fontWeight: fontWeight.bold,
+    color: colors.text,
     marginTop: 2,
   },
-  locationText: {
-    fontSize: 12,
-    color: "#64748b",
-    marginTop: 4,
+  metaRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
   },
-  surveyorText: {
-    fontSize: 12,
-    color: "#475569",
-    marginTop: 4,
-    fontWeight: "500",
+  metaText: {
+    fontSize: fontSize.xs,
+    color: colors.textSecondary,
   },
-  dateText: {
-    fontSize: 11,
-    color: "#94a3b8",
-    marginTop: 4,
+  sectionHeaderRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  sectionTitleGroup: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
   },
   sectionTitle: {
-    fontSize: 11,
-    fontWeight: "800",
-    color: "#0d9488",
-    letterSpacing: 0.5,
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.bold,
+    color: colors.text,
   },
   addMiniBtn: {
-    backgroundColor: "#f0fdfa",
-    borderWidth: 1,
-    borderColor: "#0d9488",
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 6,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 3,
+    backgroundColor: colors.primarySubtle,
+    paddingHorizontal: spacing.sm + 2,
+    paddingVertical: 4,
+    borderRadius: radius.full,
   },
   addMiniBtnText: {
-    fontSize: 11,
-    fontWeight: "700",
-    color: "#0d9488",
+    fontSize: fontSize.xs,
+    fontWeight: fontWeight.semibold,
+    color: colors.primaryDark,
   },
   emptyQuadratBox: {
-    paddingVertical: 12,
+    paddingVertical: spacing.md,
   },
   emptyQuadratText: {
-    fontSize: 12,
-    color: "#94a3b8",
-    fontStyle: "italic",
+    fontSize: fontSize.xs,
+    color: colors.textTertiary,
   },
   imageScroll: {
-    marginTop: 8,
+    marginTop: spacing.xs,
+  },
+  imageScrollContent: {
+    gap: spacing.sm,
   },
   imageCard: {
-    marginRight: 10,
     width: 100,
-    borderRadius: 8,
+    borderRadius: radius.md,
     overflow: "hidden",
     borderWidth: 1,
-    borderColor: "#e2e8f0",
+    borderColor: colors.borderLight,
+    backgroundColor: colors.surfaceSecondary,
   },
   thumbnail: {
     width: 100,
     height: 80,
-    backgroundColor: "#e2e8f0",
+    backgroundColor: colors.borderLight,
   },
   imageMeta: {
     padding: 4,
-    backgroundColor: "#ffffff",
     alignItems: "center",
   },
-  imageSyncStatus: {
-    fontSize: 9,
-    fontWeight: "700",
-  },
-  syncSuccess: {
-    color: "#059669",
-  },
-  syncPending: {
-    color: "#d97706",
-  },
-  speciesRow: {
+  specItem: {
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingVertical: 7,
+    alignItems: "center",
+    paddingVertical: spacing.xs,
     borderBottomWidth: 1,
-    borderBottomColor: "#f1f5f9",
+    borderBottomColor: colors.borderLight,
   },
-  specRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingVertical: 7,
-    borderBottomWidth: 1,
-    borderBottomColor: "#f1f5f9",
+  specItemLast: {
+    borderBottomWidth: 0,
+    paddingBottom: 0,
   },
   specLabel: {
-    fontSize: 13,
-    color: "#64748b",
+    fontSize: fontSize.xs,
+    color: colors.textSecondary,
   },
   specValueBold: {
-    fontSize: 13,
-    fontWeight: "700",
-    color: "#0f172a",
+    fontSize: fontSize.xs,
+    fontWeight: fontWeight.bold,
+    color: colors.text,
   },
   specValueItalic: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: "#0d9488",
+    fontSize: fontSize.xs,
+    fontWeight: fontWeight.semibold,
     fontStyle: "italic",
-  },
-  waveCard: {
-    backgroundColor: "#f0fdfa",
-    borderColor: "#99f6e4",
-  },
-  waveSectionTitle: {
-    fontSize: 11,
-    fontWeight: "800",
-    color: "#0f766e",
-    letterSpacing: 0.5,
-  },
-  waveAttenuationBadge: {
-    fontSize: 13,
-    fontWeight: "800",
-    color: "#0f766e",
-    backgroundColor: "#ccfbf1",
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 6,
+    color: colors.text,
   },
   waveDescription: {
-    fontSize: 12,
-    color: "#334155",
-    marginTop: 4,
-    lineHeight: 16,
+    fontSize: fontSize.xs,
+    color: colors.textSecondary,
+    lineHeight: 17,
   },
   waveMetricsRow: {
     flexDirection: "row",
-    gap: 10,
-    marginTop: 12,
+    gap: spacing.sm,
+    marginTop: spacing.xs,
   },
   waveMetricBox: {
     flex: 1,
-    backgroundColor: "#ffffff",
-    padding: 10,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#cbd5e1",
+    backgroundColor: colors.surfaceSecondary,
+    padding: spacing.sm + 2,
+    borderRadius: radius.md,
+  },
+  waveMetricBoxHighlight: {
+    backgroundColor: colors.primarySubtle,
   },
   waveMetricLabel: {
     fontSize: 10,
-    color: "#64748b",
-  },
-  waveMetricVal: {
-    fontSize: 15,
-    fontWeight: "700",
-    color: "#0f172a",
-    marginTop: 2,
-  },
-  waveMetricBoxHighlight: {
-    borderColor: "#5eead4",
+    color: colors.textSecondary,
   },
   waveMetricLabelHighlight: {
     fontSize: 10,
-    color: "#0f766e",
-    fontWeight: "600",
+    color: colors.primaryDark,
+    fontWeight: fontWeight.medium,
+  },
+  waveMetricVal: {
+    fontSize: fontSize.md,
+    fontWeight: fontWeight.bold,
+    color: colors.text,
+    marginTop: 2,
   },
   waveMetricValHighlight: {
-    fontSize: 15,
-    fontWeight: "800",
-    color: "#0d9488",
+    fontSize: fontSize.md,
+    fontWeight: fontWeight.bold,
+    color: colors.primaryDark,
     marginTop: 2,
   },
   actionBtn: {
-    backgroundColor: "#0d9488",
+    flexDirection: "row",
+    backgroundColor: colors.primary,
+    borderRadius: radius.lg,
     paddingVertical: 14,
-    borderRadius: 12,
     alignItems: "center",
-    marginTop: 8,
+    justifyContent: "center",
+    gap: spacing.sm,
+    marginTop: spacing.xs,
+  },
+  actionBtnPressed: {
+    opacity: 0.9,
   },
   actionBtnText: {
-    color: "#ffffff",
-    fontWeight: "700",
-    fontSize: 15,
+    color: colors.surface,
+    fontWeight: fontWeight.semibold,
+    fontSize: fontSize.sm,
   },
   errorText: {
-    color: "#ef4444",
-    fontSize: 16,
-    textAlign: "center",
-    marginTop: 24,
+    fontSize: fontSize.sm,
+    color: colors.error,
+    marginBottom: spacing.md,
   },
-  backBtn: {
-    marginTop: 12,
-    alignSelf: "center",
+  backBtnFallback: {
+    backgroundColor: colors.primary,
+    paddingVertical: 10,
+    paddingHorizontal: spacing.lg,
+    borderRadius: radius.md,
   },
-  backBtnText: {
-    color: "#0d9488",
-    fontSize: 14,
-    fontWeight: "600",
+  backBtnFallbackText: {
+    color: colors.surface,
+    fontWeight: fontWeight.semibold,
   },
 });

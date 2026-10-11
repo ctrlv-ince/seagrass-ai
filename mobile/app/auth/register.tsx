@@ -13,6 +13,8 @@ import {
 import { router } from "expo-router";
 import { SeagrassLogo } from "@/components/SeagrassLogo";
 import { useAuth } from "@/hooks/useAuth";
+import { Card } from "@/components/ui/Card";
+import { colors, spacing, radius, fontSize, fontWeight } from "@/theme";
 
 export default function RegisterScreen() {
   const { signUpWithEmail, signInWithGoogle, isConfigured } = useAuth();
@@ -75,31 +77,41 @@ export default function RegisterScreen() {
       style={styles.keyboardContainer}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <ScrollView contentContainerStyle={styles.container}>
+      <ScrollView
+        contentContainerStyle={styles.container}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Brand header */}
         <View style={styles.brandHeader}>
           <SeagrassLogo size="lg" variant="full" />
         </View>
 
+        {/* Demo sandbox notice */}
         {!isConfigured && (
           <View style={styles.demoBanner}>
             <Text style={styles.demoBannerText}>
-              💡 Demo Sandbox: Creating an account will initialize a local session instantly.
+              Demo Sandbox: Registration is instant and simulated in sandbox mode.
             </Text>
           </View>
         )}
 
+        {/* Error message */}
         {error && (
           <View style={styles.errorBanner}>
             <Text style={styles.errorBannerText}>{error}</Text>
           </View>
         )}
 
-        <View style={styles.card}>
+        {/* Auth Card */}
+        <Card style={styles.card}>
           <Text style={styles.cardTitle}>Create Account</Text>
 
+          {/* Google Button */}
           <Pressable
-            style={styles.googleBtn}
+            style={({ pressed }) => [
+              styles.googleBtn,
+              pressed && styles.btnPressed,
+            ]}
             onPress={handleGoogleSignIn}
             disabled={loading}
           >
@@ -108,57 +120,70 @@ export default function RegisterScreen() {
 
           <View style={styles.dividerRow}>
             <View style={styles.divider} />
-            <Text style={styles.dividerText}>OR WITH EMAIL</Text>
+            <Text style={styles.dividerText}>or with email</Text>
             <View style={styles.divider} />
           </View>
 
-          <Text style={styles.label}>Full Name</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Alex Mercer"
-            placeholderTextColor="#94a3b8"
-            value={fullName}
-            onChangeText={setFullName}
-          />
+          {/* Form */}
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Full Name</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Dr. Maria Santos"
+              placeholderTextColor={colors.textTertiary}
+              value={fullName}
+              onChangeText={setFullName}
+            />
+          </View>
 
-          <Text style={styles.label}>Email Address</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="alex@example.com"
-            placeholderTextColor="#94a3b8"
-            keyboardType="email-address"
-            autoCapitalize="none"
-            value={email}
-            onChangeText={setEmail}
-          />
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Email Address</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="user@example.com"
+              placeholderTextColor={colors.textTertiary}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              value={email}
+              onChangeText={setEmail}
+            />
+          </View>
 
-          <Text style={styles.label}>Password</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="At least 6 characters"
-            placeholderTextColor="#94a3b8"
-            secureTextEntry
-            value={password}
-            onChangeText={setPassword}
-          />
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Password</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="At least 6 characters"
+              placeholderTextColor={colors.textTertiary}
+              secureTextEntry
+              value={password}
+              onChangeText={setPassword}
+            />
+          </View>
 
-          <Text style={styles.label}>Confirm Password</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Repeat password"
-            placeholderTextColor="#94a3b8"
-            secureTextEntry
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-          />
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Confirm Password</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Repeat password"
+              placeholderTextColor={colors.textTertiary}
+              secureTextEntry
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+            />
+          </View>
 
           <Pressable
-            style={[styles.submitBtn, loading && styles.submitBtnDisabled]}
+            style={({ pressed }) => [
+              styles.submitBtn,
+              loading && styles.submitBtnDisabled,
+              pressed && styles.btnPressed,
+            ]}
             onPress={handleRegister}
             disabled={loading}
           >
             {loading ? (
-              <ActivityIndicator color="#ffffff" />
+              <ActivityIndicator color={colors.surface} size="small" />
             ) : (
               <Text style={styles.submitBtnText}>Create Account</Text>
             )}
@@ -170,9 +195,13 @@ export default function RegisterScreen() {
               <Text style={styles.footerLink}>Sign In</Text>
             </Pressable>
           </View>
-        </View>
+        </Card>
 
-        <Pressable style={styles.skipBtn} onPress={() => router.replace("/")}>
+        {/* Skip to app button */}
+        <Pressable
+          style={styles.skipBtn}
+          onPress={() => router.replace("/")}
+        >
           <Text style={styles.skipBtnText}>Continue as Guest →</Text>
         </Pressable>
       </ScrollView>
@@ -183,170 +212,142 @@ export default function RegisterScreen() {
 const styles = StyleSheet.create({
   keyboardContainer: {
     flex: 1,
-    backgroundColor: "#f8fafc",
+    backgroundColor: colors.background,
   },
   container: {
-    padding: 24,
-    paddingTop: 36,
+    padding: spacing.xl,
+    paddingTop: 48,
     justifyContent: "center",
   },
   brandHeader: {
     alignItems: "center",
-    marginBottom: 20,
-  },
-  logoBadge: {
-    width: 52,
-    height: 52,
-    borderRadius: 14,
-    backgroundColor: "#0d9488",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 10,
-  },
-  logoIcon: {
-    fontSize: 26,
-  },
-  brandTitle: {
-    fontSize: 20,
-    fontWeight: "800",
-    color: "#0f172a",
-    letterSpacing: 0.5,
-  },
-  brandSubtitle: {
-    fontSize: 13,
-    color: "#64748b",
-    marginTop: 4,
-    textAlign: "center",
+    marginBottom: spacing.xl,
   },
   demoBanner: {
-    backgroundColor: "#f0fdfa",
+    backgroundColor: colors.primarySubtle,
     borderWidth: 1,
-    borderColor: "#99f6e4",
-    padding: 12,
-    borderRadius: 10,
-    marginBottom: 16,
+    borderColor: colors.primaryLight,
+    padding: spacing.md,
+    borderRadius: radius.md,
+    marginBottom: spacing.lg,
   },
   demoBannerText: {
-    fontSize: 12,
-    color: "#0f766e",
-    lineHeight: 18,
+    fontSize: fontSize.xs,
+    color: colors.primaryDark,
+    textAlign: "center",
+    lineHeight: 17,
   },
   errorBanner: {
-    backgroundColor: "#fef2f2",
+    backgroundColor: colors.errorLight,
     borderWidth: 1,
-    borderColor: "#fecaca",
-    padding: 12,
-    borderRadius: 10,
-    marginBottom: 16,
+    borderColor: "#FECACA",
+    padding: spacing.md,
+    borderRadius: radius.md,
+    marginBottom: spacing.lg,
   },
   errorBannerText: {
-    fontSize: 12,
-    color: "#b91c1c",
+    fontSize: fontSize.xs,
+    color: colors.error,
+    textAlign: "center",
   },
   card: {
-    backgroundColor: "#ffffff",
-    borderRadius: 16,
-    padding: 20,
-    borderWidth: 1,
-    borderColor: "#e2e8f0",
-    shadowColor: "#0f172a",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 8,
-    elevation: 2,
+    padding: spacing.xl,
+    borderRadius: radius.xl,
+    gap: spacing.md,
   },
   cardTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#0f172a",
-    marginBottom: 16,
+    fontSize: fontSize.lg,
+    fontWeight: fontWeight.bold,
+    color: colors.text,
+    textAlign: "center",
+    marginBottom: spacing.xs,
   },
   googleBtn: {
-    backgroundColor: "#ffffff",
+    backgroundColor: colors.surfaceSecondary,
     borderWidth: 1,
-    borderColor: "#cbd5e1",
+    borderColor: colors.border,
     paddingVertical: 12,
-    borderRadius: 10,
+    borderRadius: radius.md,
     alignItems: "center",
-    justifyContent: "center",
   },
   googleBtnText: {
-    color: "#1e293b",
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.semibold,
+    color: colors.text,
   },
   dividerRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginVertical: 14,
+    marginVertical: spacing.xs,
   },
   divider: {
     flex: 1,
     height: 1,
-    backgroundColor: "#e2e8f0",
+    backgroundColor: colors.borderLight,
   },
   dividerText: {
-    paddingHorizontal: 10,
-    fontSize: 10,
-    color: "#94a3b8",
-    fontWeight: "700",
+    marginHorizontal: spacing.md,
+    fontSize: fontSize.xs,
+    color: colors.textTertiary,
+  },
+  inputGroup: {
+    gap: 4,
   },
   label: {
-    fontSize: 12,
-    fontWeight: "600",
-    color: "#334155",
-    marginBottom: 5,
-    marginTop: 8,
+    fontSize: fontSize.xs,
+    fontWeight: fontWeight.medium,
+    color: colors.textSecondary,
   },
   input: {
-    backgroundColor: "#f8fafc",
+    backgroundColor: colors.surfaceSecondary,
     borderWidth: 1,
-    borderColor: "#cbd5e1",
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 9,
-    fontSize: 14,
-    color: "#0f172a",
+    borderColor: colors.border,
+    borderRadius: radius.md,
+    paddingHorizontal: spacing.md,
+    paddingVertical: 11,
+    fontSize: fontSize.sm,
+    color: colors.text,
   },
   submitBtn: {
-    backgroundColor: "#0d9488",
+    backgroundColor: colors.primary,
     paddingVertical: 13,
-    borderRadius: 10,
+    borderRadius: radius.md,
     alignItems: "center",
-    marginTop: 18,
+    marginTop: spacing.xs,
   },
   submitBtnDisabled: {
-    opacity: 0.7,
+    opacity: 0.6,
   },
   submitBtnText: {
-    color: "#ffffff",
-    fontWeight: "700",
-    fontSize: 15,
+    color: colors.surface,
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.semibold,
+  },
+  btnPressed: {
+    opacity: 0.9,
   },
   footerRow: {
     flexDirection: "row",
     justifyContent: "center",
-    alignItems: "center",
-    marginTop: 16,
+    marginTop: spacing.xs,
   },
   footerText: {
-    fontSize: 13,
-    color: "#64748b",
+    fontSize: fontSize.xs,
+    color: colors.textSecondary,
   },
   footerLink: {
-    fontSize: 13,
-    color: "#0d9488",
-    fontWeight: "700",
+    fontSize: fontSize.xs,
+    color: colors.primary,
+    fontWeight: fontWeight.bold,
   },
   skipBtn: {
-    alignSelf: "center",
-    marginTop: 18,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
+    alignItems: "center",
+    marginTop: spacing.xl,
+    paddingVertical: spacing.sm,
   },
   skipBtnText: {
-    fontSize: 13,
-    color: "#64748b",
-    fontWeight: "600",
+    fontSize: fontSize.sm,
+    color: colors.textSecondary,
+    fontWeight: fontWeight.medium,
   },
 });

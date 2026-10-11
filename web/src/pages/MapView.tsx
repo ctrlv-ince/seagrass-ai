@@ -204,47 +204,45 @@ export function MapView() {
               </div>
             ) : (
               surveys.map((site) => {
-              const isSelected = selectedSite?.id === site.id;
-              const coords = site.geometry.coordinates;
+                const isSelected = selectedSite?.id === site.id;
+                const coords = site.geometry.coordinates;
 
-              return (
-                <div
-                  key={site.id}
-                  onClick={() => handleSelectSite(site)}
-                  className={`p-3.5 rounded-2xl border transition-all cursor-pointer ${
-                    isSelected
-                      ? "border-teal-500 bg-teal-50/50 shadow-xs"
-                      : "border-slate-200/70 hover:border-slate-300 hover:bg-slate-50/60"
-                  }`}
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <span className="font-semibold text-sm text-slate-900 line-clamp-1">
-                      {site.properties.title}
-                    </span>
-                    <span
-                      className={`text-[10px] px-2 py-0.5 rounded-full font-medium shrink-0 ${
-                        site.properties.status === "completed"
-                          ? "bg-emerald-50 text-emerald-700"
-                          : "bg-amber-50 text-amber-700"
+                return (
+                  <div
+                    key={site.id}
+                    onClick={() => handleSelectSite(site)}
+                    className={`p-3.5 rounded-2xl border transition-all cursor-pointer ${isSelected
+                        ? "border-teal-500 bg-teal-50/50 shadow-xs"
+                        : "border-slate-200/70 hover:border-slate-300 hover:bg-slate-50/60"
                       }`}
-                    >
-                      {site.properties.status || "active"}
-                    </span>
-                  </div>
-
-                  <div className="text-xs text-slate-500 flex items-center gap-1 mt-1.5">
-                    <MapPin className="w-3.5 h-3.5 text-teal-600 shrink-0" />
-                    <span className="truncate">{site.properties.location_name || "Coastline"}</span>
-                  </div>
-
-                  {coords && (
-                    <div className="text-[11px] text-slate-400 mt-2 font-mono">
-                      {coords[1]?.toFixed(4)}° N, {coords[0]?.toFixed(4)}° E
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <span className="font-semibold text-sm text-slate-900 line-clamp-1">
+                        {site.properties.title}
+                      </span>
+                      <span
+                        className={`text-[10px] px-2 py-0.5 rounded-full font-medium shrink-0 ${site.properties.status === "completed"
+                            ? "bg-emerald-50 text-emerald-700"
+                            : "bg-amber-50 text-amber-700"
+                          }`}
+                      >
+                        {site.properties.status || "active"}
+                      </span>
                     </div>
-                  )}
-                </div>
-              );
-            }))}
+
+                    <div className="text-xs text-slate-500 flex items-center gap-1 mt-1.5">
+                      <MapPin className="w-3.5 h-3.5 text-teal-600 shrink-0" />
+                      <span className="truncate">{site.properties.location_name || "Coastline"}</span>
+                    </div>
+
+                    {coords && (
+                      <div className="text-[11px] text-slate-400 mt-2 font-mono">
+                        {coords[1]?.toFixed(4)}° N, {coords[0]?.toFixed(4)}° E
+                      </div>
+                    )}
+                  </div>
+                );
+              }))}
           </div>
 
           <div className="pt-3 border-t border-slate-100 text-[11px] text-slate-400 flex items-center gap-1.5">
@@ -264,7 +262,7 @@ export function MapView() {
             <MapRecenter coords={center} />
             <TileLayer
               attribution='&copy; <a href="https://carto.com/">CARTO</a>'
-              url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+              url={`https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png?key=${import.meta.env.VITE_CARTO_API_KEY}`}
             />
 
             {/* Survey Site Markers */}
