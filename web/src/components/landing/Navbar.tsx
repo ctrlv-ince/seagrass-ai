@@ -33,7 +33,7 @@ export function Navbar() {
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-200 ${
         scrolled
-          ? "bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs py-3"
+          ? "bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800/80 shadow-xs py-3"
           : "bg-transparent py-5"
       }`}
     >
@@ -48,28 +48,28 @@ export function Navbar() {
           </Link>
 
           {/* Desktop Nav Items */}
-          <nav className="hidden md:flex items-center space-x-8 text-sm font-medium text-slate-600">
+          <nav className="hidden md:flex items-center space-x-8 text-sm font-medium text-slate-600 dark:text-slate-300">
             <a
               href="#features"
-              className="hover:text-teal-600 transition-colors py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/30 rounded-md"
+              className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/30 rounded-md"
             >
               Features
             </a>
             <a
               href="#how-it-works"
-              className="hover:text-teal-600 transition-colors py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/30 rounded-md"
+              className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/30 rounded-md"
             >
               How It Works
             </a>
             <a
               href="#specs"
-              className="hover:text-teal-600 transition-colors py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/30 rounded-md"
+              className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/30 rounded-md"
             >
               Seagrass Specs
             </a>
             <a
               href="#wave-impact"
-              className="hover:text-teal-600 transition-colors py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/30 rounded-md"
+              className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/30 rounded-md"
             >
               Wave Attenuation
             </a>
@@ -81,14 +81,14 @@ export function Navbar() {
               <div className="flex items-center space-x-3">
                 <Link
                   to="/dashboard"
-                  className="px-4 py-2 text-sm font-medium text-teal-700 hover:text-teal-800 bg-teal-50 hover:bg-teal-100 border border-teal-200 rounded-lg transition-all flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/30"
+                  className="px-4 py-2 text-sm font-medium text-teal-700 dark:text-teal-300 hover:text-teal-800 dark:hover:text-teal-200 bg-teal-50 dark:bg-teal-950/60 hover:bg-teal-100 dark:hover:bg-teal-900/60 border border-teal-200 dark:border-teal-800 rounded-lg transition-all flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/30"
                 >
-                  <LayoutDashboard className="w-4 h-4 text-teal-600" />
+                  <LayoutDashboard className="w-4 h-4 text-teal-600 dark:text-teal-400" />
                   Dashboard
                 </Link>
                 <button
                   onClick={() => signOut()}
-                  className="text-xs text-slate-500 hover:text-slate-800 font-medium cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/30 rounded"
+                  className="text-xs text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 font-medium cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/30 rounded"
                 >
                   Sign Out
                 </button>
@@ -97,7 +97,7 @@ export function Navbar() {
               <>
                 <Link
                   to="/login"
-                  className="text-sm font-medium text-slate-600 hover:text-teal-600 px-3 py-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/30 rounded-lg"
+                  className="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-teal-600 dark:hover:text-teal-400 px-3 py-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/30 rounded-lg"
                 >
                   Sign In
                 </Link>
@@ -116,7 +116,7 @@ export function Navbar() {
           <div className="md:hidden flex items-center">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/30"
+              className="p-2 rounded-lg text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/30"
               aria-label={mobileMenuOpen ? "Close Navigation" : "Toggle Navigation"}
               aria-expanded={mobileMenuOpen}
             >
@@ -149,41 +149,41 @@ export function Navbar() {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.25, ease: "easeInOut" }}
-            className="md:hidden bg-white border-b border-slate-200 overflow-hidden shadow-xl"
+            className="md:hidden bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 overflow-hidden shadow-xl"
           >
             <div className="px-4 pt-3 pb-6 space-y-4">
-              <nav className="flex flex-col space-y-2 text-base font-medium text-slate-700">
+              <nav className="flex flex-col space-y-2 text-base font-medium text-slate-700 dark:text-slate-200">
                 <a
                   href="#features"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="hover:text-teal-600 py-1.5 px-2 rounded-lg hover:bg-slate-50 transition-colors"
+                  className="hover:text-teal-600 dark:hover:text-teal-400 py-1.5 px-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
                 >
                   Features
                 </a>
                 <a
                   href="#how-it-works"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="hover:text-teal-600 py-1.5 px-2 rounded-lg hover:bg-slate-50 transition-colors"
+                  className="hover:text-teal-600 dark:hover:text-teal-400 py-1.5 px-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
                 >
                   How It Works
                 </a>
                 <a
                   href="#specs"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="hover:text-teal-600 py-1.5 px-2 rounded-lg hover:bg-slate-50 transition-colors"
+                  className="hover:text-teal-600 dark:hover:text-teal-400 py-1.5 px-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
                 >
                   Seagrass Specs
                 </a>
                 <a
                   href="#wave-impact"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="hover:text-teal-600 py-1.5 px-2 rounded-lg hover:bg-slate-50 transition-colors"
+                  className="hover:text-teal-600 dark:hover:text-teal-400 py-1.5 px-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
                 >
                   Wave Attenuation
                 </a>
               </nav>
 
-              <div className="pt-4 border-t border-slate-100 flex flex-col space-y-3">
+              <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex flex-col space-y-3">
                 {user ? (
                   <button
                     onClick={() => {
@@ -199,7 +199,7 @@ export function Navbar() {
                     <Link
                       to="/login"
                       onClick={() => setMobileMenuOpen(false)}
-                      className="w-full py-2.5 text-center font-medium text-slate-700 hover:text-slate-900 border border-slate-300 rounded-xl"
+                      className="w-full py-2.5 text-center font-medium text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white border border-slate-300 dark:border-slate-700 dark:bg-slate-800 rounded-xl"
                     >
                       Sign In
                     </Link>

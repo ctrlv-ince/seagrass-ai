@@ -34,27 +34,31 @@ const VARIANT_CONFIG: Record<
 > = {
   success: {
     icon: CheckCircle2,
-    cardStyle: "bg-white border-emerald-200 text-slate-800 shadow-lg shadow-emerald-500/10",
-    iconColor: "text-emerald-600 bg-emerald-50",
-    titleColor: "text-emerald-950",
+    cardStyle:
+      "bg-white dark:bg-slate-900 border-emerald-200 dark:border-emerald-800 text-slate-800 dark:text-slate-100 shadow-lg shadow-emerald-500/10",
+    iconColor: "text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60",
+    titleColor: "text-emerald-950 dark:text-emerald-200",
   },
   error: {
     icon: AlertCircle,
-    cardStyle: "bg-white border-rose-200 text-slate-800 shadow-lg shadow-rose-500/10",
-    iconColor: "text-rose-600 bg-rose-50",
-    titleColor: "text-rose-950",
+    cardStyle:
+      "bg-white dark:bg-slate-900 border-rose-200 dark:border-rose-800 text-slate-800 dark:text-slate-100 shadow-lg shadow-rose-500/10",
+    iconColor: "text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/60",
+    titleColor: "text-rose-950 dark:text-rose-200",
   },
   warning: {
     icon: AlertTriangle,
-    cardStyle: "bg-white border-amber-200 text-slate-800 shadow-lg shadow-amber-500/10",
-    iconColor: "text-amber-600 bg-amber-50",
-    titleColor: "text-amber-950",
+    cardStyle:
+      "bg-white dark:bg-slate-900 border-amber-200 dark:border-amber-800 text-slate-800 dark:text-slate-100 shadow-lg shadow-amber-500/10",
+    iconColor: "text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60",
+    titleColor: "text-amber-950 dark:text-amber-200",
   },
   info: {
     icon: Info,
-    cardStyle: "bg-white border-teal-200 text-slate-800 shadow-lg shadow-teal-500/10",
-    iconColor: "text-teal-600 bg-teal-50",
-    titleColor: "text-teal-950",
+    cardStyle:
+      "bg-white dark:bg-slate-900 border-teal-200 dark:border-teal-800 text-slate-800 dark:text-slate-100 shadow-lg shadow-teal-500/10",
+    iconColor: "text-teal-600 dark:text-teal-400 bg-teal-50 dark:bg-teal-950/60",
+    titleColor: "text-teal-950 dark:text-teal-200",
   },
 };
 

@@ -126,16 +126,16 @@ export function Detection() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200/80 pb-5">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200/80 dark:border-slate-800 pb-5">
         <div>
-          <div className="flex items-center gap-2 text-teal-700 font-semibold text-sm mb-1">
+          <div className="flex items-center gap-2 text-teal-700 dark:text-teal-400 font-semibold text-sm mb-1">
             <Layers className="w-4 h-4" />
             <span>AI Quadrat Scanner</span>
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
             Seagrass Analysis &amp; Wave Damping Extraction
           </h1>
-          <p className="text-sm text-slate-500 mt-0.5">
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
             Extract species, coverage %, blade morphometrics, and coupled hydrodynamic wave attenuation.
           </p>
         </div>
@@ -156,17 +156,17 @@ export function Detection() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Column: Image Dropzone & Preview (6 cols) */}
         <div className="lg:col-span-6 space-y-4">
-          <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs space-y-4">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 shadow-xs space-y-4">
             <div className="flex items-center justify-between">
-              <span className="font-semibold text-sm text-slate-900">Quadrat Image</span>
+              <span className="font-semibold text-sm text-slate-900 dark:text-slate-100">Quadrat Image</span>
               {previewUrl && (
                 <div className="flex items-center gap-2 text-xs">
                   <button
                     onClick={() => setShowBoxes(!showBoxes)}
                     className={`px-2.5 py-1 rounded-lg border font-medium flex items-center gap-1.5 transition-colors ${
                       showBoxes
-                        ? "bg-teal-50 border-teal-200 text-teal-700"
-                        : "bg-slate-50 border-slate-200 text-slate-600"
+                        ? "bg-teal-50 border-teal-200 text-teal-700 dark:bg-teal-950/60 dark:border-teal-800 dark:text-teal-300"
+                        : "bg-slate-50 border-slate-200 text-slate-600 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300"
                     }`}
                   >
                     <Eye className="w-3.5 h-3.5" />
@@ -178,7 +178,7 @@ export function Detection() {
                       setPreviewUrl(null);
                       setActiveAnalysis(null);
                     }}
-                    className="text-slate-400 hover:text-slate-600"
+                    className="text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300"
                   >
                     Clear
                   </button>
@@ -192,15 +192,15 @@ export function Detection() {
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={handleDrop}
                 onClick={() => fileInputRef.current?.click()}
-                className="border-2 border-dashed border-slate-200 hover:border-teal-400 rounded-2xl p-8 text-center cursor-pointer transition-colors bg-slate-50/50 hover:bg-teal-50/20"
+                className="border-2 border-dashed border-slate-200 dark:border-slate-700 hover:border-teal-400 dark:hover:border-teal-500 rounded-2xl p-8 text-center cursor-pointer transition-colors bg-slate-50/50 hover:bg-teal-50/20 dark:bg-slate-800/40 dark:hover:bg-slate-800/70"
               >
-                <div className="w-12 h-12 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center mx-auto mb-3">
+                <div className="w-12 h-12 rounded-2xl bg-teal-50 dark:bg-teal-950/80 text-teal-600 dark:text-teal-400 flex items-center justify-center mx-auto mb-3">
                   <UploadCloud className="w-6 h-6" />
                 </div>
-                <div className="font-medium text-slate-800 text-sm">
+                <div className="font-medium text-slate-800 dark:text-slate-200 text-sm">
                   Click or drag a seagrass quadrat photo here
                 </div>
-                <div className="text-xs text-slate-400 mt-1">
+                <div className="text-xs text-slate-400 dark:text-slate-500 mt-1">
                   Supports JPEG, PNG, WebP from field camera or smartphone
                 </div>
                 <input
@@ -213,7 +213,7 @@ export function Detection() {
               </div>
             ) : (
               /* Image Preview with Bounding Box Overlay */
-              <div className="relative rounded-xl overflow-hidden border border-slate-200 bg-slate-900 aspect-4/3 flex items-center justify-center">
+              <div className="relative rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-900 aspect-4/3 flex items-center justify-center">
                 <img
                   src={previewUrl}
                   alt="Quadrat scan preview"
@@ -248,8 +248,8 @@ export function Detection() {
             )}
 
             {/* Quick Demo Sample Selector */}
-            <div className="pt-2 border-t border-slate-100">
-              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-2">
+            <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
+              <span className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-2">
                 Or test with sample quadrat:
               </span>
               <div className="grid grid-cols-3 gap-2">
@@ -257,10 +257,10 @@ export function Detection() {
                   <button
                     key={s.name}
                     onClick={() => handleLoadDemoSample(s)}
-                    className="p-2 text-left rounded-xl border border-slate-200 bg-slate-50 hover:bg-teal-50 hover:border-teal-300 text-xs transition-colors"
+                    className="p-2 text-left rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/70 hover:bg-teal-50 dark:hover:bg-slate-800 hover:border-teal-300 dark:hover:border-teal-500/50 text-xs transition-colors"
                   >
-                    <div className="font-semibold text-slate-800 truncate">{s.name.split(" ")[0]}</div>
-                    <div className="text-[10px] text-teal-700 italic truncate">{s.species}</div>
+                    <div className="font-semibold text-slate-800 dark:text-slate-200 truncate">{s.name.split(" ")[0]}</div>
+                    <div className="text-[10px] text-teal-700 dark:text-teal-400 italic truncate">{s.species}</div>
                   </button>
                 ))}
               </div>
@@ -268,12 +268,12 @@ export function Detection() {
 
             {/* Link to Survey Option */}
             {surveysData && surveysData.items.length > 0 && (
-              <div className="pt-3 border-t border-slate-100 flex items-center gap-3">
-                <span className="text-xs text-slate-500 whitespace-nowrap">Attach to survey:</span>
+              <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center gap-3">
+                <span className="text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">Attach to survey:</span>
                 <select
                   value={selectedSurveyId}
                   onChange={(e) => setSelectedSurveyId(e.target.value)}
-                  className="w-full text-xs rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-slate-700 focus:outline-teal-500"
+                  className="w-full text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-2.5 py-1.5 text-slate-700 dark:text-slate-100 focus:outline-teal-500"
                 >
                   <option value="">None (Quick standalone scan)</option>
                   {surveysData.items.map((s) => (
@@ -292,49 +292,49 @@ export function Detection() {
           {activeAnalysis ? (
             <>
               {/* Species & Morphometrics Card */}
-              <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs space-y-4">
+              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 shadow-xs space-y-4">
                 <div className="flex items-start justify-between">
                   <div>
-                    <div className="flex items-center gap-2 text-xs font-semibold text-teal-700 uppercase tracking-wider">
+                    <div className="flex items-center gap-2 text-xs font-semibold text-teal-700 dark:text-teal-400 uppercase tracking-wider">
                       <Sparkles className="w-3.5 h-3.5" />
                       <span>Extracted Seagrass Specifications</span>
                     </div>
-                    <h2 className="text-xl font-bold text-slate-900 mt-1">
+                    <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mt-1">
                       {activeAnalysis.specifications.primary_species}
                     </h2>
-                    <div className="text-xs text-slate-500 italic">
+                    <div className="text-xs text-slate-500 dark:text-slate-400 italic">
                       {activeAnalysis.specifications.common_name}
                     </div>
                   </div>
-                  <span className="px-2.5 py-1 rounded-full bg-teal-50 text-teal-800 border border-teal-200 font-semibold text-xs">
+                  <span className="px-2.5 py-1 rounded-full bg-teal-50 dark:bg-teal-950/60 text-teal-800 dark:text-teal-300 border border-teal-200 dark:border-teal-800 font-semibold text-xs">
                     {Math.round(activeAnalysis.specifications.confidence * 100)}% Conf
                   </span>
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/60">
-                    <span className="text-[11px] text-slate-500 font-medium block">
+                  <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60">
+                    <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium block">
                       Meadow Coverage
                     </span>
-                    <span className="text-xl font-bold text-slate-900">
+                    <span className="text-xl font-bold text-slate-900 dark:text-slate-100">
                       {activeAnalysis.specifications.coverage_percent}%
                     </span>
                   </div>
 
-                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/60">
-                    <span className="text-[11px] text-slate-500 font-medium block">
+                  <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60">
+                    <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium block">
                       Blade Length
                     </span>
-                    <span className="text-xl font-bold text-slate-900">
+                    <span className="text-xl font-bold text-slate-900 dark:text-slate-100">
                       {activeAnalysis.specifications.blade_length_cm} cm
                     </span>
                   </div>
 
-                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/60">
-                    <span className="text-[11px] text-slate-500 font-medium block">
+                  <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60">
+                    <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium block">
                       Shoot Density
                     </span>
-                    <span className="text-xl font-bold text-slate-900">
+                    <span className="text-xl font-bold text-slate-900 dark:text-slate-100">
                       {activeAnalysis.specifications.shoot_density_m2} /m²
                     </span>
                   </div>
@@ -342,48 +342,48 @@ export function Detection() {
               </div>
 
               {/* Coupled Wave Attenuation Impact Card */}
-              <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs space-y-4">
+              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 shadow-xs space-y-4">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-xs font-semibold text-teal-700 uppercase tracking-wider">
+                  <div className="flex items-center gap-2 text-xs font-semibold text-teal-700 dark:text-teal-400 uppercase tracking-wider">
                     <ShieldCheck className="w-3.5 h-3.5" />
                     <span>Coupled Coastal Wave Impact</span>
                   </div>
-                  <span className="text-xs text-slate-400">
+                  <span className="text-xs text-slate-400 dark:text-slate-500">
                     Mendez &amp; Losada (2004)
                   </span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="p-3.5 rounded-xl bg-teal-50/70 border border-teal-200/70">
-                    <div className="flex items-center gap-1.5 text-xs text-teal-800 font-medium">
-                      <ShieldCheck className="w-4 h-4 text-teal-600" />
+                  <div className="p-3.5 rounded-xl bg-teal-50/70 dark:bg-teal-950/40 border border-teal-200/70 dark:border-teal-900/50">
+                    <div className="flex items-center gap-1.5 text-xs text-teal-800 dark:text-teal-300 font-medium">
+                      <ShieldCheck className="w-4 h-4 text-teal-600 dark:text-teal-400" />
                       <span>Energy Damping</span>
                     </div>
-                    <div className="text-2xl font-bold text-teal-900 mt-1">
+                    <div className="text-2xl font-bold text-teal-900 dark:text-teal-200 mt-1">
                       -{activeAnalysis.wave_attenuation.wave_energy_damping_pct.toFixed(1)}%
                     </div>
-                    <div className="text-[11px] text-teal-700/80 mt-0.5">
+                    <div className="text-[11px] text-teal-700/80 dark:text-teal-400/80 mt-0.5">
                       Dissipated before shoreline
                     </div>
                   </div>
 
-                  <div className="p-3.5 rounded-xl bg-cyan-50/70 border border-cyan-200/70">
-                    <div className="flex items-center gap-1.5 text-xs text-cyan-800 font-medium">
-                      <Activity className="w-4 h-4 text-cyan-600" />
+                  <div className="p-3.5 rounded-xl bg-cyan-50/70 dark:bg-cyan-950/40 border border-cyan-200/70 dark:border-cyan-900/50">
+                    <div className="flex items-center gap-1.5 text-xs text-cyan-800 dark:text-cyan-300 font-medium">
+                      <Activity className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
                       <span>Height Reduction</span>
                     </div>
-                    <div className="text-2xl font-bold text-cyan-900 mt-1">
+                    <div className="text-2xl font-bold text-cyan-900 dark:text-cyan-200 mt-1">
                       -{activeAnalysis.wave_attenuation.wave_height_reduction_pct.toFixed(1)}%
                     </div>
-                    <div className="text-[11px] text-cyan-700/80 mt-0.5">
+                    <div className="text-[11px] text-cyan-700/80 dark:text-cyan-400/80 mt-0.5">
                       From {activeAnalysis.wave_attenuation.incident_wave_height_m}m to{" "}
                       {activeAnalysis.wave_attenuation.transmitted_wave_height_m}m
                     </div>
                   </div>
                 </div>
 
-                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600 flex items-start gap-2">
-                  <Info className="w-4 h-4 text-teal-600 shrink-0 mt-0.5" />
+                <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-300 flex items-start gap-2">
+                  <Info className="w-4 h-4 text-teal-600 dark:text-teal-400 shrink-0 mt-0.5" />
                   <span>
                     Measured at 50m cross-shore meadow width in 1.5m shallow water column with 0.8m incident wave.
                   </span>
@@ -392,7 +392,7 @@ export function Detection() {
             </>
           ) : analyzeMutation.isPending ? (
             /* Loading Skeleton State */
-            <div className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-xs space-y-5 animate-pulse">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-6 shadow-xs space-y-5 animate-pulse">
               <div className="space-y-2">
                 <Skeleton className="h-4 w-40" />
                 <Skeleton className="h-7 w-64" />
@@ -407,18 +407,18 @@ export function Detection() {
                 <Skeleton className="h-24 rounded-xl" />
                 <Skeleton className="h-24 rounded-xl" />
               </div>
-              <div className="text-center text-xs text-teal-700 font-medium py-2">
+              <div className="text-center text-xs text-teal-700 dark:text-teal-400 font-medium py-2">
                 Running YOLO species segmentation &amp; hydrodynamic modeling...
               </div>
             </div>
           ) : (
             /* Empty State */
-            <div className="bg-white rounded-2xl border border-slate-200/80 p-12 text-center shadow-xs">
-              <div className="w-14 h-14 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-12 text-center shadow-xs">
+              <div className="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 flex items-center justify-center mx-auto mb-3">
                 <FileImage className="w-7 h-7" />
               </div>
-              <h3 className="font-semibold text-slate-800 text-base">No Quadrat Scanned Yet</h3>
-              <p className="text-xs text-slate-400 max-w-sm mx-auto mt-1 leading-relaxed">
+              <h3 className="font-semibold text-slate-800 dark:text-slate-200 text-base">No Quadrat Scanned Yet</h3>
+              <p className="text-xs text-slate-400 dark:text-slate-500 max-w-sm mx-auto mt-1 leading-relaxed">
                 Upload a field quadrat photo on the left or select a sample quadrat to extract seagrass specs and wave attenuation.
               </p>
             </div>

@@ -9,7 +9,7 @@ import { Footer } from "../components/landing/Footer";
 
 export function Landing() {
   return (
-    <div className="min-h-screen bg-white text-slate-900 flex flex-col relative">
+    <div className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col relative">
       {/* Accessible Keyboard Skip to Content Link */}
       <a
         href="#landing-content"

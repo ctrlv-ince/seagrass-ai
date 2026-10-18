@@ -122,15 +122,15 @@ export function SeagrassLogo({
       {LogoMark}
       <div className="flex flex-col">
         <div className="flex items-center gap-1.5 leading-none">
-          <span className="text-lg font-extrabold tracking-tight text-slate-900">
+          <span className="text-lg font-extrabold tracking-tight text-slate-900 dark:text-slate-100">
             SEAGRASS
           </span>
-          <span className="px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-teal-100 text-teal-800 rounded-md">
+          <span className="px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-teal-100 dark:bg-teal-950 dark:text-teal-300 dark:border dark:border-teal-800 text-teal-800 rounded-md">
             AI
           </span>
         </div>
         {showSubtitle && (
-          <span className="text-[10px] text-slate-500 font-semibold tracking-wider uppercase mt-1">
+          <span className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold tracking-wider uppercase mt-1">
             Specs &amp; Wave Attenuation
           </span>
         )}

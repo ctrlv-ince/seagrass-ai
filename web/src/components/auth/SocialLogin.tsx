@@ -33,7 +33,7 @@ export function SocialLogin({ onSuccess, onError }: SocialLoginProps) {
         type="button"
         onClick={handleGoogleSignIn}
         disabled={loading}
-        className="w-full flex items-center justify-center gap-3 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-800 font-medium text-sm border border-slate-300 hover:border-slate-400 transition-all shadow-xs focus:outline-none focus:ring-2 focus:ring-teal-500/20 disabled:opacity-60 disabled:cursor-not-allowed group cursor-pointer"
+        className="w-full flex items-center justify-center gap-3 px-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 font-medium text-sm border border-slate-300 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-600 transition-all shadow-xs focus:outline-none focus:ring-2 focus:ring-teal-500/20 disabled:opacity-60 disabled:cursor-not-allowed group cursor-pointer"
       >
         {loading ? (
           <Loader2 className="w-4 h-4 animate-spin text-teal-600" />
@@ -61,8 +61,8 @@ export function SocialLogin({ onSuccess, onError }: SocialLoginProps) {
       </button>
 
       <div className="relative flex items-center justify-center">
-        <div className="border-t border-slate-200 w-full"></div>
-        <span className="bg-white px-3 text-[11px] font-mono text-slate-500 uppercase tracking-wider relative">
+        <div className="border-t border-slate-200 dark:border-slate-800 w-full"></div>
+        <span className="bg-white dark:bg-slate-900 px-3 text-[11px] font-mono text-slate-500 dark:text-slate-400 uppercase tracking-wider relative">
           Or continue with email
         </span>
       </div>

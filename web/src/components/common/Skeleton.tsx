@@ -12,14 +12,14 @@ export function Skeleton({ className = "", variant = "rectangular" }: SkeletonPr
 
   return (
     <div
-      className={`animate-pulse bg-slate-200/80 ${variantStyles[variant]} ${className}`}
+      className={`animate-pulse bg-slate-200/80 dark:bg-slate-800/80 ${variantStyles[variant]} ${className}`}
     />
   );
 }
 
 export function CardSkeleton() {
   return (
-    <div className="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-xs space-y-4">
+    <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200/90 dark:border-slate-800 shadow-xs space-y-4">
       <div className="flex items-center justify-between">
         <Skeleton className="h-4 w-28" />
         <Skeleton className="h-9 w-9 rounded-xl" />
@@ -32,7 +32,7 @@ export function CardSkeleton() {
 
 export function TableRowSkeleton({ columns = 5 }: { columns?: number }) {
   return (
-    <tr className="border-b border-slate-100">
+    <tr className="border-b border-slate-100 dark:border-slate-800">
       {Array.from({ length: columns }).map((_, i) => (
         <td key={i} className="py-4 px-4">
           <Skeleton className={`h-4 ${i === 0 ? "w-32" : i === 1 ? "w-24" : "w-16"}`} />
@@ -44,7 +44,7 @@ export function TableRowSkeleton({ columns = 5 }: { columns?: number }) {
 
 export function PageSkeleton() {
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6 animate-pulse">
+    <div className="p-6 max-w-7xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <div className="space-y-2">
           <Skeleton className="h-8 w-64" />
@@ -58,7 +58,7 @@ export function PageSkeleton() {
         <CardSkeleton />
         <CardSkeleton />
       </div>
-      <div className="bg-white rounded-2xl p-6 border border-slate-200/90 h-96">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200/90 dark:border-slate-800 h-96">
         <Skeleton className="h-full w-full rounded-xl" />
       </div>
     </div>

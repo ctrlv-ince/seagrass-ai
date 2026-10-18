@@ -15,10 +15,10 @@ export interface CardProps extends Omit<HTMLAttributes<HTMLDivElement>, "title">
 }
 
 const elevationClasses: Record<CardElevation, string> = {
-  none: "border border-slate-200/80 bg-white shadow-none",
-  sm: "border border-slate-200/80 bg-white shadow-sm",
-  md: "border border-slate-200/80 bg-white shadow-md shadow-slate-900/5",
-  lg: "border border-slate-200/80 bg-white shadow-lg shadow-teal-900/5",
+  none: "border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-none",
+  sm: "border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm",
+  md: "border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-md shadow-slate-900/5",
+  lg: "border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-lg shadow-teal-900/5",
 };
 
 const paddingClasses: Record<CardPadding, string> = {
@@ -53,7 +53,7 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(function Card(
         "rounded-2xl transition-all duration-200 overflow-hidden",
         elevationClasses[elevation],
         paddingClasses[padding],
-        hoverable ? "hover:border-teal-200 hover:shadow-lg hover:shadow-teal-900/5 hover:-translate-y-0.5" : "",
+        hoverable ? "hover:border-teal-200 dark:hover:border-teal-700 hover:shadow-lg hover:shadow-teal-900/5 hover:-translate-y-0.5" : "",
         className,
       ]
         .filter(Boolean)
@@ -64,17 +64,17 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(function Card(
         <div className="flex items-start justify-between gap-4 mb-4">
           <div>
             {subtitle && (
-              <p className="text-[11px] font-mono uppercase tracking-wider text-teal-700 font-semibold mb-0.5">
+              <p className="text-[11px] font-mono uppercase tracking-wider text-teal-700 dark:text-teal-400 font-semibold mb-0.5">
                 {subtitle}
               </p>
             )}
             {title && (
-              <h3 className="text-base sm:text-lg font-bold text-slate-900">
+              <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100">
                 {title}
               </h3>
             )}
             {description && (
-              <p className="text-xs sm:text-sm text-slate-500 mt-1">
+              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
                 {description}
               </p>
             )}
@@ -86,7 +86,7 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(function Card(
       {children}
 
       {footer && (
-        <div className="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between">
+        <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
           {footer}
         </div>
       )}

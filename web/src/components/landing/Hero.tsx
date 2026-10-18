@@ -39,10 +39,10 @@ export function Hero() {
   }, [shouldReduceMotion]);
 
   return (
-    <section className="relative pt-32 pb-20 md:pt-40 md:pb-28 bg-gradient-to-b from-teal-50/70 via-slate-50/50 to-white overflow-hidden">
+    <section className="relative pt-32 pb-20 md:pt-40 md:pb-28 bg-gradient-to-b from-teal-50/70 via-slate-50/50 to-white dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 overflow-hidden">
       {/* Soft ambient lighting circles */}
-      <div className="absolute top-16 left-1/2 -translate-x-1/2 w-[800px] h-[450px] bg-teal-100/40 blur-[110px] rounded-full pointer-events-none" />
-      <div className="absolute top-36 right-10 w-[450px] h-[350px] bg-cyan-100/35 blur-[95px] rounded-full pointer-events-none" />
+      <div className="absolute top-16 left-1/2 -translate-x-1/2 w-[800px] h-[450px] bg-teal-100/40 dark:bg-teal-950/30 blur-[110px] rounded-full pointer-events-none" />
+      <div className="absolute top-36 right-10 w-[450px] h-[350px] bg-cyan-100/35 dark:bg-cyan-950/20 blur-[95px] rounded-full pointer-events-none" />
 
       {/* Floating subtle wave contours in background */}
       <div className="absolute inset-0 opacity-25 pointer-events-none overflow-hidden" aria-hidden="true">
@@ -71,9 +71,9 @@ export function Hero() {
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4 }}
-              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-teal-50 border border-teal-200 text-teal-800 text-xs font-semibold mb-6 shadow-xs"
+              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-teal-50 dark:bg-teal-950/60 border border-teal-200 dark:border-teal-800 text-teal-800 dark:text-teal-300 text-xs font-semibold mb-6 shadow-xs"
             >
-              <Sparkles className="w-3.5 h-3.5 text-teal-600 animate-pulse" />
+              <Sparkles className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400 animate-pulse" />
               <span>AI SEAGRASS ANALYSIS & HYDRODYNAMICS</span>
             </motion.div>
 
@@ -82,7 +82,7 @@ export function Hero() {
               initial={{ opacity: 0, y: 18 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-950 leading-[1.12]"
+              className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-950 dark:text-slate-100 leading-[1.12]"
             >
               Scan Seagrass. Measure{" "}
               <span className="text-teal-600 bg-clip-text text-transparent bg-gradient-to-r from-teal-600 to-emerald-600">
@@ -99,7 +99,7 @@ export function Hero() {
               initial={{ opacity: 0, y: 18 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="mt-6 text-base sm:text-lg text-slate-600 max-w-2xl leading-relaxed"
+              className="mt-6 text-base sm:text-lg text-slate-600 dark:text-slate-300 max-w-2xl leading-relaxed"
             >
               Upload any seagrass photo or benthic survey image. Our YOLOv11 models identify species, calculate coverage density and blade length, and instantly compute nearshore wave attenuation and shoreline dampening.
             </motion.p>
@@ -121,7 +121,7 @@ export function Hero() {
 
               <a
                 href="#specs"
-                className="w-full sm:w-auto px-6 py-3.5 rounded-xl font-medium text-sm text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-50 border border-slate-300 transition-all flex items-center justify-center gap-2 shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/40"
+                className="w-full sm:w-auto px-6 py-3.5 rounded-xl font-medium text-sm text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 transition-all flex items-center justify-center gap-2 shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/40"
               >
                 <span>View Sample Specs</span>
                 <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-teal-600 transition-colors" />
@@ -133,18 +133,18 @@ export function Hero() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.6, delay: 0.4 }}
-              className="mt-10 pt-6 border-t border-slate-200/80 w-full flex flex-wrap items-center gap-y-2 gap-x-6 text-xs text-slate-600 font-medium"
+              className="mt-10 pt-6 border-t border-slate-200/80 dark:border-slate-800 w-full flex flex-wrap items-center gap-y-2 gap-x-6 text-xs text-slate-600 dark:text-slate-400 font-medium"
             >
               <div className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-teal-600 dark:text-teal-400 shrink-0" />
                 <span>Species & Density Classification</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-teal-600 dark:text-teal-400 shrink-0" />
                 <span>Blade Length & Canopy Structure</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-teal-600 dark:text-teal-400 shrink-0" />
                 <span>Wave Height & Energy Attenuation</span>
               </div>
             </motion.div>
@@ -157,26 +157,26 @@ export function Hero() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="lg:col-span-5 relative"
           >
-            <div className="relative bg-white rounded-2xl border border-slate-200/90 shadow-xl shadow-slate-200/60 p-6 overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-teal-900/10">
+            <div className="relative bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-xl dark:shadow-none p-6 overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-teal-900/10">
               
               {/* Header of Telemetry Card */}
-              <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+              <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
                 <div className="flex items-center space-x-2.5">
                   <div className="relative flex h-2.5 w-2.5">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-teal-600"></span>
                   </div>
                   <div>
-                    <h3 className="text-xs font-mono font-bold tracking-wider text-slate-900 uppercase">
+                    <h3 className="text-xs font-mono font-bold tracking-wider text-slate-900 dark:text-slate-100 uppercase">
                       SAMPLE SCAN #SG-4091
                     </h3>
-                    <p className="text-[11px] text-slate-500">Benthic Quadrat • Inshore Transect A</p>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">Benthic Quadrat • Inshore Transect A</p>
                   </div>
                 </div>
 
                 {/* Pulsing Confidence Badge */}
                 <div className="relative flex items-center">
-                  <span className="px-2.5 py-1 text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-md flex items-center gap-1.5 shadow-xs">
+                  <span className="px-2.5 py-1 text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-md flex items-center gap-1.5 shadow-xs">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
                     96.8% Match
                   </span>
@@ -240,67 +240,67 @@ export function Hero() {
 
               {/* Specs Grid */}
               <div className="mt-4 grid grid-cols-2 gap-3 text-left">
-                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 hover:border-teal-200 transition-colors">
-                  <div className="flex items-center gap-1.5 text-slate-500 text-xs font-medium">
-                    <Ruler className="w-3.5 h-3.5 text-teal-600" />
+                <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700 hover:border-teal-200 dark:hover:border-teal-700 transition-colors">
+                  <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400 text-xs font-medium">
+                    <Ruler className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
                     <span>Blade Length</span>
                   </div>
-                  <div className="mt-1 text-lg font-bold text-slate-900 font-mono">
+                  <div className="mt-1 text-lg font-bold text-slate-900 dark:text-slate-100 font-mono">
                     28.5 cm
                   </div>
-                  <span className="text-[10px] text-slate-500">Average blade height</span>
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400">Average blade height</span>
                 </div>
 
-                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 hover:border-cyan-200 transition-colors">
-                  <div className="flex items-center gap-1.5 text-slate-500 text-xs font-medium">
-                    <BarChart2 className="w-3.5 h-3.5 text-cyan-600" />
+                <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700 hover:border-cyan-200 dark:hover:border-cyan-700 transition-colors">
+                  <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400 text-xs font-medium">
+                    <BarChart2 className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400" />
                     <span>Shoot Density</span>
                   </div>
-                  <div className="mt-1 text-lg font-bold text-slate-900 font-mono">
+                  <div className="mt-1 text-lg font-bold text-slate-900 dark:text-slate-100 font-mono">
                     420 / m²
                   </div>
-                  <span className="text-[10px] text-slate-500">Shoots per m² quadrat</span>
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400">Shoots per m² quadrat</span>
                 </div>
               </div>
 
               {/* Wave Attenuation Impact Output Box */}
-              <div className="mt-4 p-4 rounded-xl bg-gradient-to-br from-cyan-50/80 to-teal-50/80 border border-teal-200 hover:border-teal-300 transition-colors">
+              <div className="mt-4 p-4 rounded-xl bg-gradient-to-br from-cyan-50/80 to-teal-50/80 dark:from-teal-950/40 dark:to-cyan-950/40 border border-teal-200 dark:border-teal-800 hover:border-teal-300 dark:hover:border-teal-700 transition-colors">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <div className="p-1.5 rounded-lg bg-teal-600 text-white shadow-xs">
                       <Waves className="w-4 h-4" />
                     </div>
                     <div>
-                      <h4 className="text-xs font-bold text-slate-900 uppercase font-mono">
+                      <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 uppercase font-mono">
                         Wave Attenuation Impact
                       </h4>
-                      <p className="text-[11px] text-slate-600">Model Version: v2.1 Hydro</p>
+                      <p className="text-[11px] text-slate-600 dark:text-slate-400">Model Version: v2.1 Hydro</p>
                     </div>
                   </div>
-                  <span className="text-xl font-extrabold font-mono text-teal-700">
+                  <span className="text-xl font-extrabold font-mono text-teal-700 dark:text-teal-300">
                     -58.4%
                   </span>
                 </div>
 
-                <div className="mt-3 pt-3 border-t border-teal-200/60 grid grid-cols-2 gap-2 text-xs">
+                <div className="mt-3 pt-3 border-t border-teal-200/60 dark:border-teal-800/60 grid grid-cols-2 gap-2 text-xs">
                   <div>
-                    <span className="text-slate-500 text-[11px] block">Incoming Wave Height</span>
-                    <span className="font-semibold text-slate-800 font-mono">1.60 meters</span>
+                    <span className="text-slate-500 dark:text-slate-400 text-[11px] block">Incoming Wave Height</span>
+                    <span className="font-semibold text-slate-800 dark:text-slate-200 font-mono">1.60 meters</span>
                   </div>
                   <div className="text-right">
-                    <span className="text-slate-500 text-[11px] block">Dampened Inshore Height</span>
-                    <span className="font-bold text-teal-700 font-mono">0.67 meters</span>
+                    <span className="text-slate-500 dark:text-slate-400 text-[11px] block">Dampened Inshore Height</span>
+                    <span className="font-bold text-teal-700 dark:text-teal-300 font-mono">0.67 meters</span>
                   </div>
                 </div>
               </div>
 
               {/* Trust footer */}
-              <div className="mt-4 flex items-center justify-between text-[11px] text-slate-500">
+              <div className="mt-4 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
                 <span className="flex items-center gap-1">
-                  <ShieldCheck className="w-3.5 h-3.5 text-teal-600" />
+                  <ShieldCheck className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
                   Mendez-Losada (2004) physics engine
                 </span>
-                <span className="font-mono text-teal-700 font-semibold">Runtime: 1.1s</span>
+                <span className="font-mono text-teal-700 dark:text-teal-400 font-semibold">Runtime: 1.1s</span>
               </div>
             </div>
           </motion.div>

@@ -30,50 +30,50 @@ const SurveyRow = memo(function SurveyRow({ survey, onSelect }: SurveyRowProps) 
   return (
     <div
       onClick={() => onSelect(survey)}
-      className="p-5 hover:bg-slate-50/80 transition-colors cursor-pointer flex flex-col md:flex-row md:items-center justify-between gap-4"
+      className="p-5 hover:bg-slate-50/80 dark:hover:bg-slate-800/60 transition-colors cursor-pointer flex flex-col md:flex-row md:items-center justify-between gap-4"
     >
       <div className="space-y-1">
         <div className="flex items-center gap-2.5">
-          <h3 className="font-semibold text-slate-900 text-base">{survey.title}</h3>
+          <h3 className="font-semibold text-slate-900 dark:text-slate-100 text-base">{survey.title}</h3>
           <span
             className={`text-xs px-2.5 py-0.5 rounded-full font-medium ${
               survey.status === "completed"
-                ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800"
                 : survey.status === "in_progress"
-                ? "bg-amber-50 text-amber-700 border border-amber-200"
-                : "bg-slate-100 text-slate-600"
+                ? "bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-800"
+                : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300"
             }`}
           >
             {survey.status}
           </span>
         </div>
 
-        <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500 pt-1">
+        <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500 dark:text-slate-400 pt-1">
           {survey.location_name && (
             <span className="flex items-center gap-1">
-              <MapPin className="w-3.5 h-3.5 text-teal-600" />
+              <MapPin className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
               {survey.location_name}
             </span>
           )}
           {survey.surveyor_name && (
             <span className="flex items-center gap-1">
-              <User className="w-3.5 h-3.5 text-slate-400" />
+              <User className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
               {survey.surveyor_name}
             </span>
           )}
           <span className="flex items-center gap-1">
-            <Calendar className="w-3.5 h-3.5 text-slate-400" />
+            <Calendar className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
             {new Date(survey.created_at).toLocaleDateString()}
           </span>
           <span className="flex items-center gap-1">
-            <ImageIcon className="w-3.5 h-3.5 text-teal-600" />
+            <ImageIcon className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
             {survey.image_count} photos
           </span>
         </div>
       </div>
 
       <div className="flex items-center gap-3">
-        <button className="text-teal-700 hover:text-teal-800 text-sm font-semibold flex items-center gap-1">
+        <button className="text-teal-700 dark:text-teal-400 hover:text-teal-800 dark:hover:text-teal-300 text-sm font-semibold flex items-center gap-1">
           <span>Manage</span>
           <ChevronRight className="w-4 h-4" />
         </button>
@@ -144,16 +144,16 @@ export function Surveys() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200/80 pb-5">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200/80 dark:border-slate-800 pb-5">
         <div>
-          <div className="flex items-center gap-2 text-teal-700 font-semibold text-sm mb-1">
+          <div className="flex items-center gap-2 text-teal-700 dark:text-teal-400 font-semibold text-sm mb-1">
             <Compass className="w-4 h-4" />
             <span>Field Management</span>
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
             Field Surveys &amp; Transects
           </h1>
-          <p className="text-sm text-slate-500 mt-0.5">
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
             Organize quadrat photography, GPS transects, and meadow assessment sessions.
           </p>
         </div>
@@ -168,9 +168,9 @@ export function Surveys() {
       </div>
 
       {/* Survey List */}
-      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs overflow-hidden">
         {isLoading ? (
-          <div className="divide-y divide-slate-100 p-2">
+          <div className="divide-y divide-slate-100 dark:divide-slate-800 p-2">
             {Array.from({ length: 5 }).map((_, idx) => (
               <div
                 key={idx}
@@ -193,7 +193,7 @@ export function Surveys() {
           </div>
         ) : surveysData && surveysData.items.length > 0 ? (
           <>
-            <div className="divide-y divide-slate-100">
+            <div className="divide-y divide-slate-100 dark:divide-slate-800">
               {surveysData.items.map((survey) => (
                 <SurveyRow key={survey.id} survey={survey} onSelect={setActiveSurvey} />
               ))}
@@ -201,29 +201,29 @@ export function Surveys() {
 
             {/* Pagination Controls */}
             {surveysData.total > pageSize && (
-              <div className="p-4 bg-slate-50/70 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-600">
+              <div className="p-4 bg-slate-50/70 dark:bg-slate-900/80 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-600 dark:text-slate-400">
                 <div>
                   Showing{" "}
-                  <span className="font-semibold text-slate-900">
+                  <span className="font-semibold text-slate-900 dark:text-slate-100">
                     {(page - 1) * pageSize + 1}
                   </span>{" "}
                   to{" "}
-                  <span className="font-semibold text-slate-900">
+                  <span className="font-semibold text-slate-900 dark:text-slate-100">
                     {Math.min(page * pageSize, surveysData.total)}
                   </span>{" "}
                   of{" "}
-                  <span className="font-semibold text-slate-900">{surveysData.total}</span> surveys
+                  <span className="font-semibold text-slate-900 dark:text-slate-100">{surveysData.total}</span> surveys
                 </div>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
                     disabled={page <= 1}
-                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed font-medium transition-colors"
+                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed font-medium transition-colors"
                   >
                     <ChevronLeft className="w-3.5 h-3.5" />
                     Previous
                   </button>
-                  <span className="px-2 font-medium text-slate-700">
+                  <span className="px-2 font-medium text-slate-700 dark:text-slate-300">
                     Page {page} of {Math.ceil(surveysData.total / pageSize)}
                   </span>
                   <button
@@ -233,7 +233,7 @@ export function Surveys() {
                       )
                     }
                     disabled={page >= Math.ceil(surveysData.total / pageSize)}
-                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed font-medium transition-colors"
+                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed font-medium transition-colors"
                   >
                     Next
                     <ChevronRight className="w-3.5 h-3.5" />
@@ -263,21 +263,21 @@ export function Surveys() {
       {/* Survey Detail / Manage Modal */}
       {activeSurvey && (
         <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95">
             {/* Header */}
-            <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+            <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
               <div>
-                <span className="text-xs font-semibold text-teal-700 uppercase tracking-wider">
+                <span className="text-xs font-semibold text-teal-700 dark:text-teal-400 uppercase tracking-wider">
                   Survey Details
                 </span>
-                <h2 className="text-xl font-bold text-slate-900">{activeSurvey.title}</h2>
-                <div className="text-xs text-slate-500 mt-0.5">
+                <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">{activeSurvey.title}</h2>
+                <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                   {activeSurvey.location_name || "Coastline"} • Status: {activeSurvey.status}
                 </div>
               </div>
               <button
                 onClick={() => setActiveSurvey(null)}
-                className="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:text-slate-800 flex items-center justify-center"
+                className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 flex items-center justify-center"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -288,10 +288,10 @@ export function Surveys() {
               {/* Photo Upload Section */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="font-semibold text-sm text-slate-800">
+                  <span className="font-semibold text-sm text-slate-800 dark:text-slate-200">
                     Quadrat Photos ({activeImages?.length || 0})
                   </span>
-                  <label className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-teal-50 hover:bg-teal-100 text-teal-800 font-medium text-xs transition-colors">
+                  <label className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-teal-50 hover:bg-teal-100 dark:bg-teal-950/60 dark:hover:bg-teal-900/60 text-teal-800 dark:text-teal-300 dark:border dark:border-teal-800 font-medium text-xs transition-colors">
                     <UploadCloud className="w-4 h-4" />
                     <span>Upload Quadrat Photo</span>
                     <input
@@ -304,13 +304,13 @@ export function Surveys() {
                 </div>
 
                 {imagesLoading ? (
-                  <div className="text-xs text-slate-400 py-4 text-center">Loading images...</div>
+                  <div className="text-xs text-slate-400 dark:text-slate-500 py-4 text-center">Loading images...</div>
                 ) : activeImages && activeImages.length > 0 ? (
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                     {activeImages.map((img) => (
                       <div
                         key={img.id}
-                        className="group relative aspect-square rounded-xl overflow-hidden border border-slate-200 bg-slate-100"
+                        className="group relative aspect-square rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800"
                       >
                         {img.url ? (
                           <img
@@ -320,7 +320,7 @@ export function Surveys() {
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                           />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center text-slate-400">
+                          <div className="w-full h-full flex items-center justify-center text-slate-400 dark:text-slate-500">
                             <ImageIcon className="w-6 h-6" />
                           </div>
                         )}
@@ -333,7 +333,7 @@ export function Surveys() {
                     ))}
                   </div>
                 ) : (
-                  <div className="border border-dashed border-slate-200 rounded-xl p-6 text-center text-xs text-slate-400">
+                  <div className="border border-dashed border-slate-200 dark:border-slate-700 rounded-xl p-6 text-center text-xs text-slate-400 dark:text-slate-500">
                     No quadrat photos uploaded for this survey yet. Click &ldquo;Upload Quadrat Photo&rdquo; to add field imagery.
                   </div>
                 )}
@@ -341,10 +341,10 @@ export function Surveys() {
             </div>
 
             {/* Modal Footer */}
-            <div className="p-4 border-t border-slate-100 bg-slate-50 flex justify-end">
+            <div className="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 flex justify-end">
               <button
                 onClick={() => setActiveSurvey(null)}
-                className="px-4 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 font-medium text-xs hover:bg-slate-100"
+                className="px-4 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-medium text-xs hover:bg-slate-100 dark:hover:bg-slate-700"
               >
                 Close
               </button>
@@ -356,13 +356,13 @@ export function Surveys() {
       {/* New Survey Modal */}
       {isCreateOpen && (
         <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-xl max-w-md w-full p-6 animate-in fade-in zoom-in-95">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
-              <h3 className="font-bold text-lg text-slate-900">New Field Survey Session</h3>
+          <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl max-w-md w-full p-6 animate-in fade-in zoom-in-95">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 mb-4">
+              <h3 className="font-bold text-lg text-slate-900 dark:text-slate-100">New Field Survey Session</h3>
               <button
                 onClick={() => setIsCreateOpen(false)}
                 aria-label="Close dialog"
-                className="w-7 h-7 rounded-full bg-slate-100 text-slate-500 hover:text-slate-800 flex items-center justify-center cursor-pointer"
+                className="w-7 h-7 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 flex items-center justify-center cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -370,7 +370,7 @@ export function Surveys() {
 
             <form onSubmit={handleCreateSubmit} className="space-y-4">
               <div>
-                <label htmlFor="new-survey-title" className="text-xs font-semibold text-slate-700 block mb-1">
+                <label htmlFor="new-survey-title" className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1">
                   Survey Title *
                 </label>
                 <input
@@ -380,12 +380,12 @@ export function Surveys() {
                   placeholder="e.g. Bolinao Reef Flat Survey - Transect A"
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
-                  className="w-full text-xs rounded-xl border border-slate-200 px-3 py-2 text-slate-800 focus:outline-teal-500"
+                  className="w-full text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-slate-800 dark:text-slate-100 focus:outline-teal-500"
                 />
               </div>
 
               <div>
-                <label htmlFor="new-survey-location" className="text-xs font-semibold text-slate-700 block mb-1">
+                <label htmlFor="new-survey-location" className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1">
                   Location Name
                 </label>
                 <input
@@ -394,12 +394,12 @@ export function Surveys() {
                   placeholder="e.g. Bolinao, Pangasinan"
                   value={newLocation}
                   onChange={(e) => setNewLocation(e.target.value)}
-                  className="w-full text-xs rounded-xl border border-slate-200 px-3 py-2 text-slate-800 focus:outline-teal-500"
+                  className="w-full text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-slate-800 dark:text-slate-100 focus:outline-teal-500"
                 />
               </div>
 
               <div>
-                <label htmlFor="new-survey-surveyor" className="text-xs font-semibold text-slate-700 block mb-1">
+                <label htmlFor="new-survey-surveyor" className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1">
                   Surveyor Name
                 </label>
                 <input
@@ -408,13 +408,13 @@ export function Surveys() {
                   placeholder="e.g. Marine Field Team"
                   value={newSurveyor}
                   onChange={(e) => setNewSurveyor(e.target.value)}
-                  className="w-full text-xs rounded-xl border border-slate-200 px-3 py-2 text-slate-800 focus:outline-teal-500"
+                  className="w-full text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-slate-800 dark:text-slate-100 focus:outline-teal-500"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label htmlFor="new-survey-lat" className="text-xs font-semibold text-slate-700 block mb-1">
+                  <label htmlFor="new-survey-lat" className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1">
                     Latitude
                   </label>
                   <input
@@ -423,11 +423,11 @@ export function Surveys() {
                     step="any"
                     value={newLat}
                     onChange={(e) => setNewLat(e.target.value)}
-                    className="w-full text-xs rounded-xl border border-slate-200 px-3 py-2 text-slate-800 focus:outline-teal-500"
+                    className="w-full text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-slate-800 dark:text-slate-100 focus:outline-teal-500"
                   />
                 </div>
                 <div>
-                  <label htmlFor="new-survey-lng" className="text-xs font-semibold text-slate-700 block mb-1">
+                  <label htmlFor="new-survey-lng" className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1">
                     Longitude
                   </label>
                   <input
@@ -436,13 +436,13 @@ export function Surveys() {
                     step="any"
                     value={newLng}
                     onChange={(e) => setNewLng(e.target.value)}
-                    className="w-full text-xs rounded-xl border border-slate-200 px-3 py-2 text-slate-800 focus:outline-teal-500"
+                    className="w-full text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-slate-800 dark:text-slate-100 focus:outline-teal-500"
                   />
                 </div>
               </div>
 
               <div>
-                <label htmlFor="new-survey-desc" className="text-xs font-semibold text-slate-700 block mb-1">
+                <label htmlFor="new-survey-desc" className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1">
                   Description / Notes
                 </label>
                 <textarea
@@ -451,7 +451,7 @@ export function Surveys() {
                   placeholder="Field conditions, weather, tidal phase..."
                   value={newDesc}
                   onChange={(e) => setNewDesc(e.target.value)}
-                  className="w-full text-xs rounded-xl border border-slate-200 px-3 py-2 text-slate-800 focus:outline-teal-500"
+                  className="w-full text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-slate-800 dark:text-slate-100 focus:outline-teal-500"
                 />
               </div>
 
@@ -459,7 +459,7 @@ export function Surveys() {
                 <button
                   type="button"
                   onClick={() => setIsCreateOpen(false)}
-                  className="px-4 py-2 rounded-xl border border-slate-200 text-slate-700 font-medium text-xs hover:bg-slate-50"
+                  className="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-medium text-xs hover:bg-slate-50 dark:hover:bg-slate-800"
                 >
                   Cancel
                 </button>

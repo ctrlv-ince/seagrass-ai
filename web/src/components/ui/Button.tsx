@@ -31,11 +31,11 @@ const variantClasses: Record<ButtonVariant, string> = {
   primary:
     "bg-teal-600 hover:bg-teal-700 text-white shadow-sm hover:shadow-md hover:shadow-teal-600/20 active:bg-teal-800 border border-transparent",
   secondary:
-    "bg-slate-100 hover:bg-slate-200 text-slate-800 active:bg-slate-300 border border-slate-200/80",
+    "bg-slate-100 hover:bg-slate-200 text-slate-800 active:bg-slate-300 border border-slate-200/80 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-100 dark:border-slate-700",
   outline:
-    "bg-white hover:bg-teal-50 text-slate-700 hover:text-teal-700 border border-slate-200 hover:border-teal-300 shadow-sm",
+    "bg-white hover:bg-teal-50 text-slate-700 hover:text-teal-700 border border-slate-200 hover:border-teal-300 shadow-sm dark:bg-slate-900 dark:hover:bg-slate-800 dark:text-slate-200 dark:border-slate-700 dark:hover:border-teal-500",
   ghost:
-    "bg-transparent hover:bg-slate-100 text-slate-600 hover:text-slate-900 border border-transparent",
+    "bg-transparent hover:bg-slate-100 text-slate-600 hover:text-slate-900 border border-transparent dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-800",
   danger:
     "bg-rose-600 hover:bg-rose-700 text-white shadow-sm hover:shadow-md hover:shadow-rose-600/20 active:bg-rose-800 border border-transparent",
 };

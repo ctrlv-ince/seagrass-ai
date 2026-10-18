@@ -58,7 +58,7 @@ export function Stats() {
       suffix: "+",
       decimals: 0,
       icon: Scan,
-      color: "text-teal-600 bg-teal-50",
+      color: "text-teal-600 dark:text-teal-400 bg-teal-50 dark:bg-teal-950/60 border border-teal-200/60 dark:border-teal-800",
       description: "Field survey photos and quadrat samples classified.",
     },
     {
@@ -67,7 +67,7 @@ export function Stats() {
       suffix: "%",
       decimals: 1,
       icon: CheckCircle,
-      color: "text-emerald-600 bg-emerald-50",
+      color: "text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/60 dark:border-emerald-800",
       description: "Validation against ground-truth benthic reference data.",
     },
     {
@@ -76,7 +76,7 @@ export function Stats() {
       suffix: "%",
       decimals: 1,
       icon: Waves,
-      color: "text-cyan-600 bg-cyan-50",
+      color: "text-cyan-600 dark:text-cyan-400 bg-cyan-50 dark:bg-cyan-950/60 border border-cyan-200/60 dark:border-cyan-800",
       description: "Kinetic wave energy absorbed by seagrass canopies.",
     },
     {
@@ -85,19 +85,19 @@ export function Stats() {
       suffix: "s",
       decimals: 1,
       icon: Clock,
-      color: "text-blue-600 bg-blue-50",
+      color: "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 border border-blue-200/60 dark:border-blue-800",
       description: "Instant turnaround for specs and wave prediction results.",
     },
   ];
 
   return (
-    <section id="stats" className="py-16 bg-white border-y border-slate-200">
+    <section id="stats" className="py-16 bg-white dark:bg-slate-900 border-y border-slate-200 dark:border-slate-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-12">
-          <h2 className="text-xs font-mono font-bold tracking-widest text-teal-600 uppercase">
-            RELIABLE & INSTANT HYDRODYNAMIC SPECS
+          <h2 className="text-xs font-mono font-bold tracking-widest text-teal-600 dark:text-teal-400 uppercase">
+            RELIABLE &amp; INSTANT HYDRODYNAMIC SPECS
           </h2>
-          <p className="mt-2 text-2xl sm:text-3xl font-extrabold text-slate-900">
+          <p className="mt-2 text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-100">
             Validated AI Accuracy with Fast Turnaround
           </p>
         </div>
@@ -112,17 +112,17 @@ export function Stats() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: idx * 0.1 }}
-                className="bg-slate-50/80 rounded-2xl p-6 border border-slate-200 hover:border-teal-300 transition-all hover:shadow-md hover:shadow-teal-100/50"
+                className="bg-slate-50/80 dark:bg-slate-800/60 rounded-2xl p-6 border border-slate-200 dark:border-slate-700/80 hover:border-teal-300 dark:hover:border-teal-700 transition-all hover:shadow-md"
               >
                 <div className="flex items-center justify-between">
                   <div className={`p-2.5 rounded-xl ${stat.color}`}>
                     <Icon className="w-5 h-5" />
                   </div>
-                  <span className="text-[11px] font-mono text-slate-500 font-medium">METRICS</span>
+                  <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400 font-medium">METRICS</span>
                 </div>
 
                 <div className="mt-4">
-                  <div className="text-3xl font-extrabold text-slate-900 tracking-tight">
+                  <div className="text-3xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
                     <AnimatedCounter
                       from={0}
                       to={stat.value}
@@ -130,8 +130,8 @@ export function Stats() {
                       suffix={stat.suffix}
                     />
                   </div>
-                  <h3 className="mt-1 text-sm font-semibold text-slate-800">{stat.label}</h3>
-                  <p className="mt-2 text-xs text-slate-600 leading-relaxed">
+                  <h3 className="mt-1 text-sm font-semibold text-slate-800 dark:text-slate-200">{stat.label}</h3>
+                  <p className="mt-2 text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
                     {stat.description}
                   </p>
                 </div>

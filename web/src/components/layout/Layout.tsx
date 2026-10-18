@@ -10,7 +10,7 @@ type Props = {
 export function Layout({ children }: Props) {
   return (
     <LayoutProvider>
-      <div className="flex h-screen bg-slate-50 text-slate-900 overflow-hidden relative">
+      <div className="flex h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 overflow-hidden relative">
         {/* Accessible Keyboard Skip to Content Link */}
         <a
           href="#main-content"
@@ -26,7 +26,7 @@ export function Layout({ children }: Props) {
             id="main-content"
             tabIndex={-1}
             aria-label="Marine Telemetry Content"
-            className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-slate-50 focus:outline-none"
+            className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-slate-50 dark:bg-slate-950 focus:outline-none"
           >
             {children}
           </main>

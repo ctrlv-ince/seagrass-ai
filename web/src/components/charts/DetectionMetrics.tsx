@@ -113,19 +113,19 @@ export function DetectionMetrics({
   };
 
   return (
-    <div className="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/90 shadow-xs flex flex-col justify-between">
+    <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 sm:p-6 border border-slate-200/90 dark:border-slate-800 shadow-xs flex flex-col justify-between">
       {/* Header and Toggle */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] font-mono uppercase tracking-wider text-teal-700 font-semibold">
+            <span className="text-[11px] font-mono uppercase tracking-wider text-teal-700 dark:text-teal-400 font-semibold">
               YOLOv11 BENCHMARKS
             </span>
-            <span className="inline-flex items-center gap-1 text-[10px] bg-teal-50 text-teal-700 px-2 py-0.5 rounded-full border border-teal-200/60 font-medium">
-              <ShieldCheck className="w-3 h-3 text-teal-600" /> Model Ready
+            <span className="inline-flex items-center gap-1 text-[10px] bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-300 px-2 py-0.5 rounded-full border border-teal-200/60 dark:border-teal-800 font-medium">
+              <ShieldCheck className="w-3 h-3 text-teal-600 dark:text-teal-400" /> Model Ready
             </span>
           </div>
-          <h3 className="text-base sm:text-lg font-bold text-slate-900 mt-0.5">
+          <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100 mt-0.5">
             {title}
           </h3>
         </div>
@@ -134,34 +134,34 @@ export function DetectionMetrics({
         <div className="flex items-center gap-2 self-start sm:self-auto">
           <button
             onClick={handleExport}
-            className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl border border-slate-200/80 bg-slate-50 hover:bg-slate-100 text-slate-600 hover:text-slate-900 text-xs font-medium transition-all cursor-pointer shadow-2xs"
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl border border-slate-200/80 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white text-xs font-medium transition-all cursor-pointer shadow-2xs"
             title="Export metrics to CSV"
           >
-            <Download className="w-3.5 h-3.5 text-slate-500" />
+            <Download className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
             <span className="hidden sm:inline">Export</span>
           </button>
 
-          <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200/60">
+          <div className="flex items-center bg-slate-100 dark:bg-slate-800/80 p-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
             <button
               onClick={() => setViewMode("confidence")}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                 viewMode === "confidence"
-                  ? "bg-white text-teal-800 shadow-xs"
-                  : "text-slate-600 hover:text-slate-900"
+                  ? "bg-white dark:bg-slate-900 text-teal-800 dark:text-teal-300 shadow-xs"
+                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
               }`}
             >
-              <BarChart3 className="w-3.5 h-3.5 text-teal-600" />
+              <BarChart3 className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
               <span>Confidence</span>
             </button>
             <button
               onClick={() => setViewMode("coverage")}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                 viewMode === "coverage"
-                  ? "bg-white text-teal-800 shadow-xs"
-                  : "text-slate-600 hover:text-slate-900"
+                  ? "bg-white dark:bg-slate-900 text-teal-800 dark:text-teal-300 shadow-xs"
+                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
               }`}
             >
-              <PieIcon className="w-3.5 h-3.5 text-cyan-600" />
+              <PieIcon className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400" />
               <span>Coverage %</span>
             </button>
           </div>
@@ -180,6 +180,7 @@ export function DetectionMetrics({
                 strokeDasharray="3 3"
                 vertical={false}
                 stroke="#F1F5F9"
+                className="stroke-slate-100 dark:stroke-slate-800"
               />
               <XAxis
                 dataKey="species"
@@ -234,8 +235,8 @@ export function DetectionMetrics({
       </div>
 
       {/* Chart Footer Stats */}
-      <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
-        <span>Average Confidence: <strong className="text-slate-800 font-mono">88.5%</strong></span>
+      <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
+        <span>Average Confidence: <strong className="text-slate-800 dark:text-slate-200 font-mono">88.5%</strong></span>
         <span>5 Classified Genera</span>
       </div>
     </div>

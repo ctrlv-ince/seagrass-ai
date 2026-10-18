@@ -58,8 +58,8 @@ export function LoginForm() {
   return (
     <div className="space-y-5">
       {!isConfigured && (
-        <div className="p-3 rounded-xl bg-teal-50 border border-teal-200 text-xs text-teal-800 flex items-start gap-2">
-          <div className="w-1.5 h-1.5 rounded-full bg-teal-600 mt-1.5 shrink-0" />
+        <div className="p-3 rounded-xl bg-teal-50 dark:bg-teal-950/60 border border-teal-200 dark:border-teal-800 text-xs text-teal-800 dark:text-teal-300 flex items-start gap-2">
+          <div className="w-1.5 h-1.5 rounded-full bg-teal-600 dark:bg-teal-400 mt-1.5 shrink-0" />
           <span>
             <strong>Demo Sandbox Active:</strong> Supabase credentials not set. You can sign in with any email/password or use Google to test immediately!
           </span>
@@ -67,8 +67,8 @@ export function LoginForm() {
       )}
 
       {errorMessage && (
-        <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-700 flex items-center gap-2">
-          <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
+        <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-xs text-rose-700 dark:text-rose-300 flex items-center gap-2">
+          <AlertCircle className="w-4 h-4 shrink-0 text-rose-600 dark:text-rose-400" />
           <span>{errorMessage}</span>
         </div>
       )}
@@ -83,11 +83,11 @@ export function LoginForm() {
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Email Field */}
         <div>
-          <label htmlFor="login-email" className="block text-xs font-semibold text-slate-700 mb-1">
+          <label htmlFor="login-email" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
             EMAIL ADDRESS
           </label>
           <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 dark:text-slate-500">
               <Mail className="w-4 h-4" />
             </div>
             <input
@@ -99,22 +99,22 @@ export function LoginForm() {
               required
               aria-invalid={Boolean(fieldErrors.email)}
               aria-describedby={fieldErrors.email ? "login-email-error" : undefined}
-              className={`w-full pl-9 pr-4 py-2.5 bg-white border rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all ${
+              className={`w-full pl-9 pr-4 py-2.5 bg-white dark:bg-slate-800 border rounded-xl text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all ${
                 fieldErrors.email
                   ? "border-rose-400 focus:border-rose-500"
-                  : "border-slate-300 focus:border-teal-600"
+                  : "border-slate-300 dark:border-slate-700 focus:border-teal-600 dark:focus:border-teal-500"
               }`}
             />
           </div>
           {fieldErrors.email && (
-            <p id="login-email-error" role="alert" className="mt-1 text-xs text-rose-600">{fieldErrors.email}</p>
+            <p id="login-email-error" role="alert" className="mt-1 text-xs text-rose-600 dark:text-rose-400">{fieldErrors.email}</p>
           )}
         </div>
 
         {/* Password Field */}
         <div>
           <div className="flex items-center justify-between mb-1">
-            <label htmlFor="login-password" className="block text-xs font-semibold text-slate-700">
+            <label htmlFor="login-password" className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
               PASSWORD
             </label>
             <a
@@ -126,13 +126,13 @@ export function LoginForm() {
                   "Password recovery instructions will be sent to your email address."
                 );
               }}
-              className="text-xs text-teal-700 hover:text-teal-800 font-medium"
+              className="text-xs text-teal-700 dark:text-teal-400 hover:text-teal-800 dark:hover:text-teal-300 font-medium"
             >
               Forgot password?
             </a>
           </div>
           <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 dark:text-slate-500">
               <Lock className="w-4 h-4" />
             </div>
             <input
@@ -144,23 +144,23 @@ export function LoginForm() {
               required
               aria-invalid={Boolean(fieldErrors.password)}
               aria-describedby={fieldErrors.password ? "login-password-error" : undefined}
-              className={`w-full pl-9 pr-10 py-2.5 bg-white border rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all ${
+              className={`w-full pl-9 pr-10 py-2.5 bg-white dark:bg-slate-800 border rounded-xl text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all ${
                 fieldErrors.password
                   ? "border-rose-400 focus:border-rose-500"
-                  : "border-slate-300 focus:border-teal-600"
+                  : "border-slate-300 dark:border-slate-700 focus:border-teal-600 dark:focus:border-teal-500"
               }`}
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               aria-label={showPassword ? "Hide password" : "Show password"}
-              className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 cursor-pointer"
+              className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 cursor-pointer"
             >
               {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
           </div>
           {fieldErrors.password && (
-            <p id="login-password-error" role="alert" className="mt-1 text-xs text-rose-600">{fieldErrors.password}</p>
+            <p id="login-password-error" role="alert" className="mt-1 text-xs text-rose-600 dark:text-rose-400">{fieldErrors.password}</p>
           )}
         </div>
 
@@ -171,9 +171,9 @@ export function LoginForm() {
             type="checkbox"
             checked={rememberMe}
             onChange={(e) => setRememberMe(e.target.checked)}
-            className="w-4 h-4 rounded border-slate-300 text-teal-600 focus:ring-teal-500/20 cursor-pointer"
+            className="w-4 h-4 rounded border-slate-300 dark:border-slate-700 text-teal-600 focus:ring-teal-500/20 cursor-pointer"
           />
-          <label htmlFor="remember-me" className="ml-2 text-xs text-slate-600 cursor-pointer select-none">
+          <label htmlFor="remember-me" className="ml-2 text-xs text-slate-600 dark:text-slate-300 cursor-pointer select-none">
             Keep me signed in
           </label>
         </div>
@@ -196,9 +196,9 @@ export function LoginForm() {
       </form>
 
       {/* Switch to Register */}
-      <div className="text-center text-xs text-slate-500">
+      <div className="text-center text-xs text-slate-500 dark:text-slate-400">
         Don&apos;t have an account?{" "}
-        <Link to="/register" className="text-teal-700 hover:text-teal-800 font-semibold">
+        <Link to="/register" className="text-teal-700 dark:text-teal-400 hover:text-teal-800 dark:hover:text-teal-300 font-semibold">
           Create an account
         </Link>
       </div>

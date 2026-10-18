@@ -72,15 +72,15 @@ export function SurveyDetail() {
   };
 
   if (surveyLoading) {
-    return <div className="p-8 text-center text-slate-400 text-sm">Loading survey session...</div>;
+    return <div className="p-8 text-center text-slate-400 dark:text-slate-500 text-sm">Loading survey session...</div>;
   }
 
   if (!survey) {
     return (
-      <div className="p-12 text-center bg-white rounded-3xl border border-slate-200">
-        <h2 className="text-lg font-bold text-slate-900">Survey Not Found</h2>
-        <p className="text-xs text-slate-500 mt-1 mb-4">The requested survey session does not exist.</p>
-        <Link to="/surveys" className="text-teal-700 font-semibold text-xs hover:underline">
+      <div className="p-12 text-center bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800">
+        <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">Survey Not Found</h2>
+        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 mb-4">The requested survey session does not exist.</p>
+        <Link to="/surveys" className="text-teal-700 dark:text-teal-400 font-semibold text-xs hover:underline">
           Return to Surveys
         </Link>
       </div>
@@ -90,10 +90,10 @@ export function SurveyDetail() {
   return (
     <div className="space-y-6">
       {/* Top Breadcrumb Navigation */}
-      <div className="flex items-center justify-between border-b border-slate-200/80 pb-4">
+      <div className="flex items-center justify-between border-b border-slate-200/80 dark:border-slate-800 pb-4">
         <Link
           to="/surveys"
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-teal-700 transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-teal-700 dark:hover:text-teal-300 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Back to All Surveys</span>
@@ -109,43 +109,43 @@ export function SurveyDetail() {
       </div>
 
       {/* Survey Title & Status Banner */}
-      <div className="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2.5">
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900">{survey.title}</h1>
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">{survey.title}</h1>
             <span
               className={`text-xs px-2.5 py-0.5 rounded-full font-medium ${
                 survey.status === "completed"
-                  ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                  : "bg-amber-50 text-amber-700 border border-amber-200"
+                  ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800"
+                  : "bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-800"
               }`}
             >
               {survey.status}
             </span>
           </div>
 
-          <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500 pt-1">
+          <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500 dark:text-slate-400 pt-1">
             {survey.location_name && (
               <span className="flex items-center gap-1">
-                <MapPin className="w-3.5 h-3.5 text-teal-600" />
+                <MapPin className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
                 {survey.location_name}
               </span>
             )}
             {survey.surveyor_name && (
               <span className="flex items-center gap-1">
-                <User className="w-3.5 h-3.5 text-slate-400" />
+                <User className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
                 {survey.surveyor_name}
               </span>
             )}
             <span className="flex items-center gap-1">
-              <Calendar className="w-3.5 h-3.5 text-slate-400" />
+              <Calendar className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
               {new Date(survey.created_at).toLocaleDateString()}
             </span>
           </div>
         </div>
 
         {survey.description && (
-          <p className="text-xs text-slate-500 max-w-md bg-slate-50 p-3 rounded-2xl border border-slate-200/60 leading-relaxed">
+          <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md bg-slate-50 dark:bg-slate-800/60 p-3 rounded-2xl border border-slate-200/60 dark:border-slate-700/60 leading-relaxed">
             {survey.description}
           </p>
         )}
@@ -154,16 +154,16 @@ export function SurveyDetail() {
       {/* Main Grid: Quadrat Photos Gallery & Wave Telemetry */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left: Photos Section (7 cols) */}
-        <div className="lg:col-span-7 bg-white rounded-3xl border border-slate-200/80 p-6 shadow-xs space-y-4">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+        <div className="lg:col-span-7 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 p-6 shadow-xs space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
             <div>
-              <h2 className="font-bold text-sm text-slate-900">
+              <h2 className="font-bold text-sm text-slate-900 dark:text-slate-100">
                 Quadrat Sampling Imagery ({images?.length || 0})
               </h2>
-              <span className="text-[11px] text-slate-400">Stored in Supabase Object Storage</span>
+              <span className="text-[11px] text-slate-400 dark:text-slate-500">Stored in Supabase Object Storage</span>
             </div>
 
-            <label className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-teal-50 hover:bg-teal-100 text-teal-800 font-semibold text-xs transition-colors border border-teal-200">
+            <label className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-teal-50 hover:bg-teal-100 dark:bg-teal-950/60 dark:hover:bg-teal-900/60 text-teal-800 dark:text-teal-300 font-semibold text-xs transition-colors border border-teal-200 dark:border-teal-800">
               <UploadCloud className="w-4 h-4" />
               <span>Add Quadrat Photo</span>
               <input type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
@@ -171,13 +171,13 @@ export function SurveyDetail() {
           </div>
 
           {imagesLoading ? (
-            <div className="text-xs text-slate-400 py-8 text-center">Loading images...</div>
+            <div className="text-xs text-slate-400 dark:text-slate-500 py-8 text-center">Loading images...</div>
           ) : images && images.length > 0 ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {images.map((img) => (
                 <div
                   key={img.id}
-                  className="group relative aspect-square rounded-2xl overflow-hidden border border-slate-200 bg-slate-100"
+                  className="group relative aspect-square rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800"
                 >
                   {img.url ? (
                     <img
@@ -186,7 +186,7 @@ export function SurveyDetail() {
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-slate-400">
+                    <div className="w-full h-full flex items-center justify-center text-slate-400 dark:text-slate-500">
                       <ImageIcon className="w-6 h-6" />
                     </div>
                   )}
@@ -200,46 +200,46 @@ export function SurveyDetail() {
               ))}
             </div>
           ) : (
-            <div className="border border-dashed border-slate-200 rounded-2xl p-10 text-center text-xs text-slate-400">
+            <div className="border border-dashed border-slate-200 dark:border-slate-700 rounded-2xl p-10 text-center text-xs text-slate-400 dark:text-slate-500">
               No quadrat photos uploaded for this survey session yet.
             </div>
           )}
         </div>
 
         {/* Right: Wave Model Predictions History (5 cols) */}
-        <div className="lg:col-span-5 bg-white rounded-3xl border border-slate-200/80 p-6 shadow-xs space-y-4">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+        <div className="lg:col-span-5 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 p-6 shadow-xs space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
             <div>
-              <h2 className="font-bold text-sm text-slate-900">Wave Attenuation Logs</h2>
-              <span className="text-[11px] text-slate-400">Simulations tied to this meadow</span>
+              <h2 className="font-bold text-sm text-slate-900 dark:text-slate-100">Wave Attenuation Logs</h2>
+              <span className="text-[11px] text-slate-400 dark:text-slate-500">Simulations tied to this meadow</span>
             </div>
-            <ShieldCheck className="w-4 h-4 text-teal-600" />
+            <ShieldCheck className="w-4 h-4 text-teal-600 dark:text-teal-400" />
           </div>
 
           {predictions && predictions.length > 0 ? (
             <div className="space-y-3">
               {predictions.map((p) => (
-                <div key={p.id} className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2">
+                <div key={p.id} className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-teal-800">
+                    <span className="text-xs font-bold text-teal-800 dark:text-teal-300">
                       -{p.attenuation_percent.toFixed(1)}% Energy Dissipation
                     </span>
-                    <span className="text-[10px] font-mono text-slate-400">
+                    <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500">
                       {new Date(p.created_at).toLocaleDateString()}
                     </span>
                   </div>
 
-                  <div className="grid grid-cols-3 gap-2 text-[11px] text-slate-600 pt-1">
+                  <div className="grid grid-cols-3 gap-2 text-[11px] text-slate-600 dark:text-slate-300 pt-1">
                     <div>
-                      <span className="text-[9px] text-slate-400 block uppercase">Density</span>
+                      <span className="text-[9px] text-slate-400 dark:text-slate-500 block uppercase">Density</span>
                       <span className="font-semibold">{p.seagrass_density} /m²</span>
                     </div>
                     <div>
-                      <span className="text-[9px] text-slate-400 block uppercase">Canopy</span>
+                      <span className="text-[9px] text-slate-400 dark:text-slate-500 block uppercase">Canopy</span>
                       <span className="font-semibold">{p.blade_length_cm} cm</span>
                     </div>
                     <div>
-                      <span className="text-[9px] text-slate-400 block uppercase">Depth</span>
+                      <span className="text-[9px] text-slate-400 dark:text-slate-500 block uppercase">Depth</span>
                       <span className="font-semibold">{p.water_depth_m} m</span>
                     </div>
                   </div>
@@ -247,27 +247,27 @@ export function SurveyDetail() {
               ))}
             </div>
           ) : (
-            <div className="p-8 text-center text-xs text-slate-400 border border-dashed border-slate-200 rounded-2xl">
+            <div className="p-8 text-center text-xs text-slate-400 dark:text-slate-500 border border-dashed border-slate-200 dark:border-slate-700 rounded-2xl">
               No wave simulations recorded yet. Click &ldquo;Simulate Wave Damping&rdquo; above.
             </div>
           )}
 
           {/* Transects Section */}
-          <div className="pt-3 border-t border-slate-100 space-y-2">
-            <span className="font-bold text-xs text-slate-800 block">
+          <div className="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-2">
+            <span className="font-bold text-xs text-slate-800 dark:text-slate-200 block">
               Field Transects ({transects?.length || 0})
             </span>
             {transects && transects.length > 0 ? (
               <div className="space-y-1.5">
                 {transects.map((t) => (
-                  <div key={t.id} className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/70 text-xs flex justify-between">
-                    <span className="font-medium text-slate-800">{t.name}</span>
-                    <span className="text-slate-400">{t.quadrat_count} quadrats</span>
+                  <div key={t.id} className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60 text-xs flex justify-between">
+                    <span className="font-medium text-slate-800 dark:text-slate-200">{t.name}</span>
+                    <span className="text-slate-400 dark:text-slate-500">{t.quadrat_count} quadrats</span>
                   </div>
                 ))}
               </div>
             ) : (
-              <span className="text-[11px] text-slate-400 block italic">No transects mapped for this site yet.</span>
+              <span className="text-[11px] text-slate-400 dark:text-slate-500 block italic">No transects mapped for this site yet.</span>
             )}
           </div>
         </div>
@@ -276,15 +276,15 @@ export function SurveyDetail() {
       {/* Simulation Modal */}
       {activeSimulationOpen && (
         <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-xl max-w-md w-full p-6 animate-in fade-in zoom-in-95">
-            <h3 className="font-bold text-lg text-slate-900 mb-1">Simulate Wave Attenuation</h3>
-            <p className="text-xs text-slate-500 mb-4">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl max-w-md w-full p-6 animate-in fade-in zoom-in-95">
+            <h3 className="font-bold text-lg text-slate-900 dark:text-slate-100 mb-1">Simulate Wave Attenuation</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">
               Run Mendez &amp; Losada (2004) hydrodynamic physics calculation for this survey site.
             </p>
 
             <form onSubmit={handleRunSimulation} className="space-y-4">
               <div>
-                <label className="text-xs font-semibold text-slate-700 block mb-1">
+                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1">
                   Seagrass Shoot Density: {simDensity} /m²
                 </label>
                 <input
@@ -299,7 +299,7 @@ export function SurveyDetail() {
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-slate-700 block mb-1">
+                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1">
                   Canopy Blade Length: {simBladeLength} cm
                 </label>
                 <input
@@ -315,23 +315,23 @@ export function SurveyDetail() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-semibold text-slate-700 block mb-1">Water Depth (m)</label>
+                  <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1">Water Depth (m)</label>
                   <input
                     type="number"
                     step="0.1"
                     value={simDepth}
                     onChange={(e) => setSimDepth(Number(e.target.value))}
-                    className="w-full text-xs rounded-xl border border-slate-200 px-3 py-2 text-slate-800"
+                    className="w-full text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-slate-800 dark:text-slate-100"
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-slate-700 block mb-1">Wave Height H₀ (m)</label>
+                  <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1">Wave Height H₀ (m)</label>
                   <input
                     type="number"
                     step="0.05"
                     value={simWaveHeight}
                     onChange={(e) => setSimWaveHeight(Number(e.target.value))}
-                    className="w-full text-xs rounded-xl border border-slate-200 px-3 py-2 text-slate-800"
+                    className="w-full text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-slate-800 dark:text-slate-100"
                   />
                 </div>
               </div>
@@ -340,7 +340,7 @@ export function SurveyDetail() {
                 <button
                   type="button"
                   onClick={() => setActiveSimulationOpen(false)}
-                  className="px-4 py-2 rounded-xl border border-slate-200 text-slate-700 font-medium text-xs hover:bg-slate-50"
+                  className="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-medium text-xs hover:bg-slate-50 dark:hover:bg-slate-800"
                 >
                   Cancel
                 </button>

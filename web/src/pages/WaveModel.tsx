@@ -25,6 +25,7 @@ import { usePredictWaveAttenuation } from "../api/predictions";
 import { useDebounce } from "../hooks/useDebounce";
 import { downloadCSV, downloadJSON } from "../lib/export";
 import { WaveReport } from "../components/wave/WaveReport";
+import { useTheme } from "../context/ThemeContext";
 
 interface Preset {
   name: string;
@@ -111,6 +112,7 @@ const PRESETS_B: Preset[] = [
 ];
 
 export function WaveModel() {
+  const { isDark } = useTheme();
   const [density, setDensity] = useState(320);
   const [bladeLength, setBladeLength] = useState(35);
   const [waterDepth, setWaterDepth] = useState(1.5);
@@ -315,36 +317,36 @@ export function WaveModel() {
             onClick={() => setIsCompareMode((prev) => !prev)}
             className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold border transition-all cursor-pointer shadow-2xs ${
               isCompareMode
-                ? "bg-teal-50 border-teal-500 text-teal-800"
-                : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
+                ? "bg-teal-50 dark:bg-teal-950/60 border-teal-500 text-teal-800 dark:text-teal-300"
+                : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700"
             }`}
             title="Toggle side-by-side scenario comparison mode"
           >
-            <GitCompare className="w-3.5 h-3.5 text-teal-600" />
+            <GitCompare className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
             <span>{isCompareMode ? "Exit Compare" : "Compare Scenarios"}</span>
           </button>
           <button
             onClick={() => window.print()}
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-medium text-xs transition-colors shadow-2xs cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-medium text-xs transition-colors shadow-2xs cursor-pointer"
             title="Print or save as PDF report"
           >
-            <Printer className="w-3.5 h-3.5 text-slate-500" />
+            <Printer className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
             <span>Print Report</span>
           </button>
           <button
             onClick={handleExportCSV}
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-medium text-xs transition-colors shadow-2xs cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-medium text-xs transition-colors shadow-2xs cursor-pointer"
             title="Export wave decay curve as CSV"
           >
-            <Download className="w-3.5 h-3.5 text-slate-500" />
+            <Download className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
             <span>CSV</span>
           </button>
           <button
             onClick={handleExportJSON}
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-medium text-xs transition-colors shadow-2xs cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-medium text-xs transition-colors shadow-2xs cursor-pointer"
             title="Export simulation parameters and results as JSON"
           >
-            <Download className="w-3.5 h-3.5 text-slate-500" />
+            <Download className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
             <span>JSON</span>
           </button>
           <button
@@ -362,17 +364,17 @@ export function WaveModel() {
 
       {/* Scenario Selector Tab when in Compare Mode */}
       {isCompareMode && (
-        <div className="bg-white rounded-2xl border border-teal-200/80 p-3.5 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-teal-200/80 dark:border-teal-800/80 p-3.5 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold text-slate-700">Tuning Active Scenario:</span>
-            <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200/60">
+            <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">Tuning Active Scenario:</span>
+            <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
               <button
                 type="button"
                 onClick={() => setActiveScenarioTab("A")}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                   activeScenarioTab === "A"
                     ? "bg-teal-600 text-white shadow-xs"
-                    : "text-slate-600 hover:text-slate-900"
+                    : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
                 }`}
               >
                 <span className="w-2 h-2 rounded-full bg-teal-300"></span>
@@ -384,7 +386,7 @@ export function WaveModel() {
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                   activeScenarioTab === "B"
                     ? "bg-amber-600 text-white shadow-xs"
-                    : "text-slate-600 hover:text-slate-900"
+                    : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
                 }`}
               >
                 <span className="w-2 h-2 rounded-full bg-amber-300"></span>
@@ -393,20 +395,20 @@ export function WaveModel() {
             </div>
           </div>
 
-          <div className="text-xs text-slate-500">
+          <div className="text-xs text-slate-500 dark:text-slate-400">
             {activeScenarioTab === "A" ? (
-              <span className="text-teal-700 font-medium">Currently adjusting Scenario A parameters &amp; presets</span>
+              <span className="text-teal-700 dark:text-teal-400 font-medium">Currently adjusting Scenario A parameters &amp; presets</span>
             ) : (
-              <span className="text-amber-700 font-medium">Currently adjusting Scenario B parameters &amp; presets</span>
+              <span className="text-amber-700 dark:text-amber-400 font-medium">Currently adjusting Scenario B parameters &amp; presets</span>
             )}
           </div>
         </div>
       )}
 
       {/* Preset Quick Select */}
-      <div className="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs">
-        <div className="flex items-center gap-2 mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
-          <Sparkles className="w-3.5 h-3.5 text-teal-600" />
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-4 shadow-xs">
+        <div className="flex items-center gap-2 mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+          <Sparkles className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
           <span>
             {isCompareMode && activeScenarioTab === "B"
               ? "Scenario B Presets (Comparison)"
@@ -430,18 +432,18 @@ export function WaveModel() {
                 className={`text-left p-3.5 rounded-xl border transition-all cursor-pointer ${
                   isSelected
                     ? isCompareMode && activeScenarioTab === "B"
-                      ? "border-amber-500 bg-amber-50/50 ring-1 ring-amber-500"
-                      : "border-teal-500 bg-teal-50/50 ring-1 ring-teal-500"
-                    : "border-slate-200 bg-slate-50/50 hover:bg-slate-100/60 hover:border-slate-300"
+                      ? "border-amber-500 bg-amber-50/50 dark:bg-amber-950/40 ring-1 ring-amber-500"
+                      : "border-teal-500 bg-teal-50/50 dark:bg-teal-950/40 ring-1 ring-teal-500"
+                    : "border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 hover:bg-slate-100/60 dark:hover:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-700"
                 }`}
               >
                 <div className="flex items-center justify-between">
-                  <span className="font-semibold text-sm text-slate-900">{p.name}</span>
+                  <span className="font-semibold text-sm text-slate-900 dark:text-slate-100">{p.name}</span>
                   <span
                     className={`text-xs px-2 py-0.5 rounded-full font-medium ${
                       isCompareMode && activeScenarioTab === "B"
-                        ? "bg-amber-100 text-amber-800"
-                        : "bg-teal-100/80 text-teal-800"
+                        ? "bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300"
+                        : "bg-teal-100/80 dark:bg-teal-950/60 text-teal-800 dark:text-teal-300"
                     }`}
                   >
                     {p.meadowWidth}m
@@ -450,13 +452,13 @@ export function WaveModel() {
                 <div
                   className={`text-xs italic mt-0.5 font-medium ${
                     isCompareMode && activeScenarioTab === "B"
-                      ? "text-amber-700"
-                      : "text-teal-700"
+                      ? "text-amber-700 dark:text-amber-400"
+                      : "text-teal-700 dark:text-teal-400"
                   }`}
                 >
                   {p.species}
                 </div>
-                <p className="text-xs text-slate-500 mt-2 line-clamp-2 leading-relaxed">
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 line-clamp-2 leading-relaxed">
                   {p.description}
                 </p>
               </button>
@@ -469,10 +471,10 @@ export function WaveModel() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left: Hydrodynamic Parameters Sliders (5 cols) */}
         <div className="lg:col-span-5 space-y-4">
-          <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs space-y-5">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-              <div className="flex items-center gap-2 text-slate-900 font-semibold text-sm">
-                <Sliders className="w-4 h-4 text-teal-600" />
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 shadow-xs space-y-5">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
+              <div className="flex items-center gap-2 text-slate-900 dark:text-slate-100 font-semibold text-sm">
+                <Sliders className="w-4 h-4 text-teal-600 dark:text-teal-400" />
                 <span>
                   {isCompareMode
                     ? `Input Parameters (${activeScenarioTab === "A" ? "Scenario A - Teal" : "Scenario B - Amber"})`
@@ -484,12 +486,12 @@ export function WaveModel() {
             {/* Shoot Density */}
             <div className="space-y-1.5">
               <div className="flex justify-between items-center text-xs">
-                <span className="font-medium text-slate-700">Seagrass Shoot Density</span>
+                <span className="font-medium text-slate-700 dark:text-slate-300">Seagrass Shoot Density</span>
                 <span
                   className={`font-bold px-2 py-0.5 rounded-md ${
                     isCompareMode && activeScenarioTab === "B"
-                      ? "text-amber-800 bg-amber-50"
-                      : "text-teal-800 bg-teal-50"
+                      ? "text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/60"
+                      : "text-teal-800 dark:text-teal-300 bg-teal-50 dark:bg-teal-950/60"
                   }`}
                 >
                   {isCompareMode && activeScenarioTab === "B" ? bDensity : density} shoots/m²
@@ -514,7 +516,7 @@ export function WaveModel() {
                 }}
                 className="w-full accent-teal-600 cursor-pointer"
               />
-              <div className="flex justify-between text-[11px] text-slate-400">
+              <div className="flex justify-between text-[11px] text-slate-400 dark:text-slate-500">
                 <span>Bare (0)</span>
                 <span>Moderate (300-500)</span>
                 <span>Dense (1200)</span>
@@ -524,12 +526,12 @@ export function WaveModel() {
             {/* Blade Length */}
             <div className="space-y-1.5">
               <div className="flex justify-between items-center text-xs">
-                <span className="font-medium text-slate-700">Average Blade Length</span>
+                <span className="font-medium text-slate-700 dark:text-slate-300">Average Blade Length</span>
                 <span
                   className={`font-bold px-2 py-0.5 rounded-md ${
                     isCompareMode && activeScenarioTab === "B"
-                      ? "text-amber-800 bg-amber-50"
-                      : "text-teal-800 bg-teal-50"
+                      ? "text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/60"
+                      : "text-teal-800 dark:text-teal-300 bg-teal-50 dark:bg-teal-950/60"
                   }`}
                 >
                   {isCompareMode && activeScenarioTab === "B" ? bBladeLength : bladeLength} cm
@@ -554,7 +556,7 @@ export function WaveModel() {
                 }}
                 className="w-full accent-teal-600 cursor-pointer"
               />
-              <div className="flex justify-between text-[11px] text-slate-400">
+              <div className="flex justify-between text-[11px] text-slate-400 dark:text-slate-500">
                 <span>Short (5-15cm)</span>
                 <span>Canopy (30-50cm)</span>
                 <span>Ribbon (&gt;80cm)</span>
@@ -564,12 +566,12 @@ export function WaveModel() {
             {/* Ambient Water Depth */}
             <div className="space-y-1.5">
               <div className="flex justify-between items-center text-xs">
-                <span className="font-medium text-slate-700">Ambient Water Depth (h)</span>
+                <span className="font-medium text-slate-700 dark:text-slate-300">Ambient Water Depth (h)</span>
                 <span
                   className={`font-bold px-2 py-0.5 rounded-md ${
                     isCompareMode && activeScenarioTab === "B"
-                      ? "text-amber-800 bg-amber-50"
-                      : "text-teal-800 bg-teal-50"
+                      ? "text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/60"
+                      : "text-teal-800 dark:text-teal-300 bg-teal-50 dark:bg-teal-950/60"
                   }`}
                 >
                   {(isCompareMode && activeScenarioTab === "B" ? bWaterDepth : waterDepth).toFixed(1)} m
@@ -594,7 +596,7 @@ export function WaveModel() {
                 }}
                 className="w-full accent-teal-600 cursor-pointer"
               />
-              <div className="flex justify-between text-[11px] text-slate-400">
+              <div className="flex justify-between text-[11px] text-slate-400 dark:text-slate-500">
                 <span>Reef Flat (0.5m)</span>
                 <span>Subtidal (2.0m)</span>
                 <span>Deep (6.0m)</span>
@@ -604,12 +606,12 @@ export function WaveModel() {
             {/* Offshore Incident Wave Height */}
             <div className="space-y-1.5">
               <div className="flex justify-between items-center text-xs">
-                <span className="font-medium text-slate-700">Incident Wave Height (H₀)</span>
+                <span className="font-medium text-slate-700 dark:text-slate-300">Incident Wave Height (H₀)</span>
                 <span
                   className={`font-bold px-2 py-0.5 rounded-md ${
                     isCompareMode && activeScenarioTab === "B"
-                      ? "text-amber-800 bg-amber-50"
-                      : "text-teal-800 bg-teal-50"
+                      ? "text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/60"
+                      : "text-teal-800 dark:text-teal-300 bg-teal-50 dark:bg-teal-950/60"
                   }`}
                 >
                   {(isCompareMode && activeScenarioTab === "B" ? bWaveHeight : waveHeight).toFixed(2)} m
@@ -634,7 +636,7 @@ export function WaveModel() {
                 }}
                 className="w-full accent-teal-600 cursor-pointer"
               />
-              <div className="flex justify-between text-[11px] text-slate-400">
+              <div className="flex justify-between text-[11px] text-slate-400 dark:text-slate-500">
                 <span>Calm (0.3m)</span>
                 <span>Moderate Swell (1.0m)</span>
                 <span>Storm (3.0m)</span>
@@ -644,12 +646,12 @@ export function WaveModel() {
             {/* Peak Wave Period */}
             <div className="space-y-1.5">
               <div className="flex justify-between items-center text-xs">
-                <span className="font-medium text-slate-700">Peak Wave Period (T)</span>
+                <span className="font-medium text-slate-700 dark:text-slate-300">Peak Wave Period (T)</span>
                 <span
                   className={`font-bold px-2 py-0.5 rounded-md ${
                     isCompareMode && activeScenarioTab === "B"
-                      ? "text-amber-800 bg-amber-50"
-                      : "text-teal-800 bg-teal-50"
+                      ? "text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/60"
+                      : "text-teal-800 dark:text-teal-300 bg-teal-50 dark:bg-teal-950/60"
                   }`}
                 >
                   {(isCompareMode && activeScenarioTab === "B" ? bWavePeriod : wavePeriod).toFixed(1)} s
@@ -674,7 +676,7 @@ export function WaveModel() {
                 }}
                 className="w-full accent-teal-600 cursor-pointer"
               />
-              <div className="flex justify-between text-[11px] text-slate-400">
+              <div className="flex justify-between text-[11px] text-slate-400 dark:text-slate-500">
                 <span>Chop (2.0s)</span>
                 <span>Wind Sea (4.5s)</span>
                 <span>Long Swell (12.0s)</span>
@@ -684,12 +686,12 @@ export function WaveModel() {
             {/* Meadow Cross-Shore Width */}
             <div className="space-y-1.5">
               <div className="flex justify-between items-center text-xs">
-                <span className="font-medium text-slate-700">Meadow Cross-Shore Width</span>
+                <span className="font-medium text-slate-700 dark:text-slate-300">Meadow Cross-Shore Width</span>
                 <span
                   className={`font-bold px-2 py-0.5 rounded-md ${
                     isCompareMode && activeScenarioTab === "B"
-                      ? "text-amber-800 bg-amber-50"
-                      : "text-teal-800 bg-teal-50"
+                      ? "text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/60"
+                      : "text-teal-800 dark:text-teal-300 bg-teal-50 dark:bg-teal-950/60"
                   }`}
                 >
                   {isCompareMode && activeScenarioTab === "B" ? bMeadowWidth : meadowWidth} m
@@ -714,7 +716,7 @@ export function WaveModel() {
                 }}
                 className="w-full accent-teal-600 cursor-pointer"
               />
-              <div className="flex justify-between text-[11px] text-slate-400">
+              <div className="flex justify-between text-[11px] text-slate-400 dark:text-slate-500">
                 <span>Patch (10m)</span>
                 <span>Standard (50m)</span>
                 <span>Extensive (150m)</span>
@@ -728,59 +730,59 @@ export function WaveModel() {
           {/* Top Metric Cards (Dual or Single Mode) */}
           {isCompareMode ? (
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div className="bg-white rounded-2xl border border-teal-200/80 p-4 shadow-xs">
-                <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium mb-1">
-                  <ShieldCheck className="w-4 h-4 text-teal-600" />
+              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-teal-200/80 dark:border-teal-800/80 p-4 shadow-xs">
+                <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 font-medium mb-1">
+                  <ShieldCheck className="w-4 h-4 text-teal-600 dark:text-teal-400" />
                   <span>Energy Attenuation</span>
                 </div>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-xl font-bold text-teal-700">-{energyDamping.toFixed(1)}%</span>
+                  <span className="text-xl font-bold text-teal-700 dark:text-teal-300">-{energyDamping.toFixed(1)}%</span>
                   <span className="text-xs text-slate-400">vs</span>
-                  <span className="text-base font-bold text-amber-600">-{energyDampingB.toFixed(1)}%</span>
+                  <span className="text-base font-bold text-amber-600 dark:text-amber-400">-{energyDampingB.toFixed(1)}%</span>
                 </div>
-                <div className="text-[11px] text-teal-700 font-semibold mt-1">
+                <div className="text-[11px] text-teal-700 dark:text-teal-400 font-semibold mt-1">
                   {energyDamping >= energyDampingB ? "+" : ""}{(energyDamping - energyDampingB).toFixed(1)}% Scenario A advantage
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl border border-teal-200/80 p-4 shadow-xs">
-                <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium mb-1">
-                  <Waves className="w-4 h-4 text-cyan-600" />
+              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-teal-200/80 dark:border-teal-800/80 p-4 shadow-xs">
+                <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 font-medium mb-1">
+                  <Waves className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
                   <span>Inshore Wave Height</span>
                 </div>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-xl font-bold text-teal-700">{inshoreHeight.toFixed(2)}m</span>
+                  <span className="text-xl font-bold text-teal-700 dark:text-teal-300">{inshoreHeight.toFixed(2)}m</span>
                   <span className="text-xs text-slate-400">vs</span>
-                  <span className="text-base font-bold text-amber-600">{inshoreHeightB.toFixed(2)}m</span>
+                  <span className="text-base font-bold text-amber-600 dark:text-amber-400">{inshoreHeightB.toFixed(2)}m</span>
                 </div>
-                <div className="text-[11px] text-emerald-700 font-semibold mt-1">
+                <div className="text-[11px] text-emerald-700 dark:text-emerald-400 font-semibold mt-1">
                   {Math.abs(inshoreHeightB - inshoreHeight).toFixed(2)}m {inshoreHeight < inshoreHeightB ? "calmer shore with A" : "difference"}
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl border border-teal-200/80 p-4 shadow-xs">
-                <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium mb-1">
-                  <Activity className="w-4 h-4 text-emerald-600" />
+              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-teal-200/80 dark:border-teal-800/80 p-4 shadow-xs">
+                <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 font-medium mb-1">
+                  <Activity className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                   <span>Height Reduction</span>
                 </div>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-xl font-bold text-teal-700">-{heightReduction.toFixed(1)}%</span>
+                  <span className="text-xl font-bold text-teal-700 dark:text-teal-300">-{heightReduction.toFixed(1)}%</span>
                   <span className="text-xs text-slate-400">vs</span>
-                  <span className="text-base font-bold text-amber-600">-{heightReductionB.toFixed(1)}%</span>
+                  <span className="text-base font-bold text-amber-600 dark:text-amber-400">-{heightReductionB.toFixed(1)}%</span>
                 </div>
-                <div className="text-[11px] text-slate-500 mt-1">
+                <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
                   Δ {Math.abs(heightReduction - heightReductionB).toFixed(1)}% reduction delta
                 </div>
               </div>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div className="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs">
-                <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium mb-1">
-                  <ShieldCheck className="w-4 h-4 text-teal-600" />
+              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-4 shadow-xs">
+                <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 font-medium mb-1">
+                  <ShieldCheck className="w-4 h-4 text-teal-600 dark:text-teal-400" />
                   <span>Energy Dissipated</span>
                 </div>
-                <div className="text-2xl font-bold text-teal-700">
+                <div className="text-2xl font-bold text-teal-700 dark:text-teal-300">
                   -{energyDamping.toFixed(1)}%
                 </div>
                 <div className="text-[11px] text-slate-400 mt-0.5">
@@ -788,12 +790,12 @@ export function WaveModel() {
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs">
-                <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium mb-1">
-                  <Activity className="w-4 h-4 text-cyan-600" />
+              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-4 shadow-xs">
+                <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 font-medium mb-1">
+                  <Activity className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
                   <span>Height Reduction</span>
                 </div>
-                <div className="text-2xl font-bold text-cyan-700">
+                <div className="text-2xl font-bold text-cyan-700 dark:text-cyan-400">
                   -{heightReduction.toFixed(1)}%
                 </div>
                 <div className="text-[11px] text-slate-400 mt-0.5">
@@ -801,12 +803,12 @@ export function WaveModel() {
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs">
-                <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium mb-1">
-                  <Waves className="w-4 h-4 text-emerald-600" />
+              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-4 shadow-xs">
+                <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 font-medium mb-1">
+                  <Waves className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                   <span>Inshore Wave</span>
                 </div>
-                <div className="text-2xl font-bold text-slate-900">
+                <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">
                   {inshoreHeight.toFixed(2)} m
                 </div>
                 <div className="text-[11px] text-slate-400 mt-0.5">
@@ -817,32 +819,32 @@ export function WaveModel() {
           )}
 
           {/* Interactive Decay Chart */}
-          <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs space-y-3">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 shadow-xs space-y-3">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-semibold text-sm text-slate-900">
+                <h3 className="font-semibold text-sm text-slate-900 dark:text-slate-100">
                   {isCompareMode
                     ? "Comparative Wave Height Decay Profile"
                     : "Wave Height Decay Across Meadow Distance"}
                 </h3>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-slate-500 dark:text-slate-400">
                   Dampened wave profile (m) vs cross-shore progression (x = 0m to {meadowWidth}m)
                 </p>
               </div>
               <div className="flex items-center gap-3 text-xs">
-                <span className="flex items-center gap-1.5 text-teal-700 font-medium">
+                <span className="flex items-center gap-1.5 text-teal-700 dark:text-teal-400 font-medium">
                   <span className="w-2.5 h-2.5 rounded-full bg-teal-500"></span>
                   Scenario A (Teal)
                 </span>
                 {isCompareMode && (
-                  <span className="flex items-center gap-1.5 text-amber-600 font-medium">
+                  <span className="flex items-center gap-1.5 text-amber-600 dark:text-amber-400 font-medium">
                     <span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
                     Scenario B (Amber)
                   </span>
                 )}
                 {!isCompareMode && (
                   <span className="flex items-center gap-1.5 text-slate-400">
-                    <span className="w-2.5 h-0.5 bg-slate-300"></span>
+                    <span className="w-2.5 h-0.5 bg-slate-300 dark:bg-slate-600"></span>
                     Bare Sandbed (Unattenuated)
                   </span>
                 )}
@@ -862,18 +864,18 @@ export function WaveModel() {
                       <stop offset="95%" stopColor="#f59e0b" stopOpacity={0.02} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDark ? "#1e293b" : "#f1f5f9"} />
                   <XAxis
                     dataKey="distance_m"
-                    tick={{ fontSize: 11, fill: "#64748b" }}
+                    tick={{ fontSize: 11, fill: isDark ? "#94a3b8" : "#64748b" }}
                     tickFormatter={(v) => `${v}m`}
-                    stroke="#cbd5e1"
+                    stroke={isDark ? "#334155" : "#cbd5e1"}
                   />
                   <YAxis
-                    tick={{ fontSize: 11, fill: "#64748b" }}
+                    tick={{ fontSize: 11, fill: isDark ? "#94a3b8" : "#64748b" }}
                     domain={[0, Math.ceil(Math.max(waveHeight, isCompareMode ? bWaveHeight : 0) * 1.2 * 10) / 10]}
                     tickFormatter={(v) => `${v.toFixed(2)}m`}
-                    stroke="#cbd5e1"
+                    stroke={isDark ? "#334155" : "#cbd5e1"}
                   />
                   <Tooltip
                     formatter={(value: any, name: any) => [
@@ -882,21 +884,25 @@ export function WaveModel() {
                     ]}
                     labelFormatter={(label) => `Distance: ${label} m into meadow`}
                     contentStyle={{
-                      backgroundColor: "#ffffff",
-                      borderColor: "#e2e8f0",
+                      backgroundColor: isDark ? "#0f172a" : "#ffffff",
+                      borderColor: isDark ? "#334155" : "#e2e8f0",
+                      color: isDark ? "#f8fafc" : "#0f172a",
                       borderRadius: "12px",
                       fontSize: "12px",
-                      boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+                      boxShadow: isDark ? "0 10px 25px -5px rgba(0,0,0,0.5)" : "0 4px 12px rgba(0,0,0,0.05)",
+                    }}
+                    itemStyle={{
+                      color: isDark ? "#e2e8f0" : "#334155",
                     }}
                   />
                   <ReferenceLine
                     y={waveHeight}
-                    stroke="#94a3b8"
+                    stroke={isDark ? "#475569" : "#94a3b8"}
                     strokeDasharray="4 4"
                     label={{
                       value: `Offshore H₀: ${waveHeight}m`,
                       position: "insideTopRight",
-                      fill: "#64748b",
+                      fill: isDark ? "#94a3b8" : "#64748b",
                       fontSize: 10,
                     }}
                   />
@@ -927,31 +933,31 @@ export function WaveModel() {
           </div>
 
           {/* Hydrodynamic Physics Parameters Summary */}
-          <div className="bg-slate-50/80 rounded-2xl border border-slate-200/70 p-4">
-            <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 mb-2">
-              <Info className="w-3.5 h-3.5 text-teal-600" />
+          <div className="bg-slate-50/80 dark:bg-slate-800/60 rounded-2xl border border-slate-200/70 dark:border-slate-700 p-4">
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 mb-2">
+              <Info className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
               <span>Mendez &amp; Losada (2004) Model Formulation</span>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-              <div className="p-2 rounded-lg bg-white border border-slate-200/60">
-                <span className="text-slate-400 block text-[10px]">Submergence (l_e / h)</span>
-                <span className="font-semibold text-slate-800">
+              <div className="p-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800">
+                <span className="text-slate-400 dark:text-slate-500 block text-[10px]">Submergence (l_e / h)</span>
+                <span className="font-semibold text-slate-800 dark:text-slate-200">
                   {Math.min(bladeLength / (waterDepth * 100), 1.0).toFixed(2)}
                 </span>
               </div>
-              <div className="p-2 rounded-lg bg-white border border-slate-200/60">
-                <span className="text-slate-400 block text-[10px]">Bulk Drag (C_D)</span>
-                <span className="font-semibold text-slate-800">0.70</span>
+              <div className="p-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800">
+                <span className="text-slate-400 dark:text-slate-500 block text-[10px]">Bulk Drag (C_D)</span>
+                <span className="font-semibold text-slate-800 dark:text-slate-200">0.70</span>
               </div>
-              <div className="p-2 rounded-lg bg-white border border-slate-200/60">
-                <span className="text-slate-400 block text-[10px]">95% CI Lower</span>
-                <span className="font-semibold text-teal-700">
+              <div className="p-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800">
+                <span className="text-slate-400 dark:text-slate-500 block text-[10px]">95% CI Lower</span>
+                <span className="font-semibold text-teal-700 dark:text-teal-400">
                   {(result?.confidence_lower ?? energyDamping * 0.91).toFixed(1)}%
                 </span>
               </div>
-              <div className="p-2 rounded-lg bg-white border border-slate-200/60">
-                <span className="text-slate-400 block text-[10px]">95% CI Upper</span>
-                <span className="font-semibold text-teal-700">
+              <div className="p-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800">
+                <span className="text-slate-400 dark:text-slate-500 block text-[10px]">95% CI Upper</span>
+                <span className="font-semibold text-teal-700 dark:text-teal-400">
                   {(result?.confidence_upper ?? energyDamping * 1.07).toFixed(1)}%
                 </span>
               </div>

@@ -108,28 +108,28 @@ export function QuickStartChecklist() {
   const isAllComplete = completedSteps.length === STEPS.length;
 
   return (
-    <div className="bg-white rounded-3xl border border-teal-200/60 p-5 sm:p-6 shadow-xs relative overflow-hidden transition-all">
+    <div className="bg-white dark:bg-slate-900 rounded-3xl border border-teal-200/60 dark:border-teal-800/60 p-5 sm:p-6 shadow-xs relative overflow-hidden transition-all">
       {/* Decorative gradient blur */}
-      <div className="absolute top-0 right-0 w-72 h-36 bg-gradient-to-bl from-teal-100/40 via-cyan-50/20 to-transparent pointer-events-none rounded-tr-3xl" />
+      <div className="absolute top-0 right-0 w-72 h-36 bg-gradient-to-bl from-teal-100/40 via-cyan-50/20 to-transparent dark:from-teal-900/20 dark:via-cyan-900/10 pointer-events-none rounded-tr-3xl" />
 
       {/* Card Header */}
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-teal-50 text-teal-700 flex items-center justify-center font-bold">
-            <Sparkles className="w-5 h-5 text-teal-600" />
+          <div className="w-10 h-10 rounded-2xl bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-300 flex items-center justify-center font-bold">
+            <Sparkles className="w-5 h-5 text-teal-600 dark:text-teal-400" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="font-bold text-base text-slate-900">
+              <h2 className="font-bold text-base text-slate-900 dark:text-slate-100">
                 Interactive Onboarding Guide
               </h2>
               {isAllComplete && (
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-semibold border border-emerald-200">
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-semibold border border-emerald-200 dark:border-emerald-800">
                   Ready for Fieldwork
                 </span>
               )}
             </div>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
               Explore key telemetry and hydrodynamic simulation features.
             </p>
           </div>
@@ -137,7 +137,7 @@ export function QuickStartChecklist() {
 
         <div className="flex items-center gap-3">
           <div className="hidden sm:flex flex-col items-end">
-            <span className="text-xs font-semibold text-teal-800">
+            <span className="text-xs font-semibold text-teal-800 dark:text-teal-300">
               {completedSteps.length} of {STEPS.length} Completed
             </span>
             <span className="text-[10px] text-slate-400">{progressPct}% Complete</span>
@@ -146,7 +146,7 @@ export function QuickStartChecklist() {
           <button
             type="button"
             onClick={toggleCollapsed}
-            className="p-2 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer"
+            className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
             aria-label={isCollapsed ? "Expand checklist" : "Collapse checklist"}
           >
             {isCollapsed ? <ChevronDown className="w-5 h-5" /> : <ChevronUp className="w-5 h-5" />}
@@ -155,7 +155,7 @@ export function QuickStartChecklist() {
       </div>
 
       {/* Progress Bar */}
-      <div className="w-full bg-slate-100 h-2 rounded-full mt-4 overflow-hidden">
+      <div className="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full mt-4 overflow-hidden">
         <div
           className="bg-gradient-to-r from-teal-500 to-cyan-500 h-full rounded-full transition-all duration-500"
           style={{ width: `${progressPct}%` }}
@@ -174,8 +174,8 @@ export function QuickStartChecklist() {
                 key={step.id}
                 className={`p-3.5 rounded-2xl border transition-all flex items-start justify-between gap-3 ${
                   isDone
-                    ? "bg-slate-50/70 border-slate-200/60 opacity-90"
-                    : "bg-white border-slate-200/80 hover:border-teal-300 hover:shadow-2xs"
+                    ? "bg-slate-50/70 dark:bg-slate-900/60 border-slate-200/60 dark:border-slate-800/80 opacity-90"
+                    : "bg-white dark:bg-slate-900 border-slate-200/80 dark:border-slate-800 hover:border-teal-300 dark:hover:border-teal-700 hover:shadow-2xs"
                 }`}
               >
                 <div className="flex items-start gap-3 flex-1 min-w-0">
@@ -186,24 +186,24 @@ export function QuickStartChecklist() {
                     title={isDone ? "Mark as incomplete" : "Mark as completed"}
                   >
                     {isDone ? (
-                      <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+                      <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                     ) : (
-                      <Circle className="w-5 h-5 text-slate-300" />
+                      <Circle className="w-5 h-5 text-slate-300 dark:text-slate-600" />
                     )}
                   </button>
 
                   <div className="min-w-0">
                     <div className="flex items-center gap-1.5">
-                      <Icon className="w-3.5 h-3.5 text-teal-600 shrink-0" />
+                      <Icon className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400 shrink-0" />
                       <h3
                         className={`text-xs font-semibold truncate ${
-                          isDone ? "text-slate-500 line-through" : "text-slate-800"
+                          isDone ? "text-slate-500 line-through" : "text-slate-800 dark:text-slate-100"
                         }`}
                       >
                         {step.title}
                       </h3>
                     </div>
-                    <p className="text-[11px] text-slate-400 mt-1 line-clamp-2 leading-relaxed">
+                    <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-1 line-clamp-2 leading-relaxed">
                       {step.description}
                     </p>
                   </div>
@@ -211,7 +211,7 @@ export function QuickStartChecklist() {
 
                 <Link
                   to={step.link}
-                  className="inline-flex items-center gap-1 text-[11px] font-semibold text-teal-700 hover:text-teal-800 hover:underline shrink-0 pt-0.5"
+                  className="inline-flex items-center gap-1 text-[11px] font-semibold text-teal-700 dark:text-teal-400 hover:text-teal-800 dark:hover:text-teal-300 hover:underline shrink-0 pt-0.5"
                 >
                   <span>{step.linkLabel}</span>
                   <ArrowRight className="w-3 h-3" />
