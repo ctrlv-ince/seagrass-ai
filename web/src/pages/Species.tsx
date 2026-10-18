@@ -165,9 +165,10 @@ export function Species() {
       {/* Filter and Search Bar */}
       <div className="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3">
         <div className="relative w-full sm:w-80">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" aria-hidden="true" />
           <input
             type="text"
+            aria-label="Search species catalog by scientific name, family or features"
             placeholder="Search by scientific name, features..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -178,6 +179,7 @@ export function Species() {
         <div className="flex items-center gap-2 w-full sm:w-auto text-xs">
           <span className="text-slate-500 font-medium whitespace-nowrap">Wave Damping:</span>
           <select
+            aria-label="Filter species by wave damping capacity"
             value={selectedTier}
             onChange={(e) => setSelectedTier(e.target.value)}
             className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs text-slate-700 focus:outline-teal-500"

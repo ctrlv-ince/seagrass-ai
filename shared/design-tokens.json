@@ -1,0 +1,85 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "name": "Seagrass Design System Tokens",
+  "version": "1.0.0",
+  "colors": {
+    "background": "#F8FAFB",
+    "surface": "#FFFFFF",
+    "surfaceSecondary": "#F1F5F9",
+    "surfaceTertiary": "#F8FAFC",
+    "primary": {
+      "DEFAULT": "#0D9488",
+      "dark": "#0F766E",
+      "light": "#CCFBF1",
+      "subtle": "#F0FDFA"
+    },
+    "text": {
+      "primary": "#0F172A",
+      "secondary": "#475569",
+      "tertiary": "#94A3B8",
+      "onPrimary": "#FFFFFF"
+    },
+    "border": {
+      "DEFAULT": "#E2E8F0",
+      "light": "#F1F5F9"
+    },
+    "semantic": {
+      "success": {
+        "DEFAULT": "#059669",
+        "light": "#ECFDF5"
+      },
+      "warning": {
+        "DEFAULT": "#D97706",
+        "light": "#FEF3C7"
+      },
+      "error": {
+        "DEFAULT": "#DC2626",
+        "light": "#FEF2F2"
+      },
+      "info": {
+        "DEFAULT": "#2563EB",
+        "light": "#EFF6FF"
+      }
+    }
+  },
+  "spacing": {
+    "xs": 4,
+    "sm": 8,
+    "md": 12,
+    "lg": 16,
+    "xl": 20,
+    "xxl": 24,
+    "xxxl": 32,
+    "xxxxl": 40
+  },
+  "radius": {
+    "sm": 8,
+    "md": 12,
+    "lg": 16,
+    "xl": 20,
+    "xxl": 24,
+    "full": 9999
+  },
+  "fontSize": {
+    "xs": 11,
+    "sm": 13,
+    "md": 15,
+    "lg": 17,
+    "xl": 20,
+    "xxl": 24,
+    "hero": 28
+  },
+  "fontWeight": {
+    "regular": "400",
+    "medium": "500",
+    "semibold": "600",
+    "bold": "700",
+    "heavy": "800"
+  },
+  "shadow": {
+    "sm": "0 2px 8px -1px rgba(15, 23, 42, 0.05)",
+    "md": "0 4px 20px -2px rgba(15, 23, 42, 0.08)",
+    "lg": "0 12px 28px -6px rgba(13, 148, 136, 0.12)",
+    "glow": "0 10px 30px -5px rgba(13, 148, 136, 0.18)"
+  }
+}

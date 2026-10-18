@@ -2,10 +2,26 @@ import { useEffect } from "react";
 import { Platform, StatusBar } from "react-native";
 import { Stack } from "expo-router";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import {
+  useFonts,
+  Inter_400Regular,
+  Inter_500Medium,
+  Inter_600SemiBold,
+  Inter_700Bold,
+  Inter_800ExtraBold,
+} from "@expo-google-fonts/inter";
 import { AuthProvider } from "@/context/AuthContext";
 import { colors } from "@/theme";
 
 export default function RootLayout() {
+  const [fontsLoaded] = useFonts({
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_700Bold,
+    Inter_800ExtraBold,
+  });
+
   useEffect(() => {
     if (Platform.OS === "android") {
       StatusBar.setTranslucent(true);
@@ -13,6 +29,10 @@ export default function RootLayout() {
       StatusBar.setBarStyle("dark-content");
     }
   }, []);
+
+  if (!fontsLoaded) {
+    return null;
+  }
 
   return (
     <SafeAreaProvider>

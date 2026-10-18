@@ -207,3 +207,36 @@ export async function markImageSynced(localId: string, remoteId: string): Promis
     [remoteId, localId]
   );
 }
+
+export interface LocalDatabaseStats {
+  surveyCount: number;
+  imageCount: number;
+  pendingSyncCount: number;
+}
+
+/**
+ * Aggregate real survey and quadrat counts from local SQLite storage.
+ */
+export async function getLocalDatabaseStats(): Promise<LocalDatabaseStats> {
+  const db = await getDatabase();
+  const surveyRow = (await db.getFirstAsync(
+    `SELECT COUNT(*) as count FROM surveys`
+  )) as { count: number } | null;
+  const imageRow = (await db.getFirstAsync(
+    `SELECT COUNT(*) as count FROM survey_images`
+  )) as { count: number } | null;
+  const pendingSurveysRow = (await db.getFirstAsync(
+    `SELECT COUNT(*) as count FROM surveys WHERE sync_status = 'pending'`
+  )) as { count: number } | null;
+  const pendingImagesRow = (await db.getFirstAsync(
+    `SELECT COUNT(*) as count FROM survey_images WHERE sync_status = 'pending'`
+  )) as { count: number } | null;
+
+  return {
+    surveyCount: surveyRow?.count || 0,
+    imageCount: imageRow?.count || 0,
+    pendingSyncCount:
+      (pendingSurveysRow?.count || 0) + (pendingImagesRow?.count || 0),
+  };
+}
+

@@ -67,6 +67,8 @@ export default function NewSurveyScreen() {
         <Pressable
           style={styles.backBtn}
           onPress={() => router.back()}
+          accessibilityRole="button"
+          accessibilityLabel="Go back"
           hitSlop={8}
         >
           <ArrowLeft size={20} color={colors.text} />
@@ -163,9 +165,9 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.borderLight,
   },
   backBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: radius.md,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: colors.surfaceSecondary,
@@ -176,7 +178,7 @@ const styles = StyleSheet.create({
     color: colors.text,
   },
   topBarRightPlaceholder: {
-    width: 36,
+    width: 44,
   },
   scrollArea: {
     flex: 1,

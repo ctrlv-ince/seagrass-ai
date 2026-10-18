@@ -93,6 +93,8 @@ export default function SurveyDetailScreen() {
           <Pressable
             style={styles.topBarBtn}
             onPress={() => router.back()}
+            accessibilityRole="button"
+            accessibilityLabel="Go back"
             hitSlop={8}
           >
             <ArrowLeft size={20} color={colors.text} />
@@ -126,6 +128,8 @@ export default function SurveyDetailScreen() {
         <Pressable
           style={styles.topBarBtn}
           onPress={() => router.back()}
+          accessibilityRole="button"
+          accessibilityLabel="Go back"
           hitSlop={8}
         >
           <ArrowLeft size={20} color={colors.text} />
@@ -359,9 +363,9 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.borderLight,
   },
   topBarBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: radius.md,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: colors.surfaceSecondary,
@@ -375,7 +379,7 @@ const styles = StyleSheet.create({
     marginHorizontal: spacing.sm,
   },
   topBarRightPlaceholder: {
-    width: 36,
+    width: 44,
   },
   scrollArea: {
     flex: 1,

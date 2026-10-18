@@ -5,12 +5,31 @@
   :root {
     --primary: #0d9488;
     --primary-hover: #0f766e;
+    --primary-light: #ccfbf1;
+    --primary-subtle: #f0fdfa;
     --background: #f8fafc;
     --foreground: #0f172a;
     --card: #ffffff;
     --card-foreground: #0f172a;
     --border: #e2e8f0;
+    --border-light: #f1f5f9;
     --muted: #64748b;
+    --muted-foreground: #94a3b8;
+    --success: #059669;
+    --success-light: #ecfdf5;
+    --warning: #d97706;
+    --warning-light: #fef3c7;
+    --error: #dc2626;
+    --error-light: #fef2f2;
+    --info: #2563eb;
+    --info-light: #eff6ff;
+    --radius-sm: 0.5rem;
+    --radius-md: 0.75rem;
+    --radius-lg: 1rem;
+    --radius-xl: 1.25rem;
+    --radius-2xl: 1.5rem;
+    --shadow-sm: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+    --shadow-md: 0 12px 28px -6px rgba(13, 148, 136, 0.12);
   }
 
   * {
@@ -75,3 +94,18 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
 }
+
+/* Accessible focus outline */
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.focus-ring {
+  outline: none;
+}
+.focus-ring:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+

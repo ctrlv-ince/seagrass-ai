@@ -5,6 +5,7 @@ import {
   StyleSheet,
   ScrollView,
   Pressable,
+  Share,
 } from "react-native";
 import { router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -16,6 +17,7 @@ import {
   Camera,
   Activity,
   Sliders,
+  Share2,
 } from "lucide-react-native";
 import { BottomNavBar } from "@/components/BottomNavBar";
 import { Card } from "@/components/ui/Card";
@@ -79,6 +81,33 @@ export default function WaveCalcScreen() {
     setMeadowWidth(p.width);
   };
 
+  const handleShareReport = async () => {
+    try {
+      const report = [
+        `🌊 Seagrass AI — Coastal Wave Attenuation Report`,
+        `Physics Model: Mendez & Losada (2004)`,
+        `----------------------------------------`,
+        `• Wave Height Damping: -${results.heightReductionPct}%`,
+        `• Energy Dissipation: ${results.energyDampingPct}%`,
+        `• Offshore Wave (H₀): ${waveHeight.toFixed(2)} m`,
+        `• Shoreline Wave (H): ${Number(results.inshoreHeight).toFixed(2)} m`,
+        `• Canopy Shoot Density: ${density} shoots/m²`,
+        `• Canopy Blade Height: ${bladeLength} cm`,
+        `• Water Column Depth: ${depth.toFixed(1)} m`,
+        `• Meadow Transect Width: ${meadowWidth} m`,
+        `----------------------------------------`,
+        `Seagrass AI Marine Decision Support System`,
+      ].join("\n");
+
+      await Share.share({
+        message: report,
+        title: "Wave Attenuation Telemetry",
+      });
+    } catch (err) {
+      console.warn("Share failed:", err);
+    }
+  };
+
   return (
     <View style={styles.container}>
       {/* Top Header Bar */}
@@ -86,6 +115,8 @@ export default function WaveCalcScreen() {
         <Pressable
           onPress={() => (router.canGoBack() ? router.back() : router.push("/more"))}
           style={styles.backBtn}
+          accessibilityRole="button"
+          accessibilityLabel="Go back"
           hitSlop={8}
         >
           <ArrowLeft size={20} color={colors.text} />
@@ -139,6 +170,82 @@ export default function WaveCalcScreen() {
               <Text style={styles.secondaryResultSub}>
                 From {waveHeight}m incident
               </Text>
+            </View>
+          </View>
+        </Card>
+
+        {/* ── Hydrodynamic Coastal Profile Diagram ── */}
+        <Card style={styles.diagramCard}>
+          <View style={styles.diagramHeader}>
+            <Text style={styles.diagramTitle}>Coastal Wave Damping Profile</Text>
+            <Badge
+              label={`-${results.heightReductionPct}% Wave Height`}
+              variant="primary"
+              size="sm"
+              dot
+            />
+          </View>
+
+          <View style={styles.diagramCanvas}>
+            {/* Offshore incident wave */}
+            <View style={styles.zoneCol}>
+              <Text style={styles.zoneValue}>{waveHeight.toFixed(1)}m</Text>
+              <View
+                style={[
+                  styles.wavePillar,
+                  { height: Math.min(76, Math.max(34, waveHeight * 36)) },
+                ]}
+              >
+                <Waves size={18} color="#0284C7" />
+              </View>
+              <Text style={styles.zoneLabel}>Offshore</Text>
+            </View>
+
+            {/* Submerged Seagrass Meadow Canopy */}
+            <View style={styles.zoneMeadow}>
+              <View style={styles.canopyCanal}>
+                {Array.from({ length: 7 }).map((_, i) => (
+                  <View
+                    key={i}
+                    style={[
+                      styles.bladeStem,
+                      {
+                        height: Math.min(
+                          48,
+                          Math.max(16, (bladeLength / 100) * 52)
+                        ),
+                        opacity: 0.6 + (i % 3) * 0.2,
+                      },
+                    ]}
+                  />
+                ))}
+              </View>
+              <View style={styles.meadowFloor} />
+              <Text style={styles.zoneLabel}>
+                Meadow ({meadowWidth}m)
+              </Text>
+            </View>
+
+            {/* Inshore Dampened Shoreline Wave */}
+            <View style={styles.zoneCol}>
+              <Text style={[styles.zoneValue, { color: colors.primaryDark }]}>
+                {typeof results.inshoreHeight === "number" ? results.inshoreHeight.toFixed(2) : results.inshoreHeight}m
+              </Text>
+              <View
+                style={[
+                  styles.wavePillar,
+                  styles.wavePillarDampened,
+                  {
+                    height: Math.min(
+                      65,
+                      Math.max(18, Number(results.inshoreHeight) * 36)
+                    ),
+                  },
+                ]}
+              >
+                <Waves size={14} color={colors.primary} />
+              </View>
+              <Text style={styles.zoneLabel}>Shoreline</Text>
             </View>
           </View>
         </Card>
@@ -339,17 +446,34 @@ export default function WaveCalcScreen() {
           </View>
         </Card>
 
-        {/* Action Button: Scan Quadrat */}
-        <Pressable
-          onPress={() => router.push("/capture")}
-          style={({ pressed }) => [
-            styles.actionBtn,
-            pressed && styles.actionBtnPressed,
-          ]}
-        >
-          <Camera size={18} color={colors.surface} />
-          <Text style={styles.actionBtnText}>Scan Quadrat Instead</Text>
-        </Pressable>
+        {/* Action Button Cluster */}
+        <View style={styles.actionCluster}>
+          <Pressable
+            onPress={handleShareReport}
+            style={({ pressed }) => [
+              styles.shareBtn,
+              pressed && styles.actionBtnPressed,
+            ]}
+            accessibilityRole="button"
+            accessibilityLabel="Share Telemetry Report"
+          >
+            <Share2 size={18} color={colors.primary} />
+            <Text style={styles.shareBtnText}>Share Report</Text>
+          </Pressable>
+
+          <Pressable
+            onPress={() => router.push("/capture")}
+            style={({ pressed }) => [
+              styles.actionBtn,
+              pressed && styles.actionBtnPressed,
+            ]}
+            accessibilityRole="button"
+            accessibilityLabel="Scan Quadrat Camera"
+          >
+            <Camera size={18} color={colors.surface} />
+            <Text style={styles.actionBtnText}>Scan Quadrat</Text>
+          </Pressable>
+        </View>
       </ScrollView>
 
       <BottomNavBar activeTab="more" />
@@ -373,9 +497,9 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.borderLight,
   },
   backBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: radius.md,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: colors.surfaceSecondary,
@@ -386,7 +510,7 @@ const styles = StyleSheet.create({
     color: colors.text,
   },
   topBarRightPlaceholder: {
-    width: 36,
+    width: 44,
   },
   scrollArea: {
     flex: 1,
@@ -590,22 +714,130 @@ const styles = StyleSheet.create({
     color: colors.text,
     paddingHorizontal: spacing.sm,
   },
+  actionCluster: {
+    flexDirection: "row",
+    gap: spacing.md,
+    marginTop: spacing.sm,
+  },
+  shareBtn: {
+    flex: 1,
+    flexDirection: "row",
+    backgroundColor: colors.surface,
+    borderWidth: 1.5,
+    borderColor: colors.primary,
+    borderRadius: radius.lg,
+    paddingVertical: 14,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: spacing.xs,
+    minHeight: 48,
+  },
+  shareBtnText: {
+    color: colors.primary,
+    fontWeight: fontWeight.bold,
+    fontSize: fontSize.sm,
+  },
   actionBtn: {
+    flex: 1,
     flexDirection: "row",
     backgroundColor: colors.primary,
     borderRadius: radius.lg,
     paddingVertical: 14,
     alignItems: "center",
     justifyContent: "center",
-    marginTop: spacing.xs,
-    gap: spacing.sm,
+    gap: spacing.xs,
+    minHeight: 48,
   },
   actionBtnPressed: {
     opacity: 0.9,
+    transform: [{ scale: 0.98 }],
   },
   actionBtnText: {
     color: colors.surface,
     fontWeight: fontWeight.semibold,
     fontSize: fontSize.sm,
+  },
+
+  /* Coastal Diagram */
+  diagramCard: {
+    padding: spacing.lg,
+    gap: spacing.md,
+  },
+  diagramHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  diagramTitle: {
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.bold,
+    color: colors.text,
+  },
+  diagramCanvas: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+    justifyContent: "space-between",
+    backgroundColor: colors.surfaceSecondary,
+    borderRadius: radius.md,
+    padding: spacing.md,
+    paddingTop: spacing.lg,
+    minHeight: 130,
+  },
+  zoneCol: {
+    alignItems: "center",
+    width: 60,
+  },
+  zoneValue: {
+    fontSize: fontSize.xs,
+    fontFamily: "monospace",
+    fontWeight: fontWeight.bold,
+    color: "#0369A1",
+    marginBottom: 4,
+  },
+  wavePillar: {
+    width: 44,
+    backgroundColor: "rgba(2, 132, 199, 0.15)",
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    borderWidth: 1.5,
+    borderColor: "#0284C7",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  wavePillarDampened: {
+    backgroundColor: "rgba(13, 148, 136, 0.15)",
+    borderColor: colors.primary,
+  },
+  zoneLabel: {
+    fontSize: 9,
+    color: colors.textSecondary,
+    marginTop: 6,
+    textAlign: "center",
+    fontWeight: fontWeight.medium,
+  },
+  zoneMeadow: {
+    flex: 1,
+    marginHorizontal: spacing.sm,
+    alignItems: "center",
+  },
+  canopyCanal: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+    justifyContent: "space-around",
+    width: "100%",
+    height: 52,
+    paddingHorizontal: 4,
+  },
+  bladeStem: {
+    width: 3.5,
+    backgroundColor: "#059669",
+    borderTopLeftRadius: 3,
+    borderTopRightRadius: 3,
+  },
+  meadowFloor: {
+    width: "100%",
+    height: 3,
+    backgroundColor: "#0D9488",
+    borderRadius: 1.5,
   },
 });

@@ -361,7 +361,8 @@ export function Surveys() {
               <h3 className="font-bold text-lg text-slate-900">New Field Survey Session</h3>
               <button
                 onClick={() => setIsCreateOpen(false)}
-                className="w-7 h-7 rounded-full bg-slate-100 text-slate-500 hover:text-slate-800 flex items-center justify-center"
+                aria-label="Close dialog"
+                className="w-7 h-7 rounded-full bg-slate-100 text-slate-500 hover:text-slate-800 flex items-center justify-center cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -369,10 +370,11 @@ export function Surveys() {
 
             <form onSubmit={handleCreateSubmit} className="space-y-4">
               <div>
-                <label className="text-xs font-semibold text-slate-700 block mb-1">
+                <label htmlFor="new-survey-title" className="text-xs font-semibold text-slate-700 block mb-1">
                   Survey Title *
                 </label>
                 <input
+                  id="new-survey-title"
                   type="text"
                   required
                   placeholder="e.g. Bolinao Reef Flat Survey - Transect A"
@@ -383,10 +385,11 @@ export function Surveys() {
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-slate-700 block mb-1">
+                <label htmlFor="new-survey-location" className="text-xs font-semibold text-slate-700 block mb-1">
                   Location Name
                 </label>
                 <input
+                  id="new-survey-location"
                   type="text"
                   placeholder="e.g. Bolinao, Pangasinan"
                   value={newLocation}
@@ -396,10 +399,11 @@ export function Surveys() {
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-slate-700 block mb-1">
+                <label htmlFor="new-survey-surveyor" className="text-xs font-semibold text-slate-700 block mb-1">
                   Surveyor Name
                 </label>
                 <input
+                  id="new-survey-surveyor"
                   type="text"
                   placeholder="e.g. Marine Field Team"
                   value={newSurveyor}
@@ -410,10 +414,11 @@ export function Surveys() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-semibold text-slate-700 block mb-1">
+                  <label htmlFor="new-survey-lat" className="text-xs font-semibold text-slate-700 block mb-1">
                     Latitude
                   </label>
                   <input
+                    id="new-survey-lat"
                     type="number"
                     step="any"
                     value={newLat}
@@ -422,10 +427,11 @@ export function Surveys() {
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-slate-700 block mb-1">
+                  <label htmlFor="new-survey-lng" className="text-xs font-semibold text-slate-700 block mb-1">
                     Longitude
                   </label>
                   <input
+                    id="new-survey-lng"
                     type="number"
                     step="any"
                     value={newLng}
@@ -436,10 +442,11 @@ export function Surveys() {
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-slate-700 block mb-1">
+                <label htmlFor="new-survey-desc" className="text-xs font-semibold text-slate-700 block mb-1">
                   Description / Notes
                 </label>
                 <textarea
+                  id="new-survey-desc"
                   rows={2}
                   placeholder="Field conditions, weather, tidal phase..."
                   value={newDesc}

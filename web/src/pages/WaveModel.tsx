@@ -247,6 +247,7 @@ export function WaveModel() {
               </div>
               <input
                 type="range"
+                aria-label="Seagrass Shoot Density in shoots per square meter"
                 min="50"
                 max="1200"
                 step="10"
@@ -274,6 +275,7 @@ export function WaveModel() {
               </div>
               <input
                 type="range"
+                aria-label="Average Blade Length in centimeters"
                 min="5"
                 max="100"
                 step="1"
@@ -301,6 +303,7 @@ export function WaveModel() {
               </div>
               <input
                 type="range"
+                aria-label="Mean Water Depth in meters"
                 min="0.5"
                 max="8.0"
                 step="0.1"
@@ -328,6 +331,7 @@ export function WaveModel() {
               </div>
               <input
                 type="range"
+                aria-label="Offshore Incident Wave Height in meters"
                 min="0.2"
                 max="3.0"
                 step="0.05"
@@ -355,6 +359,7 @@ export function WaveModel() {
               </div>
               <input
                 type="range"
+                aria-label="Peak Wave Period in seconds"
                 min="2.0"
                 max="12.0"
                 step="0.5"
@@ -382,6 +387,7 @@ export function WaveModel() {
               </div>
               <input
                 type="range"
+                aria-label="Meadow Cross-Shore Width in meters"
                 min="10"
                 max="150"
                 step="5"

@@ -136,6 +136,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   title: {
+    fontFamily: "Inter_700Bold",
     fontSize: 18,
     fontWeight: "800",
     color: "#0f172a",
@@ -148,11 +149,13 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   badgeText: {
+    fontFamily: "Inter_700Bold",
     fontSize: 10,
     fontWeight: "700",
     color: "#0f766e",
   },
   subtitle: {
+    fontFamily: "Inter_600SemiBold",
     fontSize: 9,
     fontWeight: "600",
     color: "#64748b",

@@ -17,6 +17,8 @@ export const colors = {
   primaryDark: "#0F766E",
   primaryLight: "#CCFBF1",
   primarySubtle: "#F0FDFA",
+  accent: "#06B6D4",
+  accentLight: "#ECFEFF",
 
   // Text
   text: "#0F172A",
@@ -77,6 +79,14 @@ export const fontWeight = {
   heavy: "800" as const,
 };
 
+export const fontFamily = {
+  regular: "Inter_400Regular",
+  medium: "Inter_500Medium",
+  semibold: "Inter_600SemiBold",
+  bold: "Inter_700Bold",
+  heavy: "Inter_800ExtraBold",
+} as const;
+
 export const shadow = {
   sm: {
     shadowColor: "#0F172A",
@@ -101,5 +111,5 @@ export const shadow = {
   },
 } as const;
 
-const theme = { colors, spacing, radius, fontSize, fontWeight, shadow };
+const theme = { colors, spacing, radius, fontSize, fontWeight, fontFamily, shadow };
 export default theme;

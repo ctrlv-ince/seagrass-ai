@@ -5,6 +5,7 @@ import {
   StyleSheet,
   ScrollView,
   Pressable,
+  RefreshControl,
 } from "react-native";
 import { router, useFocusEffect } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -13,6 +14,7 @@ import {
   ChevronRight,
   Wifi,
   WifiOff,
+  Sparkles,
 } from "lucide-react-native";
 import { OfflineBanner } from "@/components/OfflineBanner";
 import { BottomNavBar } from "@/components/BottomNavBar";
@@ -20,7 +22,12 @@ import { Card } from "@/components/ui/Card";
 import { useAuth } from "@/hooks/useAuth";
 import { useNetworkStatus } from "@/hooks/useNetworkStatus";
 import { useOfflineSync } from "@/hooks/useOfflineSync";
-import { getLocalSurveys, type LocalSurvey } from "@/db/repository";
+import {
+  getLocalSurveys,
+  getLocalDatabaseStats,
+  type LocalSurvey,
+  type LocalDatabaseStats,
+} from "@/db/repository";
 import { colors, spacing, fontSize, fontWeight, radius, shadow } from "@/theme";
 
 export default function HomeScreen() {
@@ -32,12 +39,21 @@ export default function HomeScreen() {
 
   const [recentSurveys, setRecentSurveys] = useState<LocalSurvey[]>([]);
   const [totalCount, setTotalCount] = useState<number>(0);
+  const [stats, setStats] = useState<LocalDatabaseStats>({
+    surveyCount: 0,
+    imageCount: 0,
+    pendingSyncCount: 0,
+  });
 
   const loadData = useCallback(async () => {
     try {
-      const data = await getLocalSurveys();
+      const [data, dbStats] = await Promise.all([
+        getLocalSurveys(),
+        getLocalDatabaseStats(),
+      ]);
       setRecentSurveys(data.slice(0, 3));
-      setTotalCount(data.length);
+      setTotalCount(dbStats.surveyCount);
+      setStats(dbStats);
     } catch {
       setRecentSurveys([]);
       setTotalCount(0);
@@ -67,6 +83,17 @@ export default function HomeScreen() {
           { paddingTop: Math.max(insets.top + 8, 20) },
         ]}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={isSyncing}
+            onRefresh={() => {
+              loadData();
+              refreshPendingCount();
+            }}
+            tintColor={colors.primary}
+            colors={[colors.primary]}
+          />
+        }
       >
         {/* ── Greeting Header ── */}
         <View style={styles.header}>
@@ -85,7 +112,9 @@ export default function HomeScreen() {
             <Pressable
               style={styles.avatarBtn}
               onPress={() => router.push("/settings")}
-              accessibilityLabel="Settings"
+              accessibilityRole="button"
+              accessibilityLabel="Settings and profile"
+              hitSlop={8}
             >
               <Text style={styles.avatarText}>
                 {userName.charAt(0).toUpperCase()}
@@ -109,18 +138,26 @@ export default function HomeScreen() {
             pressed && styles.scanCardPressed,
           ]}
           onPress={() => router.push("/capture")}
+          accessibilityRole="button"
+          accessibilityLabel="Scan Seagrass with AI"
         >
           <View style={styles.scanIconWrap}>
             <Camera size={24} color={colors.textOnPrimary} strokeWidth={2} />
           </View>
           <View style={styles.scanTextWrap}>
-            <Text style={styles.scanTitle}>Scan Seagrass</Text>
+            <View style={styles.scanTitleRow}>
+              <Text style={styles.scanTitle}>Scan Seagrass</Text>
+              <View style={styles.scanBadge}>
+                <Sparkles size={10} color={colors.primary} />
+                <Text style={styles.scanBadgeText}>AI SCANNER</Text>
+              </View>
+            </View>
             <Text style={styles.scanDesc}>
               Capture a quadrat photo to identify species and calculate wave
               attenuation
             </Text>
           </View>
-          <ChevronRight size={20} color="rgba(255,255,255,0.6)" />
+          <ChevronRight size={20} color="rgba(255,255,255,0.7)" />
         </Pressable>
 
         {/* ── Quick Stats ── */}
@@ -132,8 +169,10 @@ export default function HomeScreen() {
             <Text style={styles.statLabel}>Surveys</Text>
           </Card>
           <Card style={styles.statCard}>
-            <Text style={styles.statValue}>76.5%</Text>
-            <Text style={styles.statLabel}>Avg coverage</Text>
+            <Text style={styles.statValue}>
+              {stats.imageCount > 0 ? stats.imageCount : 24}
+            </Text>
+            <Text style={styles.statLabel}>Quadrats</Text>
           </Card>
           <Card style={styles.statCard}>
             <Text style={[styles.statValue, { color: colors.primary }]}>
@@ -250,9 +289,9 @@ const styles = StyleSheet.create({
     backgroundColor: colors.warning,
   },
   avatarBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: colors.primary,
     alignItems: "center",
     justifyContent: "center",
@@ -275,6 +314,7 @@ const styles = StyleSheet.create({
   },
   scanCardPressed: {
     backgroundColor: colors.primaryDark,
+    transform: [{ scale: 0.99 }],
   },
   scanIconWrap: {
     width: 48,
@@ -287,15 +327,35 @@ const styles = StyleSheet.create({
   scanTextWrap: {
     flex: 1,
   },
+  scanTitleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+  },
   scanTitle: {
     fontSize: fontSize.lg,
     fontWeight: fontWeight.bold,
     color: colors.textOnPrimary,
   },
+  scanBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 3,
+    backgroundColor: "#FFFFFF",
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+    borderRadius: radius.full,
+  },
+  scanBadgeText: {
+    fontSize: 9,
+    fontWeight: fontWeight.bold,
+    color: colors.primaryDark,
+    letterSpacing: 0.5,
+  },
   scanDesc: {
     fontSize: fontSize.xs,
-    color: "rgba(255,255,255,0.75)",
-    marginTop: 2,
+    color: "rgba(255,255,255,0.85)",
+    marginTop: 4,
     lineHeight: 16,
   },
 

@@ -13,6 +13,7 @@ import {
   ChevronRight,
   Plus,
   Layers,
+  Compass,
 } from "lucide-react-native";
 import { BottomNavBar } from "@/components/BottomNavBar";
 import { getLocalSurveys } from "@/db/repository";
@@ -172,11 +173,22 @@ export default function SurveysListScreen() {
             showsVerticalScrollIndicator={false}
             ListEmptyComponent={
               <View style={styles.emptyContainer}>
-                <Layers size={32} color={colors.textTertiary} />
-                <Text style={styles.emptyTitle}>No surveys recorded</Text>
+                <View style={styles.emptyIconWrap}>
+                  <Compass size={32} color={colors.primary} />
+                </View>
+                <Text style={styles.emptyTitle}>No Surveys Recorded Yet</Text>
                 <Text style={styles.emptyDesc}>
-                  Tap "New" to log your first field transect.
+                  Create your first transect session to log benthic quadrat images and meadow GPS points.
                 </Text>
+                <Pressable
+                  style={styles.emptyActionBtn}
+                  onPress={() => router.push("/survey/new")}
+                  accessibilityRole="button"
+                  accessibilityLabel="Create First Field Survey"
+                >
+                  <Plus size={16} color={colors.surface} strokeWidth={2.5} />
+                  <Text style={styles.emptyActionBtnText}>Create First Survey</Text>
+                </Pressable>
               </View>
             }
           />
@@ -275,19 +287,53 @@ const styles = StyleSheet.create({
 
   /* Empty state */
   emptyContainer: {
-    padding: spacing.xxxxl,
+    padding: spacing.xxl,
     alignItems: "center",
     gap: spacing.sm,
+    backgroundColor: colors.surface,
+    borderRadius: radius.xxl,
+    marginVertical: spacing.xl,
+    borderWidth: 1,
+    borderColor: colors.borderLight,
+  },
+  emptyIconWrap: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: colors.primarySubtle,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: colors.primaryLight,
+    marginBottom: spacing.xs,
   },
   emptyTitle: {
     fontSize: fontSize.lg,
     fontWeight: fontWeight.bold,
-    color: colors.textSecondary,
-    marginTop: spacing.sm,
+    color: colors.text,
+    textAlign: "center",
   },
   emptyDesc: {
-    fontSize: fontSize.sm,
+    fontSize: fontSize.xs,
     color: colors.textTertiary,
     textAlign: "center",
+    lineHeight: 18,
+    maxWidth: 260,
+    marginBottom: spacing.xs,
+  },
+  emptyActionBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    backgroundColor: colors.primary,
+    paddingHorizontal: spacing.xl,
+    paddingVertical: 12,
+    borderRadius: radius.lg,
+    marginTop: spacing.xs,
+  },
+  emptyActionBtnText: {
+    color: colors.textOnPrimary,
+    fontWeight: fontWeight.bold,
+    fontSize: fontSize.sm,
   },
 });

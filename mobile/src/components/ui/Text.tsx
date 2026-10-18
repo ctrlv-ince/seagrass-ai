@@ -4,7 +4,7 @@ import {
   StyleSheet,
   type TextProps as RNTextProps,
 } from "react-native";
-import { colors, fontSize, fontWeight } from "@/theme";
+import { colors, fontSize, fontWeight, fontFamily } from "@/theme";
 
 export type TextVariant =
   | "hero"
@@ -33,7 +33,12 @@ export function Text({
       style={[
         styles[variant],
         color ? { color } : undefined,
-        weight ? { fontWeight: fontWeight[weight] } : undefined,
+        weight
+          ? {
+              fontWeight: fontWeight[weight],
+              fontFamily: fontFamily[weight],
+            }
+          : undefined,
         style,
       ]}
       {...rest}
@@ -45,33 +50,40 @@ export function Text({
 
 const styles = StyleSheet.create({
   hero: {
+    fontFamily: fontFamily.heavy,
     fontSize: fontSize.hero,
     fontWeight: fontWeight.heavy,
     color: colors.text,
   },
   title: {
+    fontFamily: fontFamily.bold,
     fontSize: fontSize.xl,
     fontWeight: fontWeight.bold,
     color: colors.text,
   },
   subtitle: {
+    fontFamily: fontFamily.semibold,
     fontSize: fontSize.lg,
     fontWeight: fontWeight.semibold,
     color: colors.text,
   },
   body: {
+    fontFamily: fontFamily.regular,
     fontSize: fontSize.md,
     fontWeight: fontWeight.regular,
     color: colors.text,
   },
   caption: {
+    fontFamily: fontFamily.regular,
     fontSize: fontSize.xs,
     fontWeight: fontWeight.regular,
     color: colors.textSecondary,
   },
   label: {
+    fontFamily: fontFamily.medium,
     fontSize: fontSize.sm,
     fontWeight: fontWeight.medium,
     color: colors.textSecondary,
   },
 });
+

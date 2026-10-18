@@ -19,6 +19,8 @@ import {
   Sparkles,
   ChevronDown,
   ChevronUp,
+  Grid,
+  CheckCircle2,
 } from "lucide-react-native";
 import { analyzeQuadratPhoto } from "@/api/detections";
 import { computeWaveDamping } from "@/lib/waveMath";
@@ -36,6 +38,8 @@ export default function CaptureScreen() {
   const { surveyId } = useLocalSearchParams<{ surveyId?: string }>();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
+  const [scanStep, setScanStep] = useState<number>(1);
+  const [showQuadratGrid, setShowQuadratGrid] = useState<boolean>(true);
   const [offlineMode, setOfflineMode] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [waveExpanded, setWaveExpanded] = useState(false);
@@ -107,10 +111,13 @@ export default function CaptureScreen() {
     if (!targetUri) return;
 
     setAnalyzing(true);
+    setScanStep(1);
     setResults(null);
     setOfflineMode(false);
 
     if (targetUri === "sample-quadrat") {
+      setTimeout(() => setScanStep(2), 250);
+      setTimeout(() => setScanStep(3), 500);
       setTimeout(() => {
         setResults({
           species: "Enhalus acoroides",
@@ -124,11 +131,12 @@ export default function CaptureScreen() {
           dampenedWaveM: 0.67,
         });
         setAnalyzing(false);
-      }, 700);
+      }, 750);
       return;
     }
 
     try {
+      setTimeout(() => setScanStep(2), 200);
       const res = await analyzeQuadratPhoto({
         fileUri: targetUri,
         waterDepthM: 1.5,
@@ -137,6 +145,7 @@ export default function CaptureScreen() {
         meadowWidthM: 50.0,
       });
 
+      setScanStep(3);
       setResults({
         species: res.specifications.primary_species,
         commonName: res.specifications.common_name,
@@ -236,12 +245,14 @@ export default function CaptureScreen() {
         <Pressable
           style={styles.backBtn}
           onPress={() => router.back()}
+          accessibilityRole="button"
           accessibilityLabel="Go back"
+          hitSlop={8}
         >
           <ArrowLeft size={20} color={colors.text} />
         </Pressable>
         <Text style={styles.screenTitle}>Scan Quadrat</Text>
-        <View style={{ width: 36 }} />
+        <View style={{ width: 44 }} />
       </View>
 
       {/* ── Hint + action buttons ── */}
@@ -287,30 +298,123 @@ export default function CaptureScreen() {
 
       {/* ── Image preview ── */}
       {selectedImage && (
-        <View style={styles.previewWrap}>
-          {selectedImage === "sample-quadrat" ? (
-            <View style={styles.samplePlaceholder}>
-              <Text style={styles.sampleEmoji}>🌿</Text>
-              <Text style={styles.sampleText}>Sample Quadrat</Text>
-              <Text style={styles.sampleCoords}>
-                10.315°N, 119.012°E
-              </Text>
-            </View>
-          ) : (
-            <Image
-              source={{ uri: selectedImage }}
-              style={styles.previewImage}
+        <View style={styles.previewContainer}>
+          <View style={styles.previewWrap}>
+            {selectedImage === "sample-quadrat" ? (
+              <View style={styles.samplePlaceholder}>
+                <Text style={styles.sampleEmoji}>🌿</Text>
+                <Text style={styles.sampleText}>Sample Quadrat</Text>
+                <Text style={styles.sampleCoords}>
+                  10.315°N, 119.012°E
+                </Text>
+              </View>
+            ) : (
+              <Image
+                source={{ uri: selectedImage }}
+                style={styles.previewImage}
+              />
+            )}
+
+            {/* 3×3 Scientific Quadrat Grid Overlay */}
+            {showQuadratGrid && (
+              <View style={styles.quadratOverlay} pointerEvents="none">
+                <View style={[styles.gridLineV, { left: "33.3%" }]} />
+                <View style={[styles.gridLineV, { left: "66.6%" }]} />
+                <View style={[styles.gridLineH, { top: "33.3%" }]} />
+                <View style={[styles.gridLineH, { top: "66.6%" }]} />
+
+                {/* Corner reticles */}
+                <View style={[styles.cornerReticle, styles.cornerTL]} />
+                <View style={[styles.cornerReticle, styles.cornerTR]} />
+                <View style={[styles.cornerReticle, styles.cornerBL]} />
+                <View style={[styles.cornerReticle, styles.cornerBR]} />
+
+                <View style={styles.quadratBadge}>
+                  <Text style={styles.quadratBadgeText}>50 × 50 cm Quadrat</Text>
+                </View>
+              </View>
+            )}
+          </View>
+
+          {/* Grid Overlay Toggle */}
+          <Pressable
+            style={styles.gridToggleBtn}
+            onPress={() => setShowQuadratGrid(!showQuadratGrid)}
+            accessibilityRole="button"
+            accessibilityLabel="Toggle 50x50cm quadrat grid"
+          >
+            <Grid
+              size={13}
+              color={showQuadratGrid ? colors.primary : colors.textTertiary}
             />
-          )}
+            <Text
+              style={[
+                styles.gridToggleText,
+                showQuadratGrid && styles.gridToggleTextActive,
+              ]}
+            >
+              {showQuadratGrid ? "50×50cm Quadrat Frame: ON" : "Show Quadrat Frame"}
+            </Text>
+          </Pressable>
         </View>
       )}
 
-      {/* ── Loading ── */}
+      {/* ── Multi-Step Progress Indicator ── */}
       {analyzing && (
-        <View style={styles.loadingWrap}>
-          <ActivityIndicator size="large" color={colors.primary} />
-          <Text style={styles.loadingText}>Analyzing canopy...</Text>
-        </View>
+        <Card style={styles.stepperCard}>
+          <Text style={styles.stepperTitle}>Analyzing Benthic Quadrat...</Text>
+          <View style={styles.stepList}>
+            <View style={styles.stepRow}>
+              {scanStep > 1 ? (
+                <CheckCircle2 size={16} color={colors.success} />
+              ) : (
+                <ActivityIndicator size="small" color={colors.primary} />
+              )}
+              <Text
+                style={[
+                  styles.stepLabel,
+                  scanStep === 1 && styles.stepLabelActive,
+                ]}
+              >
+                1. Image preprocessing & color calibration
+              </Text>
+            </View>
+
+            <View style={styles.stepRow}>
+              {scanStep > 2 ? (
+                <CheckCircle2 size={16} color={colors.success} />
+              ) : scanStep === 2 ? (
+                <ActivityIndicator size="small" color={colors.primary} />
+              ) : (
+                <View style={styles.stepPendingDot} />
+              )}
+              <Text
+                style={[
+                  styles.stepLabel,
+                  scanStep === 2 && styles.stepLabelActive,
+                ]}
+              >
+                2. YOLOv11 benthic species segmentation
+              </Text>
+            </View>
+
+            <View style={styles.stepRow}>
+              {scanStep === 3 ? (
+                <ActivityIndicator size="small" color={colors.primary} />
+              ) : (
+                <View style={styles.stepPendingDot} />
+              )}
+              <Text
+                style={[
+                  styles.stepLabel,
+                  scanStep === 3 && styles.stepLabelActive,
+                ]}
+              >
+                3. Hydrodynamic wave attenuation model
+              </Text>
+            </View>
+          </View>
+        </Card>
       )}
 
       {/* ── Results ── */}
@@ -445,9 +549,9 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   backBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: colors.surfaceSecondary,
     alignItems: "center",
     justifyContent: "center",
@@ -511,19 +615,112 @@ const styles = StyleSheet.create({
     fontWeight: fontWeight.semibold,
   },
 
-  /* Preview */
+  /* Preview & Quadrat Grid */
+  previewContainer: {
+    gap: spacing.xs,
+  },
   previewWrap: {
     borderRadius: radius.lg,
     overflow: "hidden",
+    position: "relative",
   },
   previewImage: {
     width: "100%",
-    height: 200,
+    height: 240,
     backgroundColor: colors.surfaceSecondary,
   },
+  quadratOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    borderWidth: 2,
+    borderColor: "rgba(255, 255, 255, 0.7)",
+  },
+  gridLineV: {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    width: 1,
+    backgroundColor: "rgba(255, 255, 255, 0.4)",
+  },
+  gridLineH: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    height: 1,
+    backgroundColor: "rgba(255, 255, 255, 0.4)",
+  },
+  cornerReticle: {
+    position: "absolute",
+    width: 16,
+    height: 16,
+    borderColor: "#5EEAD4",
+  },
+  cornerTL: {
+    top: 6,
+    left: 6,
+    borderTopWidth: 2.5,
+    borderLeftWidth: 2.5,
+  },
+  cornerTR: {
+    top: 6,
+    right: 6,
+    borderTopWidth: 2.5,
+    borderRightWidth: 2.5,
+  },
+  cornerBL: {
+    bottom: 6,
+    left: 6,
+    borderBottomWidth: 2.5,
+    borderLeftWidth: 2.5,
+  },
+  cornerBR: {
+    bottom: 6,
+    right: 6,
+    borderBottomWidth: 2.5,
+    borderRightWidth: 2.5,
+  },
+  quadratBadge: {
+    position: "absolute",
+    bottom: 8,
+    right: 8,
+    backgroundColor: "rgba(15, 23, 42, 0.75)",
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: radius.full,
+  },
+  quadratBadgeText: {
+    color: "#FFFFFF",
+    fontSize: 10,
+    fontWeight: fontWeight.bold,
+    letterSpacing: 0.5,
+  },
+  gridToggleBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: radius.md,
+    backgroundColor: colors.surfaceSecondary,
+    alignSelf: "center",
+  },
+  gridToggleText: {
+    fontSize: fontSize.xs,
+    color: colors.textSecondary,
+    fontWeight: fontWeight.medium,
+  },
+  gridToggleTextActive: {
+    color: colors.primary,
+    fontWeight: fontWeight.semibold,
+  },
+
   samplePlaceholder: {
     backgroundColor: "#042F2E",
-    paddingVertical: spacing.xxxl,
+    height: 240,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -542,16 +739,44 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
 
-  /* Loading */
-  loadingWrap: {
+  /* Stepper Progress Card */
+  stepperCard: {
+    padding: spacing.lg,
+    gap: spacing.md,
+    backgroundColor: colors.surface,
+  },
+  stepperTitle: {
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.bold,
+    color: colors.text,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+    marginBottom: 4,
+  },
+  stepList: {
+    gap: spacing.md,
+  },
+  stepRow: {
+    flexDirection: "row",
     alignItems: "center",
     gap: spacing.md,
-    paddingVertical: spacing.xxl,
   },
-  loadingText: {
-    fontSize: fontSize.md,
-    fontWeight: fontWeight.semibold,
+  stepLabel: {
+    fontSize: fontSize.sm,
+    color: colors.textTertiary,
+    flex: 1,
+  },
+  stepLabelActive: {
     color: colors.text,
+    fontWeight: fontWeight.semibold,
+  },
+  stepPendingDot: {
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    borderWidth: 2,
+    borderColor: colors.border,
+    marginLeft: 1,
   },
 
   /* Results */

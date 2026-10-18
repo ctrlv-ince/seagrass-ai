@@ -116,7 +116,7 @@ export function RegisterForm() {
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Full Name */}
         <div>
-          <label className="block text-xs font-semibold text-slate-700 mb-1">
+          <label htmlFor="register-fullname" className="block text-xs font-semibold text-slate-700 mb-1">
             FULL NAME
           </label>
           <div className="relative">
@@ -124,11 +124,14 @@ export function RegisterForm() {
               <User className="w-4 h-4" />
             </div>
             <input
+              id="register-fullname"
               type="text"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               placeholder="Alex Mercer"
               required
+              aria-invalid={Boolean(fieldErrors.fullName)}
+              aria-describedby={fieldErrors.fullName ? "register-fullname-error" : undefined}
               className={`w-full pl-9 pr-4 py-2.5 bg-white border rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all ${
                 fieldErrors.fullName
                   ? "border-rose-400 focus:border-rose-500"
@@ -137,13 +140,13 @@ export function RegisterForm() {
             />
           </div>
           {fieldErrors.fullName && (
-            <p className="mt-1 text-xs text-rose-600">{fieldErrors.fullName}</p>
+            <p id="register-fullname-error" role="alert" className="mt-1 text-xs text-rose-600">{fieldErrors.fullName}</p>
           )}
         </div>
 
         {/* Email Address */}
         <div>
-          <label className="block text-xs font-semibold text-slate-700 mb-1">
+          <label htmlFor="register-email" className="block text-xs font-semibold text-slate-700 mb-1">
             EMAIL ADDRESS
           </label>
           <div className="relative">
@@ -151,11 +154,14 @@ export function RegisterForm() {
               <Mail className="w-4 h-4" />
             </div>
             <input
+              id="register-email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="alex@example.com"
               required
+              aria-invalid={Boolean(fieldErrors.email)}
+              aria-describedby={fieldErrors.email ? "register-email-error" : undefined}
               className={`w-full pl-9 pr-4 py-2.5 bg-white border rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all ${
                 fieldErrors.email
                   ? "border-rose-400 focus:border-rose-500"
@@ -164,13 +170,13 @@ export function RegisterForm() {
             />
           </div>
           {fieldErrors.email && (
-            <p className="mt-1 text-xs text-rose-600">{fieldErrors.email}</p>
+            <p id="register-email-error" role="alert" className="mt-1 text-xs text-rose-600">{fieldErrors.email}</p>
           )}
         </div>
 
         {/* Password */}
         <div>
-          <label className="block text-xs font-semibold text-slate-700 mb-1">
+          <label htmlFor="register-password" className="block text-xs font-semibold text-slate-700 mb-1">
             PASSWORD
           </label>
           <div className="relative">
@@ -178,11 +184,14 @@ export function RegisterForm() {
               <Lock className="w-4 h-4" />
             </div>
             <input
+              id="register-password"
               type={showPassword ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="At least 6 characters"
               required
+              aria-invalid={Boolean(fieldErrors.password)}
+              aria-describedby={fieldErrors.password ? "register-password-error" : undefined}
               className={`w-full pl-9 pr-10 py-2.5 bg-white border rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all ${
                 fieldErrors.password
                   ? "border-rose-400 focus:border-rose-500"
@@ -192,19 +201,20 @@ export function RegisterForm() {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
+              aria-label={showPassword ? "Hide password" : "Show password"}
               className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 cursor-pointer"
             >
               {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
           </div>
           {fieldErrors.password && (
-            <p className="mt-1 text-xs text-rose-600">{fieldErrors.password}</p>
+            <p id="register-password-error" role="alert" className="mt-1 text-xs text-rose-600">{fieldErrors.password}</p>
           )}
         </div>
 
         {/* Confirm Password */}
         <div>
-          <label className="block text-xs font-semibold text-slate-700 mb-1">
+          <label htmlFor="register-confirm-password" className="block text-xs font-semibold text-slate-700 mb-1">
             CONFIRM PASSWORD
           </label>
           <div className="relative">
@@ -212,11 +222,14 @@ export function RegisterForm() {
               <Lock className="w-4 h-4" />
             </div>
             <input
+              id="register-confirm-password"
               type={showPassword ? "text" : "password"}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder="Repeat your password"
               required
+              aria-invalid={Boolean(fieldErrors.confirmPassword)}
+              aria-describedby={fieldErrors.confirmPassword ? "register-confirm-password-error" : undefined}
               className={`w-full pl-9 pr-4 py-2.5 bg-white border rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all ${
                 fieldErrors.confirmPassword
                   ? "border-rose-400 focus:border-rose-500"
@@ -225,7 +238,7 @@ export function RegisterForm() {
             />
           </div>
           {fieldErrors.confirmPassword && (
-            <p className="mt-1 text-xs text-rose-600">{fieldErrors.confirmPassword}</p>
+            <p id="register-confirm-password-error" role="alert" className="mt-1 text-xs text-rose-600">{fieldErrors.confirmPassword}</p>
           )}
         </div>
 
@@ -236,6 +249,8 @@ export function RegisterForm() {
             type="checkbox"
             checked={agreeTerms}
             onChange={(e) => setAgreeTerms(e.target.checked)}
+            aria-invalid={Boolean(fieldErrors.agreeTerms)}
+            aria-describedby={fieldErrors.agreeTerms ? "agree-terms-error" : undefined}
             className="w-4 h-4 mt-0.5 rounded border-slate-300 text-teal-600 focus:ring-teal-500/20 cursor-pointer"
           />
           <label htmlFor="agree-terms" className="ml-2 text-xs text-slate-600 cursor-pointer select-none">
@@ -245,7 +260,7 @@ export function RegisterForm() {
           </label>
         </div>
         {fieldErrors.agreeTerms && (
-          <p className="text-xs text-rose-600">{fieldErrors.agreeTerms}</p>
+          <p id="agree-terms-error" role="alert" className="text-xs text-rose-600">{fieldErrors.agreeTerms}</p>
         )}
 
         {/* Submit */}

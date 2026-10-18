@@ -6,7 +6,7 @@ import {
   ActivityIndicator,
   type PressableProps,
 } from "react-native";
-import { colors, radius, fontSize, fontWeight } from "@/theme";
+import { colors, radius, fontSize, fontWeight, fontFamily } from "@/theme";
 
 type ButtonVariant = "primary" | "secondary" | "ghost";
 type ButtonSize = "sm" | "md" | "lg";
@@ -101,6 +101,7 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   label: {
+    fontFamily: fontFamily.semibold,
     fontWeight: fontWeight.semibold,
   },
   labelPrimary: {
