@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { useSurveys } from "../api/surveys";
 import { DetectionMetrics } from "../components/charts/DetectionMetrics";
 import { WaveAttenuationChart } from "../components/charts/WaveAttenuationChart";
+import { QuickStartChecklist } from "../components/dashboard/QuickStartChecklist";
 import { Badge } from "../components/ui/Badge";
 import {
   Waves,
@@ -134,6 +135,9 @@ export function Dashboard() {
           </div>
         </div>
       </div>
+
+      {/* Interactive Quick Start Onboarding */}
+      <QuickStartChecklist />
 
       {/* Metrics Row with Sparklines */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">

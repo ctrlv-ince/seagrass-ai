@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import apiClient from "../api/client";
 import { Skeleton } from "../components/common/Skeleton";
+import { LayerSwitcher, MAP_LAYERS, type MapLayerType } from "../components/map/LayerSwitcher";
 
 // Custom Leaflet icon for coastal survey sites
 const surveyIcon = L.divIcon({
@@ -75,6 +76,7 @@ export function MapView() {
   const [selectedSite, setSelectedSite] = useState<GeoFeature | null>(null);
   const [center, setCenter] = useState<[number, number]>([14.5995, 120.9842]);
   const [isLoading, setIsLoading] = useState(true);
+  const [mapLayer, setMapLayer] = useState<MapLayerType>("osm");
 
   useEffect(() => {
     async function loadGeoData() {
@@ -252,7 +254,9 @@ export function MapView() {
         </div>
 
         {/* Right: Map Container (8 cols) */}
-        <div className="lg:col-span-8 rounded-3xl overflow-hidden border border-slate-200/80 shadow-xs relative bg-slate-100">
+        <div className="lg:col-span-8 rounded-3xl overflow-hidden border border-slate-200/80 shadow-xs relative bg-slate-100 min-h-[500px]">
+          <LayerSwitcher currentLayer={mapLayer} onLayerChange={setMapLayer} />
+
           <MapContainer
             center={center}
             zoom={12}
@@ -261,8 +265,10 @@ export function MapView() {
           >
             <MapRecenter coords={center} />
             <TileLayer
-              attribution='&copy; <a href="https://carto.com/">CARTO</a>'
-              url={`https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png?key=${import.meta.env.VITE_CARTO_API_KEY}`}
+              key={mapLayer}
+              attribution={MAP_LAYERS[mapLayer].attribution}
+              url={MAP_LAYERS[mapLayer].url}
+              maxZoom={MAP_LAYERS[mapLayer].maxZoom}
             />
 
             {/* Survey Site Markers */}

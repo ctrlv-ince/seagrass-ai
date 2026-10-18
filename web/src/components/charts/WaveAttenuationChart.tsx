@@ -10,7 +10,8 @@ import {
   ResponsiveContainer,
   Legend,
 } from "recharts";
-import { Waves, Activity } from "lucide-react";
+import { Waves, Activity, Download } from "lucide-react";
+import { downloadCSV } from "../../lib/export";
 
 interface CurvePoint {
   distance_m: number;
@@ -88,6 +89,16 @@ export function WaveAttenuationChart({
 }: WaveAttenuationChartProps) {
   const [showUnvegetated, setShowUnvegetated] = useState(true);
 
+  const handleExport = () => {
+    const rows = data.map((d) => ({
+      "Distance (m)": d.distance_m,
+      "Wave Height with Seagrass (m)": d.wave_height_m,
+      "Bare Substrate Wave Height (m)": d.unvegetated_height_m,
+      "Wave Energy Attenuation (%)": d.attenuation_pct,
+    }));
+    downloadCSV(rows, "wave-attenuation-decay-curve.csv");
+  };
+
   return (
     <div className="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/90 shadow-xs flex flex-col justify-between">
       {/* Header and Toggle */}
@@ -106,18 +117,30 @@ export function WaveAttenuationChart({
           </h3>
         </div>
 
-        {/* Comparison toggle */}
-        <button
-          onClick={() => setShowUnvegetated((prev) => !prev)}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${
-            showUnvegetated
-              ? "bg-slate-100 border-slate-300 text-slate-800"
-              : "bg-white border-slate-200 text-slate-500 hover:text-slate-800"
-          }`}
-        >
-          <Activity className="w-3.5 h-3.5 text-cyan-600" />
-          <span>{showUnvegetated ? "Hide Bare Seabed" : "Compare Bare Seabed"}</span>
-        </button>
+        {/* Buttons */}
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          <button
+            onClick={handleExport}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 transition-all cursor-pointer shadow-2xs"
+            title="Export decay curve data to CSV"
+          >
+            <Download className="w-3.5 h-3.5 text-slate-500" />
+            <span>Export CSV</span>
+          </button>
+
+          {/* Comparison toggle */}
+          <button
+            onClick={() => setShowUnvegetated((prev) => !prev)}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${
+              showUnvegetated
+                ? "bg-slate-100 border-slate-300 text-slate-800"
+                : "bg-white border-slate-200 text-slate-500 hover:text-slate-800"
+            }`}
+          >
+            <Activity className="w-3.5 h-3.5 text-cyan-600" />
+            <span>{showUnvegetated ? "Hide Bare Seabed" : "Compare Bare Seabed"}</span>
+          </button>
+        </div>
       </div>
 
       {/* Area Chart */}

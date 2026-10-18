@@ -1,9 +1,11 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "./context/AuthContext";
+import { ThemeProvider } from "./context/ThemeContext";
 import { ToastProvider } from "./components/ui/Toast";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { Layout } from "./components/layout/Layout";
+import { CommandPalette } from "./components/common/CommandPalette";
 
 import { lazy, Suspense } from "react";
 import { PageSkeleton } from "./components/common/Skeleton";
@@ -36,8 +38,10 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <ToastProvider>
+        <ThemeProvider>
+          <ToastProvider>
           <BrowserRouter>
+            <CommandPalette />
             <Suspense fallback={<PageSkeleton />}>
               <Routes>
               {/* Public Marketing & Auth Routes */}
@@ -133,6 +137,7 @@ export default function App() {
           </Suspense>
         </BrowserRouter>
         </ToastProvider>
+        </ThemeProvider>
       </AuthProvider>
     </QueryClientProvider>
   );

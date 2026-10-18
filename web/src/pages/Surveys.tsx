@@ -19,6 +19,7 @@ import {
   type Survey,
 } from "../api/surveys";
 import { Skeleton } from "../components/common/Skeleton";
+import { EmptyState } from "../components/common/EmptyState";
 
 interface SurveyRowProps {
   survey: Survey;
@@ -242,21 +243,20 @@ export function Surveys() {
             )}
           </>
         ) : (
-          <div className="p-12 text-center">
-            <div className="w-12 h-12 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center mx-auto mb-3">
-              <Compass className="w-6 h-6" />
-            </div>
-            <h3 className="font-semibold text-slate-800 text-base">No Surveys Created Yet</h3>
-            <p className="text-xs text-slate-500 max-w-sm mx-auto mt-1">
-              Create your first survey session to start uploading quadrat imagery and logging meadow coordinates.
-            </p>
-            <button
-              onClick={() => setIsCreateOpen(true)}
-              className="mt-4 px-4 py-2 rounded-xl bg-teal-600 text-white font-medium text-xs hover:bg-teal-700"
-            >
-              Create First Survey
-            </button>
-          </div>
+          <EmptyState
+            icon={Compass}
+            title="No Marine Surveys Created Yet"
+            description="Create your first coastal survey session to log coordinates, upload drone/quadrat imagery, and run AI detection analysis."
+            action={{
+              label: "Create First Survey",
+              icon: Plus,
+              onClick: () => setIsCreateOpen(true),
+            }}
+            secondaryAction={{
+              label: "Explore GIS Map",
+              to: "/map",
+            }}
+          />
         )}
       </div>
 

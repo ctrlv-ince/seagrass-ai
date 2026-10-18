@@ -5,9 +5,11 @@ import {
   Waves,
   Info,
   ExternalLink,
+  Download,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useDebounce } from "../hooks/useDebounce";
+import { downloadCSV } from "../lib/export";
 
 interface SpeciesData {
   scientificName: string;
@@ -136,6 +138,23 @@ export function Species() {
     });
   }, [debouncedSearch, selectedTier]);
 
+  const handleExportCSV = () => {
+    const rows = filteredSpecies.map((s) => ({
+      "Scientific Name": s.scientificName,
+      "Common Name": s.commonName,
+      "Family": s.family,
+      "Blade Length Range": s.bladeLengthRange,
+      "Blade Width Range": s.bladeWidthRange,
+      "Shoot Density Range": s.shootDensityRange,
+      "Habitat Depth": s.habitatDepth,
+      "Drag Coefficient (Cd)": s.dragCoefficient,
+      "Wave Damping Tier": s.waveDampingTier,
+      "Key Features": s.keyFeatures.join("; "),
+      "Description": s.description,
+    }));
+    downloadCSV(rows, "seagrass-species-catalog.csv");
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -153,13 +172,23 @@ export function Species() {
           </p>
         </div>
 
-        <Link
-          to="/detection"
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-semibold text-sm transition-colors shadow-xs"
-        >
-          <Waves className="w-4 h-4" />
-          <span>Scan Quadrat</span>
-        </Link>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleExportCSV}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl border border-slate-200/90 bg-white hover:bg-slate-50 text-slate-700 font-medium text-sm transition-colors shadow-2xs cursor-pointer"
+            title="Export filtered catalog to CSV"
+          >
+            <Download className="w-4 h-4 text-slate-500" />
+            <span>Export CSV</span>
+          </button>
+          <Link
+            to="/detection"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-semibold text-sm transition-colors shadow-xs"
+          >
+            <Waves className="w-4 h-4" />
+            <span>Scan Quadrat</span>
+          </Link>
+        </div>
       </div>
 
       {/* Filter and Search Bar */}

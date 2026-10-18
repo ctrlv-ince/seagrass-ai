@@ -7,12 +7,16 @@ import {
   CheckCircle2,
   LogOut,
   RefreshCw,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
+import { useTheme } from "../context/ThemeContext";
 import apiClient from "../api/client";
 
 export function Settings() {
   const { user, signOut } = useAuth();
+  const { theme, setTheme, isDark } = useTheme();
   const [apiStatus, setApiStatus] = useState<"checking" | "online" | "offline">("checking");
   const [defaultDepth, setDefaultDepth] = useState("1.5");
   const [defaultWaveHeight, setDefaultWaveHeight] = useState("0.8");
@@ -93,6 +97,60 @@ export function Settings() {
             <span className="text-slate-600 font-mono text-[11px] mt-0.5 block truncate">
               {user?.id || "local-user-session"}
             </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Interface Appearance Card */}
+      <div className="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-xs space-y-4">
+        <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+          <div className="flex items-center gap-2.5">
+            <div className="w-10 h-10 rounded-2xl bg-teal-50 text-teal-700 flex items-center justify-center font-bold text-sm">
+              {isDark ? <Moon className="w-5 h-5 text-teal-600" /> : <Sun className="w-5 h-5 text-teal-600" />}
+            </div>
+            <div>
+              <h2 className="font-bold text-base text-slate-900">Theme &amp; Appearance</h2>
+              <span className="text-xs text-slate-500">Toggle dark mode and customize visual preferences</span>
+            </div>
+          </div>
+          <span className="text-xs px-2.5 py-1 rounded-full bg-slate-100 font-mono text-slate-700 font-semibold capitalize">
+            {theme} Mode
+          </span>
+        </div>
+
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-200/70">
+          <div>
+            <div className="font-semibold text-sm text-slate-900">Color Palette</div>
+            <div className="text-xs text-slate-500 mt-0.5">
+              High-contrast marine dark palette tailored for low-light fieldwork and OLED displays
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setTheme("light")}
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${
+                !isDark
+                  ? "bg-white border-teal-500 text-teal-800 shadow-2xs"
+                  : "bg-slate-100 border-slate-200 text-slate-600 hover:text-slate-900"
+              }`}
+            >
+              <Sun className="w-3.5 h-3.5" />
+              <span>Light</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setTheme("dark")}
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${
+                isDark
+                  ? "bg-white border-teal-500 text-teal-800 shadow-2xs"
+                  : "bg-slate-100 border-slate-200 text-slate-600 hover:text-slate-900"
+              }`}
+            >
+              <Moon className="w-3.5 h-3.5" />
+              <span>Dark</span>
+            </button>
           </div>
         </div>
       </div>

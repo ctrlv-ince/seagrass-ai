@@ -12,7 +12,8 @@ import {
   Cell,
   Legend,
 } from "recharts";
-import { BarChart3, PieChart as PieIcon, ShieldCheck } from "lucide-react";
+import { BarChart3, PieChart as PieIcon, ShieldCheck, Download } from "lucide-react";
+import { downloadCSV } from "../../lib/export";
 
 interface SpeciesData {
   species: string;
@@ -101,6 +102,16 @@ export function DetectionMetrics({
 }: DetectionMetricsProps) {
   const [viewMode, setViewMode] = useState<"confidence" | "coverage">("confidence");
 
+  const handleExport = () => {
+    const rows = data.map((d) => ({
+      "Species": d.species,
+      "Common Name": d.commonName,
+      "Confidence (%)": d.confidence,
+      "Coverage (%)": d.coverage,
+    }));
+    downloadCSV(rows, "detection-metrics.csv");
+  };
+
   return (
     <div className="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/90 shadow-xs flex flex-col justify-between">
       {/* Header and Toggle */}
@@ -119,30 +130,41 @@ export function DetectionMetrics({
           </h3>
         </div>
 
-        {/* View mode toggle button */}
-        <div className="flex items-center bg-slate-100 p-1 rounded-xl self-start sm:self-auto border border-slate-200/60">
+        {/* View mode toggle button & export */}
+        <div className="flex items-center gap-2 self-start sm:self-auto">
           <button
-            onClick={() => setViewMode("confidence")}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-              viewMode === "confidence"
-                ? "bg-white text-teal-800 shadow-xs"
-                : "text-slate-600 hover:text-slate-900"
-            }`}
+            onClick={handleExport}
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl border border-slate-200/80 bg-slate-50 hover:bg-slate-100 text-slate-600 hover:text-slate-900 text-xs font-medium transition-all cursor-pointer shadow-2xs"
+            title="Export metrics to CSV"
           >
-            <BarChart3 className="w-3.5 h-3.5 text-teal-600" />
-            <span>Confidence</span>
+            <Download className="w-3.5 h-3.5 text-slate-500" />
+            <span className="hidden sm:inline">Export</span>
           </button>
-          <button
-            onClick={() => setViewMode("coverage")}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-              viewMode === "coverage"
-                ? "bg-white text-teal-800 shadow-xs"
-                : "text-slate-600 hover:text-slate-900"
-            }`}
-          >
-            <PieIcon className="w-3.5 h-3.5 text-cyan-600" />
-            <span>Coverage %</span>
-          </button>
+
+          <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200/60">
+            <button
+              onClick={() => setViewMode("confidence")}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                viewMode === "confidence"
+                  ? "bg-white text-teal-800 shadow-xs"
+                  : "text-slate-600 hover:text-slate-900"
+              }`}
+            >
+              <BarChart3 className="w-3.5 h-3.5 text-teal-600" />
+              <span>Confidence</span>
+            </button>
+            <button
+              onClick={() => setViewMode("coverage")}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                viewMode === "coverage"
+                  ? "bg-white text-teal-800 shadow-xs"
+                  : "text-slate-600 hover:text-slate-900"
+              }`}
+            >
+              <PieIcon className="w-3.5 h-3.5 text-cyan-600" />
+              <span>Coverage %</span>
+            </button>
+          </div>
         </div>
       </div>
 

@@ -1,10 +1,12 @@
 import { useAuth } from "../../hooks/useAuth";
 import { useLayoutSidebar } from "../../context/LayoutContext";
-import { Database, Bell, Search, ShieldCheck, Menu } from "lucide-react";
+import { useTheme } from "../../context/ThemeContext";
+import { Database, Bell, Search, ShieldCheck, Menu, Sun, Moon } from "lucide-react";
 
 export function Header() {
   const { isConfigured } = useAuth();
   const { toggleMobileOpen } = useLayoutSidebar();
+  const { isDark, toggleTheme } = useTheme();
 
   return (
     <header className="h-16 px-4 sm:px-6 bg-white border-b border-slate-200 flex items-center justify-between text-slate-800">
@@ -18,15 +20,18 @@ export function Header() {
           <Menu className="w-5 h-5 text-slate-700" />
         </button>
 
-        <div className="relative">
+        <button
+          type="button"
+          onClick={() => window.dispatchEvent(new CustomEvent("open-command-palette"))}
+          className="relative flex items-center w-48 sm:w-72 md:w-80 pl-9 pr-2.5 py-1.5 text-xs bg-slate-50 hover:bg-slate-100/80 border border-slate-300 rounded-lg text-slate-400 hover:text-slate-600 transition-colors cursor-pointer text-left font-sans"
+          title="Open Command Palette (Ctrl+K or ⌘K)"
+        >
           <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-          <input
-            type="text"
-            placeholder="Search surveys, quadrats, species..."
-            aria-label="Search surveys, quadrats, or species"
-            className="w-48 sm:w-72 md:w-80 pl-9 pr-4 py-1.5 text-xs bg-slate-50 border border-slate-300 rounded-lg text-slate-800 placeholder-slate-400 focus:outline-none focus:border-teal-600 focus:ring-1 focus:ring-teal-500/20 font-sans"
-          />
-        </div>
+          <span className="truncate">Search commands or jump to...</span>
+          <kbd className="hidden sm:inline-flex items-center gap-0.5 ml-auto px-1.5 py-0.5 text-[10px] font-mono text-slate-400 bg-white border border-slate-200 rounded shadow-2xs">
+            ⌘K
+          </kbd>
+        </button>
       </div>
 
       <div className="flex items-center space-x-3 sm:space-x-4">
@@ -38,6 +43,16 @@ export function Header() {
             {isConfigured ? "Connected" : "Demo Sandbox"}
           </span>
         </div>
+
+        {/* Theme toggle */}
+        <button
+          onClick={toggleTheme}
+          title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+          aria-label="Toggle dark mode"
+          className="p-2 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/30"
+        >
+          {isDark ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4" />}
+        </button>
 
         <button
           title="Notifications"
