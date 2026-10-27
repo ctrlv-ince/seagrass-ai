@@ -19,6 +19,14 @@ class SpeciesCreate(BaseModel):
     description: str | None = None
 
 
+class SpeciesUpdate(BaseModel):
+    """Request schema for updating an existing species."""
+
+    scientific_name: str | None = Field(None, min_length=1, max_length=255)
+    common_name: str | None = None
+    description: str | None = None
+
+
 class SpeciesResponse(BaseModel):
     """Response schema for a species."""
 

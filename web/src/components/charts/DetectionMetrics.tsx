@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import {
   BarChart,
   Bar,
@@ -12,8 +12,9 @@ import {
   Cell,
   Legend,
 } from "recharts";
-import { BarChart3, PieChart as PieIcon, ShieldCheck, Download } from "lucide-react";
-import { downloadCSV } from "../../lib/export";
+import { BarChart3, PieChart as PieIcon, ShieldCheck } from "lucide-react";
+import { downloadCSV, downloadPDF, captureChartImage } from "../../lib/export";
+import { ExportDropdown } from "../common/ExportDropdown";
 
 interface SpeciesData {
   species: string;
@@ -101,15 +102,78 @@ export function DetectionMetrics({
   title = "AI Model Detection & Species Breakdown",
 }: DetectionMetricsProps) {
   const [viewMode, setViewMode] = useState<"confidence" | "coverage">("confidence");
+  const [isExporting, setIsExporting] = useState(false);
+  const chartRef = useRef<HTMLDivElement>(null);
 
-  const handleExport = () => {
-    const rows = data.map((d) => ({
-      "Species": d.species,
-      "Common Name": d.commonName,
-      "Confidence (%)": d.confidence,
-      "Coverage (%)": d.coverage,
-    }));
-    downloadCSV(rows, "detection-metrics.csv");
+  const handleExportCSV = () => {
+    setIsExporting(true);
+    try {
+      const rows = data.map((d) => ({
+        "Species": d.species,
+        "Common Name": d.commonName,
+        "Confidence (%)": d.confidence,
+        "Coverage (%)": d.coverage,
+      }));
+      downloadCSV(rows, "detection-metrics.csv");
+    } finally {
+      setTimeout(() => setIsExporting(false), 500);
+    }
+  };
+
+  const handleExportPDF = async () => {
+    setIsExporting(true);
+    try {
+      const charts = [];
+      if (chartRef.current) {
+        const img = await captureChartImage(chartRef.current);
+        charts.push({
+          title: viewMode === "confidence"
+            ? "YOLOv11 Model Inference Confidence by Species"
+            : "Canopy Coverage Percentage Breakdown",
+          subtitle: `Active visualization mode: ${viewMode.toUpperCase()}`,
+          imageData: img,
+          height: 65,
+        });
+      }
+
+      const rows = data.map((d) => ({
+        "Species": d.species,
+        "Common Name": d.commonName,
+        "Confidence (%)": `${d.confidence}%`,
+        "Canopy Coverage (%)": `${d.coverage}%`,
+      }));
+
+      const avgConfidence = (data.reduce((acc, cur) => acc + cur.confidence, 0) / (data.length || 1)).toFixed(1);
+      const totalCoverage = data.reduce((acc, cur) => acc + cur.coverage, 0);
+
+      await downloadPDF({
+        filename: "detection-metrics",
+        title: title || "AI Model Detection & Species Breakdown",
+        subtitle: "YOLOv11 segmentation accuracy and taxa canopy composition metrics.",
+        meta: {
+          "Model Architecture": "YOLOv11 Segmentation",
+          "Taxa Genera": `${data.length} Identified`,
+          "Mean Confidence": `${avgConfidence}%`,
+          "Total Canopy Coverage": `${totalCoverage}%`,
+        },
+        kpis: [
+          { label: "Mean Confidence", value: `${avgConfidence}%`, change: "Inference benchmark" },
+          { label: "Canopy Coverage", value: `${totalCoverage}%`, change: "Estimated meadow area" },
+          { label: "Classified Genera", value: data.length, change: "Active taxonomic classes" },
+        ],
+        charts,
+        tables: [
+          {
+            title: "Taxa Detection & Canopy Metrics Table",
+            rows,
+          },
+        ],
+      });
+    } catch (err) {
+      console.error("Failed to generate detection metrics PDF:", err);
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   return (
@@ -132,14 +196,13 @@ export function DetectionMetrics({
 
         {/* View mode toggle button & export */}
         <div className="flex items-center gap-2 self-start sm:self-auto">
-          <button
-            onClick={handleExport}
-            className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl border border-slate-200/80 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white text-xs font-medium transition-all cursor-pointer shadow-2xs"
-            title="Export metrics to CSV"
-          >
-            <Download className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
-            <span className="hidden sm:inline">Export</span>
-          </button>
+          <ExportDropdown
+            onExportCSV={handleExportCSV}
+            onExportPDF={handleExportPDF}
+            isExporting={isExporting}
+            label="Export"
+            size="sm"
+          />
 
           <div className="flex items-center bg-slate-100 dark:bg-slate-800/80 p-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
             <button
@@ -169,7 +232,7 @@ export function DetectionMetrics({
       </div>
 
       {/* Chart Render Area */}
-      <div className="h-64 sm:h-72 w-full">
+      <div ref={chartRef} className="h-64 sm:h-72 w-full">
         <ResponsiveContainer width="100%" height="100%">
           {viewMode === "confidence" ? (
             <BarChart

@@ -4,6 +4,7 @@ import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import { ToastProvider } from "./components/ui/Toast";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
+import { AdminRoute } from "./components/auth/AdminRoute";
 import { Layout } from "./components/layout/Layout";
 import { CommandPalette } from "./components/common/CommandPalette";
 
@@ -24,6 +25,14 @@ const WaveModel = lazy(() => import("./pages/WaveModel").then((m) => ({ default:
 const MapView = lazy(() => import("./pages/MapView").then((m) => ({ default: m.MapView })));
 const Species = lazy(() => import("./pages/Species").then((m) => ({ default: m.Species })));
 const Settings = lazy(() => import("./pages/Settings").then((m) => ({ default: m.Settings })));
+
+// Admin Portal Pages (Lazy)
+const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard").then((m) => ({ default: m.AdminDashboard })));
+const UserManagement = lazy(() => import("./pages/admin/UserManagement").then((m) => ({ default: m.UserManagement })));
+const SurveyAdmin = lazy(() => import("./pages/admin/SurveyAdmin").then((m) => ({ default: m.SurveyAdmin })));
+const SpeciesAdmin = lazy(() => import("./pages/admin/SpeciesAdmin").then((m) => ({ default: m.SpeciesAdmin })));
+const SystemSettings = lazy(() => import("./pages/admin/SystemSettings").then((m) => ({ default: m.SystemSettings })));
+const AdminReports = lazy(() => import("./pages/admin/AdminReports").then((m) => ({ default: m.AdminReports })));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -128,6 +137,68 @@ export default function App() {
                       <Settings />
                     </Layout>
                   </ProtectedRoute>
+                }
+              />
+
+              {/* Admin Portal Routes */}
+              <Route
+                path="/admin"
+                element={
+                  <AdminRoute>
+                    <Layout>
+                      <AdminDashboard />
+                    </Layout>
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/admin/users"
+                element={
+                  <AdminRoute>
+                    <Layout>
+                      <UserManagement />
+                    </Layout>
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/admin/surveys"
+                element={
+                  <AdminRoute>
+                    <Layout>
+                      <SurveyAdmin />
+                    </Layout>
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/admin/species"
+                element={
+                  <AdminRoute>
+                    <Layout>
+                      <SpeciesAdmin />
+                    </Layout>
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/admin/system"
+                element={
+                  <AdminRoute>
+                    <Layout>
+                      <SystemSettings />
+                    </Layout>
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/admin/reports"
+                element={
+                  <AdminRoute>
+                    <Layout>
+                      <AdminReports />
+                    </Layout>
+                  </AdminRoute>
                 }
               />
 

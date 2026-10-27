@@ -64,7 +64,7 @@ export function Dashboard() {
   const userName =
     user?.user_metadata?.full_name ||
     user?.email?.split("@")[0] ||
-    "Researcher";
+    "User";
 
   const totalSurveys = surveysData?.total && surveysData.total > 0 ? surveysData.total : 18;
   const recentSurveys = useMemo(() => {

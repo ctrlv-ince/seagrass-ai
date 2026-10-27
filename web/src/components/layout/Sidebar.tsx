@@ -1,4 +1,4 @@
-import { NavLink, Link, useNavigate } from "react-router-dom";
+import { NavLink, Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { useLayoutSidebar } from "../../context/LayoutContext";
 import {
@@ -14,6 +14,13 @@ import {
   X,
   PanelLeftClose,
   PanelLeftOpen,
+  ShieldCheck,
+  Users,
+  Layers,
+  TreePine,
+  Cpu,
+  BarChart3,
+  ArrowLeft,
 } from "lucide-react";
 import { SeagrassLogo } from "../common/SeagrassLogo";
 
@@ -27,15 +34,27 @@ const navItems = [
   { to: "/settings", label: "Settings", icon: Settings },
 ] as const;
 
+const adminNavItems = [
+  { to: "/admin", label: "Admin Overview", icon: ShieldCheck },
+  { to: "/admin/users", label: "User Directory", icon: Users },
+  { to: "/admin/surveys", label: "Survey Control", icon: Layers },
+  { to: "/admin/species", label: "Species Catalog", icon: TreePine },
+  { to: "/admin/reports", label: "Reports & Analytics", icon: BarChart3 },
+  { to: "/admin/system", label: "System Health", icon: Cpu },
+] as const;
+
 export function Sidebar() {
-  const { user, signOut } = useAuth();
+  const { user, signOut, isAdmin } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const {
     isCollapsed,
     toggleCollapsed,
     isMobileOpen,
     closeMobile,
   } = useLayoutSidebar();
+
+  const isAdminRoute = location.pathname.startsWith("/admin");
 
   const handleSignOut = async () => {
     await signOut();
@@ -57,13 +76,13 @@ export function Sidebar() {
           isCollapsed ? "w-20" : "w-64"
         }`}
       >
-        <div>
-          {/* Brand & Desktop Collapse Toggle */}
-          <div
-            className={`flex items-center border-b border-slate-100 dark:border-slate-800 ${
-              isCollapsed ? "p-3 justify-center flex-col gap-2" : "p-4 justify-between"
-            }`}
-          >
+        {/* Brand Header */}
+        <div
+          className={`flex items-center shrink-0 border-b border-slate-100 dark:border-slate-800 ${
+            isCollapsed ? "p-3 justify-center flex-col gap-2" : "p-4 justify-between"
+          }`}
+        >
+          <div className="flex items-center gap-2 overflow-hidden">
             <Link
               to="/"
               className="flex items-center group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/30 rounded-lg"
@@ -72,61 +91,146 @@ export function Sidebar() {
               <SeagrassLogo
                 size="sm"
                 variant={isCollapsed ? "icon" : "full"}
-                showSubtitle={!isCollapsed}
+                showSubtitle={!isCollapsed && !isAdminRoute}
               />
             </Link>
-
-            <button
-              onClick={toggleCollapsed}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/30"
-              title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-              aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-              aria-expanded={!isCollapsed}
-            >
-              {isCollapsed ? (
-                <PanelLeftOpen className="w-4 h-4 text-slate-500 dark:text-slate-400" />
-              ) : (
-                <PanelLeftClose className="w-4 h-4 text-slate-500 dark:text-slate-400" />
-              )}
-            </button>
+            {!isCollapsed && isAdminRoute && (
+              <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20 uppercase tracking-wider">
+                Admin
+              </span>
+            )}
           </div>
 
-          {/* Navigation Items */}
-          <nav className="p-3 space-y-1" aria-label="Sidebar Menu">
-            {!isCollapsed && (
-              <div className="px-3 py-2 text-[10px] font-mono uppercase tracking-wider text-slate-400 font-semibold">
-                Platform Menu
-              </div>
+          <button
+            onClick={toggleCollapsed}
+            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/30"
+            title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            aria-expanded={!isCollapsed}
+          >
+            {isCollapsed ? (
+              <PanelLeftOpen className="w-4 h-4 text-slate-500 dark:text-slate-400" />
+            ) : (
+              <PanelLeftClose className="w-4 h-4 text-slate-500 dark:text-slate-400" />
             )}
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              return (
-                <NavLink
-                  key={item.to}
-                  to={item.to}
-                  title={isCollapsed ? item.label : undefined}
-                  className={({ isActive }) =>
-                    `flex items-center rounded-xl text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/30 ${
-                      isCollapsed
-                        ? "justify-center p-3"
-                        : "gap-3 px-3 py-2.5"
-                    } ${
-                      isActive
-                        ? "bg-teal-50 dark:bg-teal-950/60 text-teal-800 dark:text-teal-300 border border-teal-200 dark:border-teal-800 font-semibold shadow-xs"
-                        : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-800"
-                    }`
-                  }
-                >
-                  <Icon className="w-4 h-4 shrink-0 text-teal-600 dark:text-teal-400" />
-                  {!isCollapsed && <span className="truncate">{item.label}</span>}
-                </NavLink>
-              );
-            })}
-          </nav>
+          </button>
         </div>
 
-        {/* User Profile & Actions */}
-        <div className="p-3 border-t border-slate-100 dark:border-slate-800 space-y-2">
+        {/* Scrollable Navigation Menu */}
+        <nav
+          className="flex-1 min-h-0 overflow-y-auto p-3 space-y-1"
+          aria-label="Sidebar Menu"
+        >
+          {isAdminRoute ? (
+            /* ── ADMIN ROUTE NAVIGATION (ADMIN OPERATIONS ONLY) ── */
+            <>
+              {/* Return to User Platform Button */}
+              <div className="mb-2">
+                <Link
+                  to="/dashboard"
+                  title={isCollapsed ? "Return to User Platform" : undefined}
+                  className={`flex items-center rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-teal-700 dark:hover:text-teal-300 bg-slate-100/90 dark:bg-slate-800/80 hover:bg-teal-50 dark:hover:bg-teal-950/40 border border-slate-200 dark:border-slate-700/80 transition-all ${
+                    isCollapsed ? "justify-center p-2.5" : "gap-2.5 px-3 py-2"
+                  }`}
+                >
+                  <ArrowLeft className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400 shrink-0" />
+                  {!isCollapsed && <span>Switch to Platform</span>}
+                </Link>
+              </div>
+
+              {!isCollapsed && (
+                <div className="px-3 py-1.5 text-[10px] font-mono uppercase tracking-wider text-emerald-700 dark:text-emerald-400 font-bold flex items-center gap-1.5">
+                  <ShieldCheck className="w-3 h-3 text-emerald-500" />
+                  Admin Operations
+                </div>
+              )}
+
+              {adminNavItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <NavLink
+                    key={item.to}
+                    to={item.to}
+                    end={item.to === "/admin"}
+                    title={isCollapsed ? item.label : undefined}
+                    className={({ isActive }) =>
+                      `flex items-center rounded-xl text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/30 ${
+                        isCollapsed
+                          ? "justify-center p-3"
+                          : "gap-3 px-3 py-2.5"
+                      } ${
+                        isActive
+                          ? "bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 font-semibold shadow-xs"
+                          : "text-slate-600 dark:text-slate-400 hover:text-emerald-700 dark:hover:text-emerald-300 hover:bg-slate-50 dark:hover:bg-slate-800"
+                      }`
+                    }
+                  >
+                    <Icon className="w-4 h-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
+                    {!isCollapsed && <span className="truncate">{item.label}</span>}
+                  </NavLink>
+                );
+              })}
+            </>
+          ) : (
+            /* ── STANDARD PLATFORM NAVIGATION ── */
+            <>
+              {!isCollapsed && (
+                <div className="px-3 py-2 text-[10px] font-mono uppercase tracking-wider text-slate-400 font-semibold">
+                  Platform Menu
+                </div>
+              )}
+              {navItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <NavLink
+                    key={item.to}
+                    to={item.to}
+                    title={isCollapsed ? item.label : undefined}
+                    className={({ isActive }) =>
+                      `flex items-center rounded-xl text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/30 ${
+                        isCollapsed
+                          ? "justify-center p-3"
+                          : "gap-3 px-3 py-2.5"
+                      } ${
+                        isActive
+                          ? "bg-teal-50 dark:bg-teal-950/60 text-teal-800 dark:text-teal-300 border border-teal-200 dark:border-teal-800 font-semibold shadow-xs"
+                          : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-800"
+                      }`
+                    }
+                  >
+                    <Icon className="w-4 h-4 shrink-0 text-teal-600 dark:text-teal-400" />
+                    {!isCollapsed && <span className="truncate">{item.label}</span>}
+                  </NavLink>
+                );
+              })}
+
+              {/* Clean Portal Switcher for Admins */}
+              {isAdmin && (
+                <div className="pt-3 mt-3 border-t border-slate-100 dark:border-slate-800">
+                  <NavLink
+                    to="/admin"
+                    title={isCollapsed ? "Switch to Admin Portal" : undefined}
+                    className={({ isActive }) =>
+                      `flex items-center rounded-xl text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/30 ${
+                        isCollapsed ? "justify-center p-2.5" : "gap-2.5 px-3 py-2"
+                      } ${
+                        isActive
+                          ? "bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 shadow-xs"
+                          : "bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20"
+                      }`
+                    }
+                  >
+                    <ShieldCheck className="w-4 h-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
+                    {!isCollapsed && <span>Switch to Admin Portal</span>}
+                  </NavLink>
+                </div>
+              )}
+            </>
+          )}
+        </nav>
+
+        {/* User Profile & Actions (Pinned at bottom) */}
+        <div className="shrink-0 p-3 border-t border-slate-100 dark:border-slate-800 space-y-2 mt-auto bg-white dark:bg-slate-900">
           {!isCollapsed && (
             <Link
               to="/"
@@ -200,51 +304,118 @@ export function Sidebar() {
 
           {/* Drawer slide-in panel */}
           <aside className="relative w-72 max-w-[85vw] h-full bg-white dark:bg-slate-900 shadow-2xl flex flex-col justify-between text-slate-700 dark:text-slate-200 z-10 animate-in slide-in-from-left duration-200 border-r border-slate-200 dark:border-slate-800">
-            <div>
-              {/* Header with Logo and Close Button */}
-              <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+            {/* Header with Logo and Close Button */}
+            <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-2">
                 <Link to="/" onClick={closeMobile} className="flex items-center">
                   <SeagrassLogo size="sm" variant="full" />
                 </Link>
-                <button
-                  onClick={closeMobile}
-                  className="p-2 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-                  aria-label="Close navigation menu"
-                >
-                  <X className="w-5 h-5" />
-                </button>
+                {isAdminRoute && (
+                  <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20 uppercase tracking-wider">
+                    Admin
+                  </span>
+                )}
               </div>
-
-              {/* Navigation items */}
-              <nav className="p-3 space-y-1">
-                <div className="px-3 py-2 text-[10px] font-mono uppercase tracking-wider text-slate-400 font-semibold">
-                  Platform Menu
-                </div>
-                {navItems.map((item) => {
-                  const Icon = item.icon;
-                  return (
-                    <NavLink
-                      key={item.to}
-                      to={item.to}
-                      onClick={closeMobile}
-                      className={({ isActive }) =>
-                        `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                          isActive
-                            ? "bg-teal-50 dark:bg-teal-950/60 text-teal-800 dark:text-teal-300 border border-teal-200 dark:border-teal-800 font-semibold"
-                            : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-800"
-                        }`
-                      }
-                    >
-                      <Icon className="w-4 h-4 shrink-0 text-teal-600 dark:text-teal-400" />
-                      <span>{item.label}</span>
-                    </NavLink>
-                  );
-                })}
-              </nav>
+              <button
+                onClick={closeMobile}
+                className="p-2 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                aria-label="Close navigation menu"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
 
-            {/* Profile & sign out in mobile drawer */}
-            <div className="p-4 border-t border-slate-100 dark:border-slate-800 space-y-3">
+            {/* Scrollable Navigation items */}
+            <nav className="flex-1 min-h-0 overflow-y-auto p-3 space-y-1">
+              {isAdminRoute ? (
+                <>
+                  <div className="mb-2">
+                    <Link
+                      to="/dashboard"
+                      onClick={closeMobile}
+                      className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-teal-700 dark:hover:text-teal-300 bg-slate-100/90 dark:bg-slate-800/80 hover:bg-teal-50 dark:hover:bg-teal-950/40 border border-slate-200 dark:border-slate-700/80 transition-all"
+                    >
+                      <ArrowLeft className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400 shrink-0" />
+                      <span>Switch to Platform</span>
+                    </Link>
+                  </div>
+
+                  <div className="px-3 py-1.5 text-[10px] font-mono uppercase tracking-wider text-emerald-700 dark:text-emerald-400 font-bold flex items-center gap-1.5">
+                    <ShieldCheck className="w-3 h-3 text-emerald-500" />
+                    Admin Operations
+                  </div>
+                  {adminNavItems.map((item) => {
+                    const Icon = item.icon;
+                    return (
+                      <NavLink
+                        key={item.to}
+                        to={item.to}
+                        end={item.to === "/admin"}
+                        onClick={closeMobile}
+                        className={({ isActive }) =>
+                          `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                            isActive
+                              ? "bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 font-semibold"
+                              : "text-slate-600 dark:text-slate-400 hover:text-emerald-700 dark:hover:text-emerald-300 hover:bg-slate-50 dark:hover:bg-slate-800/80"
+                          }`
+                        }
+                      >
+                        <Icon className="w-4 h-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
+                        <span>{item.label}</span>
+                      </NavLink>
+                    );
+                  })}
+                </>
+              ) : (
+                <>
+                  <div className="px-3 py-2 text-[10px] font-mono uppercase tracking-wider text-slate-400 font-semibold">
+                    Platform Menu
+                  </div>
+                  {navItems.map((item) => {
+                    const Icon = item.icon;
+                    return (
+                      <NavLink
+                        key={item.to}
+                        to={item.to}
+                        onClick={closeMobile}
+                        className={({ isActive }) =>
+                          `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                            isActive
+                              ? "bg-teal-50 dark:bg-teal-950/60 text-teal-800 dark:text-teal-300 border border-teal-200 dark:border-teal-800 font-semibold"
+                              : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-800"
+                          }`
+                        }
+                      >
+                        <Icon className="w-4 h-4 shrink-0 text-teal-600 dark:text-teal-400" />
+                        <span>{item.label}</span>
+                      </NavLink>
+                    );
+                  })}
+
+                  {isAdmin && (
+                    <div className="pt-3 mt-3 border-t border-slate-100 dark:border-slate-800">
+                      <NavLink
+                        to="/admin"
+                        onClick={closeMobile}
+                        className={({ isActive }) =>
+                          `flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
+                            isActive
+                              ? "bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800"
+                              : "bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20"
+                          }`
+                        }
+                      >
+                        <ShieldCheck className="w-4 h-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
+                        <span>Switch to Admin Portal</span>
+                      </NavLink>
+                    </div>
+                  )}
+                </>
+              )}
+            </nav>
+
+            {/* Profile & sign out in mobile drawer (pinned at bottom) */}
+            <div className="shrink-0 p-4 border-t border-slate-100 dark:border-slate-800 space-y-3 mt-auto bg-white dark:bg-slate-900">
               <Link
                 to="/"
                 onClick={closeMobile}

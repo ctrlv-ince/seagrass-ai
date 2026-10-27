@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 from app.config import settings
 from app.database import Base
 # Import all models for autogenerate metadata discovery
+import app.models.user  # noqa: F401
 import app.models.seagrass  # noqa: F401
 import app.models.survey  # noqa: F401
 import app.models.prediction  # noqa: F401
@@ -52,6 +53,10 @@ async def run_async_migrations() -> None:
         configuration,
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
+        connect_args={
+            "statement_cache_size": 0,
+            "prepared_statement_cache_size": 0,
+        },
     )
 
     async with connectable.connect() as connection:

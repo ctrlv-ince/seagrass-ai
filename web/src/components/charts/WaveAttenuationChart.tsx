@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import {
   AreaChart,
   Area,
@@ -10,8 +10,9 @@ import {
   ResponsiveContainer,
   Legend,
 } from "recharts";
-import { Waves, Activity, Download } from "lucide-react";
-import { downloadCSV } from "../../lib/export";
+import { Waves, Activity } from "lucide-react";
+import { downloadCSV, downloadPDF, captureChartImage } from "../../lib/export";
+import { ExportDropdown } from "../common/ExportDropdown";
 
 interface CurvePoint {
   distance_m: number;
@@ -88,15 +89,73 @@ export function WaveAttenuationChart({
   transmittedHeight = 0.67,
 }: WaveAttenuationChartProps) {
   const [showUnvegetated, setShowUnvegetated] = useState(true);
+  const [isExporting, setIsExporting] = useState(false);
+  const chartRef = useRef<HTMLDivElement>(null);
 
-  const handleExport = () => {
-    const rows = data.map((d) => ({
-      "Distance (m)": d.distance_m,
-      "Wave Height with Seagrass (m)": d.wave_height_m,
-      "Bare Substrate Wave Height (m)": d.unvegetated_height_m,
-      "Wave Energy Attenuation (%)": d.attenuation_pct,
-    }));
-    downloadCSV(rows, "wave-attenuation-decay-curve.csv");
+  const handleExportCSV = () => {
+    setIsExporting(true);
+    try {
+      const rows = data.map((d) => ({
+        "Distance (m)": d.distance_m,
+        "Wave Height with Seagrass (m)": d.wave_height_m,
+        "Bare Substrate Wave Height (m)": d.unvegetated_height_m,
+        "Wave Energy Attenuation (%)": d.attenuation_pct,
+      }));
+      downloadCSV(rows, "wave-attenuation-decay-curve.csv");
+    } finally {
+      setTimeout(() => setIsExporting(false), 500);
+    }
+  };
+
+  const handleExportPDF = async () => {
+    setIsExporting(true);
+    try {
+      const charts = [];
+      if (chartRef.current) {
+        const img = await captureChartImage(chartRef.current);
+        charts.push({
+          title: "Hydrodynamic Attenuation Decay Profile",
+          subtitle: "Comparison across transect distance against bare seabed baseline",
+          imageData: img,
+          height: 65,
+        });
+      }
+
+      const rows = data.map((d) => ({
+        "Distance (m)": d.distance_m,
+        "Seagrass Wave (m)": `${d.wave_height_m.toFixed(2)} m`,
+        "Bare Seabed (m)": `${d.unvegetated_height_m.toFixed(2)} m`,
+        "Energy Damping (%)": `-${d.attenuation_pct}%`,
+      }));
+
+      await downloadPDF({
+        filename: "wave-attenuation-decay-curve",
+        title: title || "Hydrodynamic Wave Attenuation Decay Curve",
+        subtitle: "Physics engine based on Mendez & Losada (2004) wave damping equations.",
+        meta: {
+          "Incident Height (H0)": `${incidentHeight.toFixed(2)} m`,
+          "Transmitted Height (Ht)": `${transmittedHeight.toFixed(2)} m`,
+          "Total Damping": "-58.4%",
+          "Transect Distance": `${data[data.length - 1]?.distance_m || 100} m`,
+        },
+        kpis: [
+          { label: "Incident Wave (H0)", value: `${incidentHeight.toFixed(2)}m`, change: "Offshore swell" },
+          { label: "Transmitted Wave (Ht)", value: `${transmittedHeight.toFixed(2)}m`, change: "Meadow boundary" },
+          { label: "Energy Attenuation", value: "-58.4%", change: "Wave dissipation" },
+        ],
+        charts,
+        tables: [
+          {
+            title: "Transect Point Decay Matrix",
+            rows,
+          },
+        ],
+      });
+    } catch (err) {
+      console.error("Failed to generate wave attenuation PDF:", err);
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   return (
@@ -106,7 +165,7 @@ export function WaveAttenuationChart({
         <div>
           <div className="flex items-center gap-2">
             <span className="text-[11px] font-mono uppercase tracking-wider text-cyan-700 dark:text-cyan-400 font-semibold">
-              MENDEZ & LOSADA (2004)
+              MENDEZ &amp; LOSADA (2004)
             </span>
             <span className="inline-flex items-center gap-1 text-[10px] bg-cyan-50 dark:bg-cyan-950/60 text-cyan-700 dark:text-cyan-300 px-2 py-0.5 rounded-full border border-cyan-200/60 dark:border-cyan-800 font-medium">
               <Waves className="w-3 h-3 text-cyan-600 dark:text-cyan-400" /> Physics Engine
@@ -119,14 +178,13 @@ export function WaveAttenuationChart({
 
         {/* Buttons */}
         <div className="flex items-center gap-2 self-start sm:self-auto">
-          <button
-            onClick={handleExport}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white transition-all cursor-pointer shadow-2xs"
-            title="Export decay curve data to CSV"
-          >
-            <Download className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
-            <span>Export CSV</span>
-          </button>
+          <ExportDropdown
+            onExportCSV={handleExportCSV}
+            onExportPDF={handleExportPDF}
+            isExporting={isExporting}
+            label="Export"
+            size="sm"
+          />
 
           {/* Comparison toggle */}
           <button
@@ -144,7 +202,7 @@ export function WaveAttenuationChart({
       </div>
 
       {/* Area Chart */}
-      <div className="h-64 sm:h-72 w-full">
+      <div ref={chartRef} className="h-64 sm:h-72 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart
             data={data}

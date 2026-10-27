@@ -15,15 +15,23 @@ import {
   Download,
   ArrowRight,
   Command,
+  ShieldCheck,
+  Users,
+  Layers,
+  TreePine,
+  Cpu,
+  BarChart3,
+  FileText,
 } from "lucide-react";
 import { useTheme } from "../../context/ThemeContext";
-import { downloadCSV } from "../../lib/export";
+import { useAuth } from "../../hooks/useAuth";
+import { downloadCSV, downloadPDF } from "../../lib/export";
 
 interface CommandItem {
   id: string;
   title: string;
   description: string;
-  category: "Navigation" | "Actions";
+  category: "Navigation" | "Actions" | "Admin";
   icon: typeof Search;
   shortcut?: string;
   onSelect: () => void;
@@ -36,6 +44,7 @@ export function CommandPalette() {
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const { isDark, toggleTheme } = useTheme();
+  const { isAdmin } = useAuth();
 
   // Register global hotkey Ctrl+K / Cmd+K
   useEffect(() => {
@@ -194,7 +203,109 @@ export function CommandPalette() {
         downloadCSV(sampleSpecies, "seagrass-species-catalog.csv");
       },
     },
-  ], [navigate, isDark, toggleTheme]);
+    {
+      id: "act-export-species-pdf",
+      title: "Export Species Catalog (PDF)",
+      description: "Download styled PDF reference guide of Southeast Asian seagrass taxa",
+      category: "Actions",
+      icon: FileText,
+      onSelect: async () => {
+        setIsOpen(false);
+        const sampleSpecies = [
+          { "Scientific Name": "Enhalus acoroides", "Common Name": "Tropical Ribbon Grass", "Drag Coefficient": "0.85", "Damping Tier": "Very High" },
+          { "Scientific Name": "Thalassia hemprichii", "Common Name": "Pacific Turtle Grass", "Drag Coefficient": "0.75", "Damping Tier": "High" },
+          { "Scientific Name": "Halophila ovalis", "Common Name": "Paddle Grass", "Drag Coefficient": "0.50", "Damping Tier": "Moderate" },
+          { "Scientific Name": "Cymodocea serrulata", "Common Name": "Serrated Ribbon", "Drag Coefficient": "0.65", "Damping Tier": "Moderate" },
+          { "Scientific Name": "Syringodium isoetifolium", "Common Name": "Syringodium", "Drag Coefficient": "0.60", "Damping Tier": "Moderate" },
+        ];
+        await downloadPDF({
+          filename: "seagrass-species-catalog",
+          title: "Seagrass Species Reference Guide",
+          subtitle: "Field taxonomy and hydrodynamic attenuation characteristics.",
+          orientation: "landscape",
+          tables: [
+            {
+              title: "Southeast Asian Seagrass Reference Catalog",
+              rows: sampleSpecies,
+            },
+          ],
+        });
+      },
+    },
+    ...(isAdmin
+      ? ([
+          {
+            id: "admin-dashboard",
+            title: "Admin: Platform Operations",
+            description: "View telemetry, analytics, and infrastructure health",
+            category: "Admin",
+            icon: ShieldCheck,
+            shortcut: "G A",
+            onSelect: () => {
+              navigate("/admin");
+              setIsOpen(false);
+            },
+          },
+          {
+            id: "admin-users",
+            title: "Admin: User Directory",
+            description: "Manage registered user accounts, roles, and privileges",
+            category: "Admin",
+            icon: Users,
+            shortcut: "G U",
+            onSelect: () => {
+              navigate("/admin/users");
+              setIsOpen(false);
+            },
+          },
+          {
+            id: "admin-surveys",
+            title: "Admin: Survey Repository",
+            description: "Oversee global field surveys, bulk status updates, and deletions",
+            category: "Admin",
+            icon: Layers,
+            onSelect: () => {
+              navigate("/admin/surveys");
+              setIsOpen(false);
+            },
+          },
+          {
+            id: "admin-species",
+            title: "Admin: Species Catalog CRUD",
+            description: "Create, edit, and maintain reference species taxonomy",
+            category: "Admin",
+            icon: TreePine,
+            onSelect: () => {
+              navigate("/admin/species");
+              setIsOpen(false);
+            },
+          },
+          {
+            id: "admin-reports",
+            title: "Admin: Reports & Graphs",
+            description: "Executive telemetry analytics, species composition, and CSV/PDF reports",
+            category: "Admin",
+            icon: BarChart3,
+            shortcut: "G R",
+            onSelect: () => {
+              navigate("/admin/reports");
+              setIsOpen(false);
+            },
+          },
+          {
+            id: "admin-system",
+            title: "Admin: System Health Diagnostics",
+            description: "Database, YOLO model, and cache runtime checks",
+            category: "Admin",
+            icon: Cpu,
+            onSelect: () => {
+              navigate("/admin/system");
+              setIsOpen(false);
+            },
+          },
+        ] as CommandItem[])
+      : []),
+  ], [navigate, isDark, toggleTheme, isAdmin]);
 
   const filteredCommands = useMemo(() => {
     const term = query.toLowerCase().trim();

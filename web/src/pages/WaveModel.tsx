@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import {
   AreaChart,
   Area,
@@ -23,7 +23,8 @@ import {
 } from "lucide-react";
 import { usePredictWaveAttenuation } from "../api/predictions";
 import { useDebounce } from "../hooks/useDebounce";
-import { downloadCSV, downloadJSON } from "../lib/export";
+import { downloadCSV, downloadJSON, downloadPDF, captureChartImage } from "../lib/export";
+import { ExportDropdown } from "../components/common/ExportDropdown";
 import { WaveReport } from "../components/wave/WaveReport";
 import { useTheme } from "../context/ThemeContext";
 
@@ -131,6 +132,9 @@ export function WaveModel() {
   const [bWavePeriod, setBWavePeriod] = useState(4.5);
   const [bMeadowWidth, setBMeadowWidth] = useState(50);
   const [bActivePreset, setBActivePreset] = useState<string | null>("Degraded Meadow");
+
+  const chartContainerRef = useRef<HTMLDivElement>(null);
+  const [isExporting, setIsExporting] = useState(false);
 
   // Debounce slider values (300ms) to prevent flooding API during slider drag
   const debouncedDensity = useDebounce(density, 300);
@@ -265,12 +269,71 @@ export function WaveModel() {
   }, [decayData, decayDataB, isCompareMode]);
 
   const handleExportCSV = () => {
-    const rows = decayData.map((pt) => ({
-      "Distance (m)": pt.distance_m,
-      "Wave Height (m)": Number(pt.wave_height_m.toFixed(3)),
-      "Energy Decay (%)": pt.energy_decay_pct !== undefined ? Number(pt.energy_decay_pct.toFixed(1)) : "",
-    }));
-    downloadCSV(rows, `wave-decay-profile-${meadowWidth}m.csv`);
+    setIsExporting(true);
+    try {
+      const rows = decayData.map((pt) => ({
+        "Distance (m)": pt.distance_m,
+        "Wave Height (m)": Number(pt.wave_height_m.toFixed(3)),
+        "Energy Decay (%)": pt.energy_decay_pct !== undefined ? Number(pt.energy_decay_pct.toFixed(1)) : "",
+      }));
+      downloadCSV(rows, `wave-decay-profile-${meadowWidth}m.csv`);
+    } finally {
+      setTimeout(() => setIsExporting(false), 500);
+    }
+  };
+
+  const handleExportPDF = async () => {
+    setIsExporting(true);
+    try {
+      const charts = [];
+      if (chartContainerRef.current) {
+        const img = await captureChartImage(chartContainerRef.current);
+        charts.push({
+          title: isCompareMode
+            ? "Comparative Wave Height Decay Profile"
+            : "Wave Height Decay Across Meadow Distance",
+          subtitle: `Incident wave progression from offshore (0m) to shoreward boundary (${meadowWidth}m)`,
+          imageData: img,
+          height: 65,
+        });
+      }
+
+      const rows = decayData.map((pt) => ({
+        "Distance (m)": pt.distance_m,
+        "Wave Height (m)": Number(pt.wave_height_m.toFixed(3)),
+        "Energy Decay (%)": pt.energy_decay_pct !== undefined ? `${Number(pt.energy_decay_pct.toFixed(1))}%` : "—",
+      }));
+
+      await downloadPDF({
+        filename: `wave-model-simulation-${activePreset ? activePreset.toLowerCase().replace(/\s+/g, "-") : "custom"}`,
+        title: "Wave Attenuation Simulation Report",
+        subtitle: "Physics-based Mendez & Losada (2004) vegetation wave dissipation numerical model.",
+        meta: {
+          Scenario: activePreset || "Custom Parameters",
+          "Meadow Width": `${meadowWidth} m`,
+          "Water Depth": `${waterDepth} m`,
+          "Shoot Density": `${density} shoots/m²`,
+          "Offshore Wave (H0)": `${waveHeight} m`,
+          "Peak Period (T)": `${wavePeriod} s`,
+        },
+        kpis: [
+          { label: "Energy Attenuation", value: `-${energyDamping.toFixed(1)}%`, change: "Kinetic energy absorbed" },
+          { label: "Height Reduction", value: `-${heightReduction.toFixed(1)}%`, change: `From ${waveHeight.toFixed(2)}m` },
+          { label: "Inshore Wave (Ht)", value: `${inshoreHeight.toFixed(2)} m`, change: `At ${meadowWidth}m boundary` },
+        ],
+        charts,
+        tables: [
+          {
+            title: "Cross-Shore Wave Decay Profile Data Points",
+            rows,
+          },
+        ],
+      });
+    } catch (err) {
+      console.error("Failed to generate wave model PDF:", err);
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   const handleExportJSON = () => {
@@ -305,7 +368,7 @@ export function WaveModel() {
             <span>Hydrodynamic Damping Simulator</span>
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-            Wave Attenuation & Coastal Energy Impact
+            Wave Attenuation &amp; Coastal Energy Impact
           </h1>
           <p className="text-sm text-slate-500 mt-0.5">
             Physics-based Mendez &amp; Losada (2004) vegetation wave dissipation engine.
@@ -333,14 +396,13 @@ export function WaveModel() {
             <Printer className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
             <span>Print Report</span>
           </button>
-          <button
-            onClick={handleExportCSV}
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-medium text-xs transition-colors shadow-2xs cursor-pointer"
-            title="Export wave decay curve as CSV"
-          >
-            <Download className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
-            <span>CSV</span>
-          </button>
+          <ExportDropdown
+            onExportCSV={handleExportCSV}
+            onExportPDF={handleExportPDF}
+            isExporting={isExporting}
+            label="Export"
+            size="sm"
+          />
           <button
             onClick={handleExportJSON}
             className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-medium text-xs transition-colors shadow-2xs cursor-pointer"
@@ -851,7 +913,7 @@ export function WaveModel() {
               </div>
             </div>
 
-            <div className="h-64 w-full pt-2">
+            <div ref={chartContainerRef} className="h-64 w-full pt-2">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={combinedDecayData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <defs>

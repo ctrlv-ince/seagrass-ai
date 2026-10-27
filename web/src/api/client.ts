@@ -2,6 +2,7 @@
  * Axios HTTP client configured for the Seagrass API.
  */
 import axios from "axios";
+import { supabase, isSupabaseConfigured } from "../lib/supabase";
 
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:8000/api/v1",
@@ -11,9 +12,33 @@ const apiClient = axios.create({
   timeout: 30_000,
 });
 
-// Request interceptor — add auth token when available
-apiClient.interceptors.request.use((config) => {
-  // TODO: Add auth token from auth store
+// Request interceptor — attach Supabase session token or demo token
+apiClient.interceptors.request.use(async (config) => {
+  try {
+    if (isSupabaseConfigured) {
+      const { data } = await supabase.auth.getSession();
+      const token = data?.session?.access_token;
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    } else {
+      // In demo mode, supply demo token
+      const stored = localStorage.getItem("seagrass_demo_user");
+      let token = "demo-admin";
+      if (stored) {
+        try {
+          const user = JSON.parse(stored);
+          const role = user?.user_metadata?.role || "admin";
+          token = `demo-${user.id || "admin"}-${role}`;
+        } catch {
+          token = "demo-admin";
+        }
+      }
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+  } catch (err) {
+    console.warn("Failed to set auth header on API request:", err);
+  }
   return config;
 });
 
@@ -21,7 +46,6 @@ apiClient.interceptors.request.use((config) => {
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    // TODO: Handle 401 (redirect to login), 5xx (toast notification)
     return Promise.reject(error);
   }
 );

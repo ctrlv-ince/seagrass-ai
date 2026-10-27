@@ -2,15 +2,20 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import type { User, Session } from "@supabase/supabase-js";
 import { supabase, isSupabaseConfigured } from "../lib/supabase";
 
+export type UserRole = "admin" | "user";
+
 interface AuthContextType {
   user: User | null;
   session: Session | null;
+  role: UserRole;
+  isAdmin: boolean;
   loading: boolean;
   isConfigured: boolean;
   signInWithEmail: (email: string, password: string) => Promise<{ error: Error | null }>;
   signUpWithEmail: (email: string, password: string, fullName: string) => Promise<{ error: Error | null }>;
   signInWithGoogle: () => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
+  setDemoRole: (newRole: UserRole) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -23,6 +28,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Derive role: binary admin vs user
+  const role: UserRole = user?.user_metadata?.role === "admin" ? "admin" : "user";
+  const isAdmin = role === "admin";
+
   useEffect(() => {
     if (!isSupabaseConfigured) {
       // Check for local demo user
@@ -30,10 +39,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (stored) {
         try {
           const parsed = JSON.parse(stored);
+          const rawRole = parsed.user_metadata?.role;
+          const normalizedRole: UserRole = rawRole === "admin" ? "admin" : "user";
+          parsed.user_metadata = { ...(parsed.user_metadata || {}), role: normalizedRole };
           setUser(parsed);
         } catch {
           localStorage.removeItem(DEMO_USER_KEY);
         }
+      } else {
+        // Auto-seed a default demo admin so the user can immediately test all features
+        const defaultAdmin = {
+          id: "demo-admin-01",
+          email: "admin@seagrass.demo",
+          user_metadata: { full_name: "Admin Demo User", role: "admin" },
+          app_metadata: {},
+          aud: "authenticated",
+          created_at: new Date().toISOString(),
+        } as unknown as User;
+        setUser(defaultAdmin);
+        localStorage.setItem(DEMO_USER_KEY, JSON.stringify(defaultAdmin));
       }
       setLoading(false);
       return;
@@ -57,13 +81,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
+  const setDemoRole = (newRole: UserRole) => {
+    if (user) {
+      const updatedUser = {
+        ...user,
+        user_metadata: {
+          ...user.user_metadata,
+          role: newRole,
+        },
+      } as User;
+      setUser(updatedUser);
+      if (!isSupabaseConfigured) {
+        localStorage.setItem(DEMO_USER_KEY, JSON.stringify(updatedUser));
+      }
+    }
+  };
+
   const signInWithEmail = async (email: string, password: string) => {
     if (!isSupabaseConfigured) {
       // Demo authentication simulation
       const mockUser = {
         id: "demo-" + Date.now(),
         email,
-        user_metadata: { full_name: email.split("@")[0] },
+        user_metadata: { full_name: email.split("@")[0], role: "admin" },
         app_metadata: {},
         aud: "authenticated",
         created_at: new Date().toISOString(),
@@ -86,7 +126,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const mockUser = {
         id: "demo-" + Date.now(),
         email,
-        user_metadata: { full_name: fullName },
+        user_metadata: { full_name: fullName, role: "user" },
         app_metadata: {},
         aud: "authenticated",
         created_at: new Date().toISOString(),
@@ -102,6 +142,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       options: {
         data: {
           full_name: fullName,
+          role: "user",
         },
       },
     });
@@ -113,7 +154,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const mockUser = {
         id: "demo-google-" + Date.now(),
         email: "demo.marine.scientist@ocean.org",
-        user_metadata: { full_name: "Dr. Maya Lin (Demo)" },
+        user_metadata: { full_name: "Dr. Maya Lin (Demo)", role: "admin" },
         app_metadata: {},
         aud: "authenticated",
         created_at: new Date().toISOString(),
@@ -149,12 +190,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       value={{
         user,
         session,
+        role,
+        isAdmin,
         loading,
         isConfigured: isSupabaseConfigured,
         signInWithEmail,
         signUpWithEmail,
         signInWithGoogle,
         signOut,
+        setDemoRole,
       }}
     >
       {children}

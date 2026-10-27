@@ -5,11 +5,11 @@ import {
   Waves,
   Info,
   ExternalLink,
-  Download,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useDebounce } from "../hooks/useDebounce";
-import { downloadCSV } from "../lib/export";
+import { downloadCSV, downloadPDF } from "../lib/export";
+import { ExportDropdown } from "../components/common/ExportDropdown";
 
 interface SpeciesData {
   scientificName: string;
@@ -122,6 +122,7 @@ const SPECIES_CATALOG: SpeciesData[] = [
 export function Species() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedTier, setSelectedTier] = useState<string>("all");
+  const [isExporting, setIsExporting] = useState(false);
 
   const debouncedSearch = useDebounce(searchTerm, 200);
 
@@ -139,20 +140,64 @@ export function Species() {
   }, [debouncedSearch, selectedTier]);
 
   const handleExportCSV = () => {
-    const rows = filteredSpecies.map((s) => ({
-      "Scientific Name": s.scientificName,
-      "Common Name": s.commonName,
-      "Family": s.family,
-      "Blade Length Range": s.bladeLengthRange,
-      "Blade Width Range": s.bladeWidthRange,
-      "Shoot Density Range": s.shootDensityRange,
-      "Habitat Depth": s.habitatDepth,
-      "Drag Coefficient (Cd)": s.dragCoefficient,
-      "Wave Damping Tier": s.waveDampingTier,
-      "Key Features": s.keyFeatures.join("; "),
-      "Description": s.description,
-    }));
-    downloadCSV(rows, "seagrass-species-catalog.csv");
+    setIsExporting(true);
+    try {
+      const rows = filteredSpecies.map((s) => ({
+        "Scientific Name": s.scientificName,
+        "Common Name": s.commonName,
+        "Family": s.family,
+        "Blade Length Range": s.bladeLengthRange,
+        "Blade Width Range": s.bladeWidthRange,
+        "Shoot Density Range": s.shootDensityRange,
+        "Habitat Depth": s.habitatDepth,
+        "Drag Coefficient (Cd)": s.dragCoefficient,
+        "Wave Damping Tier": s.waveDampingTier,
+        "Key Features": s.keyFeatures.join("; "),
+        "Description": s.description,
+      }));
+      downloadCSV(rows, "seagrass-species-catalog.csv");
+    } finally {
+      setTimeout(() => setIsExporting(false), 500);
+    }
+  };
+
+  const handleExportPDF = async () => {
+    setIsExporting(true);
+    try {
+      const rows = filteredSpecies.map((s) => ({
+        "Scientific Name": s.scientificName,
+        "Common Name": s.commonName,
+        "Family": s.family,
+        "Blade Dimensions": `${s.bladeLengthRange} × ${s.bladeWidthRange}`,
+        "Shoot Density": s.shootDensityRange,
+        "Habitat Depth": s.habitatDepth,
+        "Drag (Cd)": String(s.dragCoefficient),
+        "Wave Damping": s.waveDampingTier,
+      }));
+
+      await downloadPDF({
+        filename: "seagrass-species-catalog",
+        title: "Seagrass Species Reference Guide",
+        subtitle:
+          "Field taxonomy, blade canopy morphology, and bulk hydrodynamic drag coefficients.",
+        orientation: "landscape",
+        meta: {
+          "Damping Filter": selectedTier === "all" ? "All Tiers" : selectedTier,
+          "Search Query": debouncedSearch || "None",
+          "Taxa In Catalog": `${filteredSpecies.length} of ${SPECIES_CATALOG.length}`,
+        },
+        tables: [
+          {
+            title: "Southeast Asian Seagrass Botanical & Hydrodynamic Reference Matrix",
+            rows,
+          },
+        ],
+      });
+    } catch (err) {
+      console.error("Failed to generate species PDF:", err);
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   return (
@@ -173,14 +218,13 @@ export function Species() {
         </div>
 
         <div className="flex items-center gap-2">
-          <button
-            onClick={handleExportCSV}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl border border-slate-200/90 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-medium text-sm transition-colors shadow-2xs cursor-pointer"
-            title="Export filtered catalog to CSV"
-          >
-            <Download className="w-4 h-4 text-slate-500 dark:text-slate-400" />
-            <span>Export CSV</span>
-          </button>
+          <ExportDropdown
+            onExportCSV={handleExportCSV}
+            onExportPDF={handleExportPDF}
+            isExporting={isExporting}
+            label="Export"
+            size="md"
+          />
           <Link
             to="/detection"
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-semibold text-sm transition-colors shadow-xs"

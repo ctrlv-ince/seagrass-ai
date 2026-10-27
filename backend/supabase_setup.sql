@@ -114,3 +114,73 @@ ON CONFLICT (id) DO NOTHING;
 CREATE POLICY "Public Read Access"
 ON storage.objects FOR SELECT
 USING (bucket_id = 'seagrass-images');
+
+-- 9. Create User Profiles Table (synced from Supabase Auth)
+CREATE TABLE IF NOT EXISTS user_profiles (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    auth_user_id UUID UNIQUE NOT NULL,
+    email VARCHAR(320) NOT NULL,
+    full_name VARCHAR(255),
+    role VARCHAR(20) DEFAULT 'user' CHECK (role IN ('admin', 'user')),
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMPTZ DEFAULT now(),
+    updated_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_user_profiles_auth_user ON user_profiles(auth_user_id);
+CREATE INDEX IF NOT EXISTS idx_user_profiles_email ON user_profiles(email);
+CREATE INDEX IF NOT EXISTS idx_user_profiles_role ON user_profiles(role);
+CREATE INDEX IF NOT EXISTS idx_user_profiles_created_at ON user_profiles(created_at DESC);
+
+-- Automatic sync trigger: Copies newly registered Supabase auth users into user_profiles
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER AS $$
+BEGIN
+    INSERT INTO public.user_profiles (auth_user_id, email, full_name, role, is_active)
+    VALUES (
+        NEW.id,
+        NEW.email,
+        COALESCE(
+            NEW.raw_user_meta_data->>'full_name',
+            NEW.raw_user_meta_data->>'name',
+            split_part(NEW.email, '@', 1)
+        ),
+        COALESCE(NEW.raw_user_meta_data->>'role', 'user'),
+        true
+    )
+    ON CONFLICT (auth_user_id) DO UPDATE
+    SET email = EXCLUDED.email,
+        full_name = COALESCE(EXCLUDED.full_name, public.user_profiles.full_name),
+        updated_at = now();
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
+    AFTER INSERT ON auth.users
+    FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
+-- 10. Seed Demo Administrator
+-- Fixed mock UID used for offline testing and demo sandboxes
+INSERT INTO public.user_profiles (
+    id,
+    auth_user_id,
+    email,
+    full_name,
+    role,
+    is_active
+)
+VALUES (
+    '00000000-0000-0000-0000-000000000001',
+    '00000000-0000-0000-0000-000000000001',
+    'admin@seagrass.demo',
+    'Demo Administrator',
+    'admin',
+    true
+)
+ON CONFLICT (auth_user_id) DO UPDATE
+SET role = 'admin',
+    is_active = true,
+    updated_at = now();
+

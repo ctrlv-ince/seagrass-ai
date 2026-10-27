@@ -28,6 +28,10 @@ class Settings(BaseSettings):
         default="",
         description="Supabase service-role key for server-side access",
     )
+    supabase_jwt_secret: str = Field(
+        default="",
+        description="Supabase JWT secret for verifying auth tokens",
+    )
 
     # ── Object Storage (S3-compatible) ─────────────────────────
     s3_endpoint_url: str = Field(default="")
